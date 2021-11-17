@@ -1,9 +1,10 @@
 const User = require('../db_models/user');
+const bcrypt = require('bcryptjs');
 
 exports.postSignUp = (req, res, next) =>{
-    const email = req.body.email;
-    const password = req.body.password;
-    const repeatPassword = req.body.confirmPassword;
+    const email = 'test@test.com'
+    const password = 'Masterdamus12';
+    const repeatPassword = 'Masterdamus12';
     if(password !== repeatPassword){
         return res.send({
             success: false,
@@ -11,17 +12,33 @@ exports.postSignUp = (req, res, next) =>{
             error: 'Password and repeat password did not match'
         })
     }
+   
     User.findOne({email: email})
     .then(userDoc =>{
         if(userDoc){
-           return res.redirect('/signup')
+            console.log('user exists')
+            return console.log(userDoc)
         }
-        const user = new User({email: email, password: password});
-        return user.save();
+        
+        return bcrypt.hash(password, 12)
     })
-    .then(done=>{req.redirect('/login')})
-    .catch(error=>{
+    .then(hashedPassword =>{{
+        const user = new User({
+            email: email,
+            password: hashedPassword,
+            roles: ['USER'],
+            contributions: [],
+            questions: []
 
+        });
+        
+        return user.save();
+    }})
+    .then(res=>{
+        console.log('user saved')
+    })
+    .catch(error=>{
+        console.log('error creating user')
     })
 }
 

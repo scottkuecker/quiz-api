@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/milancakic89/quiz#readme",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "connect-mongodb-session": "^3.1.1",
     "express": "^4.17.1",
     "express-session": "^1.17.2",
