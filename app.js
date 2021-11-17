@@ -9,7 +9,6 @@ const questionRoutes = require('./routes/questions-routes');
 const authRoutes = require('./routes/auth-routes');
 
 const server = express();
-
 const store = new MongoDBStore({
     uri: environment.mongoUrl,
     collection: 'sessions'

@@ -3,8 +3,21 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const questionSchema = new Schema({
-    title: { type: String, required: true },
-    price:{ type: Number, required: true }
+    question: { type: String, required: true },
+    correct_letter: { type: String, required: true},
+    correct_text: { type: String, required: true },
+    answered_correctly: { type: Number, required: true, default: 0 },
+    posted_by: { type: String, required: true, default: 'ADMIN' },
+    answered_wrong: { type: Number, required: true, default: 0  },
+    question_picked: { type: Number, required: true, default: 0  },
+    question_status: { type: String, required: true, default: "PENDING" },
+    answers: [
+        { 
+            letter: { type: String, required: true }, 
+            text: { type: String, required: true }
+        }
+    ],
+    question_difficulty: { type: Number, required: false, default: 1 },
 });
 
 

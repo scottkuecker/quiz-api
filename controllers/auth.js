@@ -16,15 +16,10 @@ exports.postSignUp = (req, res, next) =>{
         if(userDoc){
            return res.redirect('/signup')
         }
-        const user = new User({
-            email: email,
-            password: password
-        });
+        const user = new User({email: email, password: password});
         return user.save();
     })
-    .then(done=>{
-        req.redirect('/login')
-    })
+    .then(done=>{req.redirect('/login')})
     .catch(error=>{
 
     })
