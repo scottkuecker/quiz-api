@@ -2,7 +2,6 @@ const jwt = require('jsonwebtoken');
 const environment = require('../environment');
 
 exports.authMidleware = (req, res,next) =>{
-    console.log('middleware')
     const authHeader = req.get('Authorization')
     if(authHeader){
         const token = req.get('Authorization').split(' ')[1];
@@ -11,20 +10,24 @@ exports.authMidleware = (req, res,next) =>{
             decodedToken = jwt.verify(token, environment.signingSecret)
         }
         catch (e) {
-            err.statusCode = 500;
-            throw err;
+            res.json({
+                sucess: false,
+                error: 'Authorization failed or missing tokken'
+            })
         }
         if (!decodedToken) {
-            const error = new Error('Not authenticated.')
-            error.statusCode = 401;
-            throw error;
+            res.json({
+                sucess: false,
+                error: 'Authorization failed'
+            })
         }
         req.user = decodedToken.user;
         next();
     }else{
-        const error = new Error('No token provided.')
-        error.statusCode = 401;
-        throw error;
+        res.json({
+            sucess: false,
+            error: 'User not logged in'
+        })
     }
    
 }
