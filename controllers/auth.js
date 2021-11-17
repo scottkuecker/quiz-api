@@ -1,39 +1,37 @@
 const User = require('../db_models/user');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const environment = require('../environment');
 
 exports.postSignUp = (req, res, next) =>{
-    const email = 'test@test.com'
-    const password = 'Masterdamus12';
-    const repeatPassword = 'Masterdamus12';
+    const email = req.body.email;
+    const password = req.body.password;
+    const repeatPassword = req.body.repeatPassword;
     if(password !== repeatPassword){
-        return res.send({
-            success: false,
-            data: null,
-            error: 'Password and repeat password did not match'
-        })
+        return res.redirect('/login');
     }
    
     User.findOne({email: email})
     .then(userDoc =>{
         if(userDoc){
             console.log('user exists')
-            return console.log(userDoc)
+            return res.redirect('/login');
         }
-        
         return bcrypt.hash(password, 12)
-    })
-    .then(hashedPassword =>{{
-        const user = new User({
-            email: email,
-            password: hashedPassword,
-            roles: ['USER'],
-            contributions: [],
-            questions: []
+                     .then(hashedPassword => {
+                        {
+                            const user = new User({
+                                email: email,
+                                password: hashedPassword,
+                                roles: ['USER'],
+                                contributions: [],
+                                questions: []
 
-        });
-        
-        return user.save();
-    }})
+                            });
+                            return user.save();
+                        }
+        })
+    })
     .then(res=>{
         console.log('user saved')
     })
@@ -43,9 +41,29 @@ exports.postSignUp = (req, res, next) =>{
 }
 
 exports.postLogin = (req, res, next) => {
-        // req.session.isLogged = true;
-    // req.session.save();
-    // res.send({
-    //     success: true
-    // })
+    const email = req.body.email;
+    const password = req.body.password;
+    let user = null;
+    User.findOne({ email: email })
+        .then(userDoc => {
+            if (!userDoc) {
+                return res.redirect('/login');
+            }
+            bcrypt.compare(password, user.password).then(doMatch =>{
+                if(doMatch){
+                    const token = jwt.sign({
+                        success: true,
+                        user: userDoc,
+                        error: []
+                    }, environment.signingSecret,{expiresIn: '3h'})
+                    return res.status(200).json({
+                        user: userDoc,
+                        token: token
+                    })
+                }
+            }).catch(error=>console.log('password not match')) 
+        })
+        .catch(error=>{
+            console.log('error in postLogin')
+        })
 }
