@@ -5,7 +5,7 @@ const router = require('express').Router();
 
 
 
-router.get('/question', authMiddleware.authMidleware, questions.getQuestion);
+router.get('/question', questions.getQuestion);
 
 
 

@@ -4,8 +4,8 @@ const router = require('express').Router();
 
 
 
-router.post('/signup', auth.postSignUp);
-router.get('/login', auth.postSignUp);
+router.get('/signup', auth.signUp);
+router.get('/login', auth.login);
 
 
 

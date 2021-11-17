@@ -1,8 +1,16 @@
 const Question = require('../db_models/question');
 
-exports.getQuestion = (req, res, next) => {
-    Question.findOne()
-    .then(res =>{
-        console.log(res)
+exports.getQuestion = async (req, res, next) => {
+    const question = await Question.findOne()
+    if(question){
+        return res.json({
+            question: question
+        })
+    }
+    return res.json({
+        question: []
     })
+
+ 
+
 }

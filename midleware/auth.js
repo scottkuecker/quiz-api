@@ -22,7 +22,7 @@ exports.authMidleware = (req, res,next) =>{
         req.user = decodedToken.user;
         next();
     }else{
-        const error = new Error('Not token provided.')
+        const error = new Error('No token provided.')
         error.statusCode = 401;
         throw error;
     }

@@ -3,67 +3,60 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const environment = require('../environment');
 
-exports.postSignUp = (req, res, next) =>{
-    const email = req.body.email;
-    const password = req.body.password;
-    const repeatPassword = req.body.repeatPassword;
+exports.signUp = async (req, res, next) =>{
+    const email = 'test2@test.com';
+    const password = 'Testerdamus12';
+    const repeatPassword = 'Testerdamus12';
     if(password !== repeatPassword){
         return res.redirect('/login');
     }
-   
-    User.findOne({email: email})
-    .then(userDoc =>{
-        if(userDoc){
-            console.log('user exists')
+    const user = await User.findOne({email: email});
+    if(user){
             return res.redirect('/login');
-        }
-        return bcrypt.hash(password, 12)
-                     .then(hashedPassword => {
-                        {
-                            const user = new User({
-                                email: email,
-                                password: hashedPassword,
-                                roles: ['USER'],
-                                contributions: [],
-                                questions: []
+    }
+    let hashedPassword = await bcrypt.hash(password, 12);
+    if(hashedPassword){
+        const user = new User({
+            email: email,
+            password: hashedPassword,
+            roles: ['USER'],
+            contributions: [],
+            questions: []
 
-                            });
-                            return user.save();
-                        }
-        })
-    })
-    .then(res=>{
-        console.log('user saved')
-    })
-    .catch(error=>{
-        console.log('error creating user')
-    })
+        });
+        return user.save();
+    }
 }
 
-exports.postLogin = (req, res, next) => {
-    const email = req.body.email;
-    const password = req.body.password;
-    let user = null;
-    User.findOne({ email: email })
-        .then(userDoc => {
-            if (!userDoc) {
-                return res.redirect('/login');
-            }
-            bcrypt.compare(password, user.password).then(doMatch =>{
-                if(doMatch){
-                    const token = jwt.sign({
-                        success: true,
-                        user: userDoc,
-                        error: []
-                    }, environment.signingSecret,{expiresIn: '3h'})
-                    return res.status(200).json({
-                        user: userDoc,
-                        token: token
-                    })
-                }
-            }).catch(error=>console.log('password not match')) 
-        })
-        .catch(error=>{
-            console.log('error in postLogin')
-        })
+exports.login = async (req, res, next) => {
+    // const email = req.body.email;
+    // const password = req.body.password;
+    const email = 'test2@test.com';
+    const password = 'Testerdamus12';
+    const userDoc = await User.findOne({ email: email });
+    if (!userDoc){
+        throw new Error('User does not exist')
+    }
+    else{
+        const doMatch = await bcrypt.compare(password, userDoc.password);
+        if (doMatch) {
+            const token = jwt.sign({ user: userDoc }, environment.signingSecret, { expiresIn: '3h' })
+            return res.status(200).json({
+                user: {
+                    email: userDoc.email,
+                    name: userDoc.name,
+                    title: userDoc.title,
+                    score: userDoc.score,
+                    lives: userDoc.lives,
+                    roles: userDoc.roles,
+                    contributions: userDoc.contributions,
+                    avatar_url: userDoc.avatar_url,
+                    questions: userDoc.questions
+                },
+                token: token
+            })
+        } else {
+            throw new Error('Password did not match')
+        }
+    } 
 }
