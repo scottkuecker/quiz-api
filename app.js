@@ -4,6 +4,9 @@ const mongoose = require('mongoose');
 const environment = require('./environment');
 const session = require('express-session');
 const MongoDBStore= require('connect-mongodb-session')(session);
+const cors = require('cors');
+
+
 
 const questionRoutes = require('./routes/questions-routes');
 const authRoutes = require('./routes/auth-routes');
@@ -25,6 +28,7 @@ server.use(session({
     saveUninitialized: false,
     store: store
 }))
+server.use(cors({ origin: 'http://localhost:4201' }));
 server.use(questionRoutes);
 server.use(authRoutes);
 
