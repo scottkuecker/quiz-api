@@ -14,7 +14,7 @@ const userSchema = new Schema({
     increase_lives_at: {type: Number, required: false, default: null},
     reset_lives_at: { type: Number, required: false, default: null },
     contributions: [{type: String, required: true}],
-    avatar_url: {type: String, required: false},
+    avatar_url: { type: String, required: false, default: 'https://cdnjs.cloudflare.com/ajax/libs/admin-lte/2.4.0/img/avatar.png'},
     questions: []
 });
 

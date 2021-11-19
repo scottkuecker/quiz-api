@@ -1,16 +1,16 @@
 const Question = require('../db_models/question');
+const Users = require('../db_models/user');
 const messages = require('../messages');
 
 exports.getQuestion = async (req, res, next) => {
     const id = req.user._id || null;
-    console.log(id)
     if(!id){
         return res.json({
             sucess: false,
             message: messages.get_question_missing_id
         })
     }
-    const questions = await Question.find({ question_status: 'PUBLISHED'});
+    const questions = await Question.find({ status: 'NA CEKANJU'});
     const questionsByOthers = [];
     questions.forEach(q =>{
         if(q._id.toString() !== id){
@@ -19,16 +19,21 @@ exports.getQuestion = async (req, res, next) => {
     });
     let random = Math.floor(Math.random() * questionsByOthers.length);
     if (questionsByOthers && questionsByOthers.length){
+        let picked = questionsByOthers[random];
+        let timesPicked = picked.question_picked + 1;
+        await Question.findByIdAndUpdate({ _id: picked._id.toString() }, { question_picked: timesPicked})
         return res.json({
             success: true,
             data: questionsByOthers[random],
             message: ''
         })
+    }else{
+        return res.json({
+            success: false,
+            message: messages.empty_questions_list
+        })
     }
-    return res.json({
-        success: false,
-        message: messages.empty_questions_list
-    })
+
 }
 
 exports.getAllQuestions = async (req, res, next) => {
@@ -50,7 +55,6 @@ exports.getAllQuestions = async (req, res, next) => {
     const questionsByOthers = [];
 
     questions.forEach(q => {
-        console.log(id, q._id.toString())
         if(!root){
             if (q.posted_by === id) {
                 questionsByOthers.push(q);
@@ -77,7 +81,6 @@ exports.addQuestion = async (req, res, next) =>{
     const questionText = req.body.question || 'Some question?';
     const correct_letter = req.body.correct_letter || 'B';
     const correctText = req.body.correct_text || 'Some correct answer';
-    console.log(req.body)
     const allAnswers = req.body.answers || 
     [
         { letter: 'A', text: 'Some wrong text'},
@@ -138,4 +141,53 @@ exports.deleteQuestion = async (req, res, next) =>{
         message: messages.empty_questions_list
     })
     
+}
+
+exports.checkQuestion = async (req, res, next) =>{
+    const userId = req.user._id;
+    const correct = req.body.correct;
+    const questionID = req.body.questionId;
+    Question.findById(questionID).then(question =>{
+        if (question){
+            if(correct){
+                question.answered_correctly++;
+            }else{
+                question.answered_wrong++;
+            }
+            return question.save();
+        }
+    })
+    .then(saved =>{
+        return res.send({
+            success: true,
+            message: correct ? 'Correct' : 'Wrong',
+            correct: correct,
+        })
+    })
+}
+
+exports.quizResults = async (req, res, next) =>{
+
+}
+
+exports.reduceLives = async (req, res, next) => {
+    const id = req.user._id;
+    let lives = 0;
+    Users.findById(id).then(user =>{
+        if(user){
+            if(user.lives > 0){
+                user.lives--;
+                lives = user.lives;
+                return user.save()
+            }
+            return user.save();
+        }
+    })
+    .then(saved =>{
+        return res.send({
+            success: true,
+            message: 'Number of attempts',
+            lives: lives
+        })
+    })
 }
