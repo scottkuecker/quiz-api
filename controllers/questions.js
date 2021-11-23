@@ -10,7 +10,7 @@ exports.getQuestion = async (req, res, next) => {
             message: messages.get_question_missing_id
         })
     }
-    const questions = await Question.find({ status: 'NA CEKANJU'});
+    const questions = await Question.find({ status: 'ODOBRENO'});
     const questionsByOthers = [];
     questions.forEach(q =>{
         if(q._id.toString() !== id){
@@ -36,9 +36,52 @@ exports.getQuestion = async (req, res, next) => {
 
 }
 
+exports.publishQuestion = async(req, res, next) => {
+    const id = req.body.id;
+    const root = req.user.roles.some(role => role === 'ADMIN')
+    const result = await Question.findByIdAndUpdate(id, {status: 'ODOBRENO'});
+    if(result){
+        return res.send({
+            success: true
+        })
+    }
+    return res.send({
+        success: false
+    })
+}
+
+exports.unpublishQuestion = async (req, res, next) => {
+    const id = req.body.id;
+    const root = req.user.roles.some(role => role === 'ADMIN')
+    const result = await Question.findByIdAndUpdate(id, {status: 'NA CEKANJU'});
+    if(result){
+        return res.send({
+            success: true
+        })
+    }
+    return res.send({
+        success: false
+    })
+}
+
+exports.updateQuestionText = async (req, res, next) =>{
+    const id = req.body.id;
+    const text = req.body.text;
+    const root = req.user.roles.some(role => role === 'ADMIN')
+    const result = await Question.findByIdAndUpdate(id, {question: text, status: 'NA CEKANJU'});
+    if(result){
+        return res.send({
+            success: true
+        })
+    }
+    return res.send({
+        success: false
+    })  
+}
+
 exports.getAllQuestions = async (req, res, next) => {
     if(!req.user){
-        res.send({
+        return res.send({
             success: false,
             message: 'Something went wrong. Please login again.'
         })

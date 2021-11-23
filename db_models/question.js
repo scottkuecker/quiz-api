@@ -10,7 +10,7 @@ const questionSchema = new Schema({
     posted_by: { type: String, required: true, default: 'ADMIN' },
     answered_wrong: { type: Number, required: true, default: 0  },
     question_picked: { type: Number, required: true, default: 0  },
-    status: { type: String, required: true, default: "NA CEKANJU" },
+    status: { type: String, required: true, default: "ODOBRENO" },
     answers: [
         { 
             letter: { type: String, required: true }, 

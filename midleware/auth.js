@@ -10,13 +10,13 @@ exports.authMidleware = (req, res,next) =>{
             decodedToken = jwt.verify(token, environment.signingSecret)
         }
         catch (e) {
-            res.json({
+            return res.json({
                 sucess: false,
                 error: 'Authorization failed or missing tokken'
             })
         }
         if (!decodedToken) {
-            res.json({
+            return res.json({
                 sucess: false,
                 error: 'Authorization failed'
             })
@@ -24,7 +24,7 @@ exports.authMidleware = (req, res,next) =>{
         req.user = decodedToken.user;
         next();
     }else{
-        res.json({
+       return res.json({
             sucess: false,
             error: 'User not logged in'
         })

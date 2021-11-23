@@ -44,6 +44,7 @@ exports.signUp = async (req, res, next) =>{
 exports.login = async (req, res, next) => {
     const email = req.body.email;
     const password = req.body.password;
+    console.log(email, password)
     const userDoc = await User.findOne({ email: email });
     if (!userDoc){
         return res.json({
