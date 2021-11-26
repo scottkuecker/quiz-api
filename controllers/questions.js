@@ -18,6 +18,8 @@ exports.getQuestion = async (req, res, next) => {
         }
     });
     let random = Math.floor(Math.random() * questionsByOthers.length);
+    console.log('questions length: ' + questionsByOthers.length)
+    console.log('selected: ' + random)
     if (questionsByOthers && questionsByOthers.length){
         let picked = questionsByOthers[random];
         let timesPicked = picked.question_picked + 1;
@@ -97,7 +99,7 @@ exports.getAllQuestions = async (req, res, next) => {
     const questions = await Question.find();
     const questionsByOthers = [];
 
-    questions.forEach(q => {
+    questions.forEach( async (q, index) => {
         if(!root){
             if (q.posted_by === id) {
                 questionsByOthers.push(q);
