@@ -124,7 +124,9 @@ exports.addQuestion = async (req, res, next) =>{
     const questionText = req.body.question || 'Some question?';
     const correct_letter = req.body.correct_letter || 'B';
     const correctText = req.body.correct_text || 'Some correct answer';
+    const category = req.body.category;
     const allAnswers = req.body.answers || 
+   
     [
         { letter: 'A', text: 'Some wrong text'},
         { letter: 'B', text: 'Some correct answer' },
@@ -139,10 +141,20 @@ exports.addQuestion = async (req, res, next) =>{
         correct_letter: correct_letter,
         correct_text: correctText,
         posted_by: req.user._id.toString(),
+        category: category,
         answers: allAnswers
     });
 
     question.save();
+    const userDoc = await Users.findById(req.user._id.toString());
+    if(userDoc){
+        const userCat = userDoc.categories.some(cat => cat.category === category);
+        if(!userCat){
+            userDoc.category.push({category: category, questions_added: 1})
+        }else{
+            userDoc.category[`${category}`].questions_added += 1; 
+        }
+    }
     res.send({
         success: true,
         message: 'Question added'

@@ -10,6 +10,10 @@ const userSchema = new Schema({
     score: { type: Number, required: true, default: 0 },
     lives: { type: Number, required: true, default: 3 },
     roles: [{type: String,required: true, default: 'USER'}],
+    categories: [{
+        category: {type: String, required: true}, 
+        questions_added: {type: Number, required: true}
+    }],
     reset_password_token: {type: String, required: false, default: null},
     increase_lives_at: {type: Number, required: false, default: null},
     reset_lives_at: { type: Number, required: false, default: null },
