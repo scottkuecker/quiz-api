@@ -11,6 +11,7 @@ const cors = require('cors');
 const questionRoutes = require('./routes/questions-routes');
 const authRoutes = require('./routes/auth-routes');
 const userRoutes = require('./routes/user-routes');
+const achievementRoutes = require('./routes/achievement-routes');
 
 const server = express();
 const store = new MongoDBStore({
@@ -33,6 +34,7 @@ server.use(cors({ origin: ['http://localhost:4201', 'http://localhost:4200'] }))
 server.use(questionRoutes);
 server.use(authRoutes);
 server.use(userRoutes);
+server.use(achievementRoutes);
 
 server.use('', (req,res, next)=>{
         res.send({
