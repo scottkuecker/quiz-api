@@ -8,7 +8,7 @@ const questionSchema = new Schema({
     correct_text: { type: String, required: true },
     answered_correctly: { type: Number, required: true, default: 0 },
     posted_by: { type: String, required: true, default: 'ADMIN' },
-    category: [{ category: String, questions_added: Number }],
+    category: String,
     answered_wrong: { type: Number, required: true, default: 0  },
     question_picked: { type: Number, required: true, default: 0  },
     status: { type: String, required: true, default: "ODOBRENO" },

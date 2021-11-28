@@ -2,6 +2,7 @@ const Question = require('../db_models/question');
 const Users = require('../db_models/user');
 const messages = require('../messages');
 
+
 exports.getQuestion = async (req, res, next) => {
     const id = req.user._id || null;
     if(!id){
@@ -18,8 +19,6 @@ exports.getQuestion = async (req, res, next) => {
         }
     });
     let random = Math.floor(Math.random() * questionsByOthers.length);
-    console.log('questions length: ' + questionsByOthers.length)
-    console.log('selected: ' + random)
     if (questionsByOthers && questionsByOthers.length){
         let picked = questionsByOthers[random];
         let timesPicked = picked.question_picked + 1;
@@ -69,7 +68,6 @@ exports.unpublishQuestion = async (req, res, next) => {
 exports.updateQuestionText = async (req, res, next) =>{
     const id = req.body.id;
     const text = req.body.text;
-    const root = req.user.roles.some(role => role === 'ADMIN')
     const result = await Question.findByIdAndUpdate(id, {question: text, status: 'NA CEKANJU'});
     if(result){
         return res.send({
@@ -100,7 +98,7 @@ exports.getAllQuestions = async (req, res, next) => {
     const questionsByOthers = [];
 
     questions.forEach( async (q, index) => {
-        if(!root){
+        if(root){
             if (q.posted_by === id) {
                 questionsByOthers.push(q);
             }
@@ -126,18 +124,8 @@ exports.addQuestion = async (req, res, next) =>{
     const questionText = req.body.question || 'Some question?';
     const correct_letter = req.body.correct_letter || 'B';
     const correctText = req.body.correct_text || 'Some correct answer';
-    const category = req.body.category;
-    const allAnswers = req.body.answers || 
-   
-    [
-        { letter: 'A', text: 'Some wrong text'},
-        { letter: 'B', text: 'Some correct answer' },
-        { letter: 'C', text: 'Some wrong text' },
-        { letter: 'D', text: 'Some wrong text' }
-    ];
-
-    //TODO const user = req.user;
-
+    const category = req.body.category.toUpperCase();
+    const allAnswers = req.body.answers;
     const question = new Question({
         question: questionText,
         correct_letter: correct_letter,
@@ -146,18 +134,22 @@ exports.addQuestion = async (req, res, next) =>{
         category: category,
         answers: allAnswers
     });
-
-    question.save();
+    await question.save();
     const userDoc = await Users.findById(req.user._id.toString());
     if(userDoc){
         const userCat = userDoc.categories.some(cat => cat.category === category);
         if(!userCat){
-            userDoc.category.push({category: category, questions_added: 1})
+            userDoc.categories.push({category: category, questions_added: 1})
         }else{
-            userDoc.category[`${category}`].questions_added += 1; 
+            userDoc.categories.forEach(cat =>{
+                if(cat.category === category){
+                    cat.questions_added += 1;
+                }
+            })
         }
+        await userDoc.save();
     }
-    res.send({
+    return res.send({
         success: true,
         message: 'Question added'
     })
@@ -204,14 +196,38 @@ exports.checkQuestion = async (req, res, next) =>{
     const userId = req.user._id;
     const correct = req.body.correct;
     const questionID = req.body.questionId;
+    let category = '';
     Question.findById(questionID).then(question =>{
         if (question){
             if(correct){
                 question.answered_correctly++;
+                category = question.category;
             }else{
                 question.answered_wrong++;
+                category = question.category;
             }
             return question.save();
+        }
+    })
+    .then(async () =>{
+        const user = await Users.findById(userId);
+        if(user){
+            let hasAchievement = user.achievements.some(achievement => achievement.category === category)
+            if(!hasAchievement){
+                user.achievements.push({
+                    category: category,
+                    answered: 1
+                })
+            }else{
+                if(correct){
+                    user.achievements.forEach(achievement =>{
+                        if(achievement.category === category){
+                            achievement.answered += 1;
+                        }
+                    })
+                }
+            }
+            return user.save();
         }
     })
     .then(saved =>{
@@ -230,6 +246,7 @@ exports.quizResults = async (req, res, next) =>{
 exports.reduceLives = async (req, res, next) => {
     const id = req.user._id;
     let lives = 0;
+    let userDoc = null;
     Users.findById(id).then(user =>{
         if(user){
             if(user.lives > 0){
@@ -241,10 +258,13 @@ exports.reduceLives = async (req, res, next) => {
         }
     })
     .then(saved =>{
+        if(saved){
+            userDoc = saved;
+        }
         return res.send({
             success: true,
             message: 'Number of attempts',
-            lives: lives
+            user: userDoc,
         })
     })
 }
