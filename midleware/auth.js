@@ -12,12 +12,14 @@ exports.authMidleware = (req, res,next) =>{
         catch (e) {
             return res.json({
                 sucess: false,
+                data: undefined,
                 error: 'Authorization failed or missing tokken'
             })
         }
         if (!decodedToken) {
             return res.json({
                 sucess: false,
+                data: undefined,
                 error: 'Authorization failed'
             })
         }
@@ -26,6 +28,7 @@ exports.authMidleware = (req, res,next) =>{
     }else{
        return res.json({
             sucess: false,
+            data: undefined,
             error: 'User not logged in'
         })
     }

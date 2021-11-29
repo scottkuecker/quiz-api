@@ -61,7 +61,7 @@ exports.login = async (req, res, next) => {
             if (doMatch) {
                 const token = jwt.sign({ user: userDoc }, environment.signingSecret, { expiresIn: '3h' })
                 return res.status(200).json({
-                    user: {
+                    data: {
                         email: userDoc.email,
                         name: userDoc.name,
                         title: userDoc.title,
@@ -74,7 +74,7 @@ exports.login = async (req, res, next) => {
                     },
                     token: token,
                     success: true,
-                    message: 'Success'
+                    error: undefined
                 })
             } else {
                 res.send({
