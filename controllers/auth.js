@@ -9,14 +9,16 @@ exports.signUp = async (req, res, next) =>{
     if(!password){
         return res.send({
             success: false,
-            message: 'Password is required'
+            data: undefined,
+            error: 'Password is required'
         });
     }
     const user = await User.findOne({email: email});
     if(user){
           return res.send({
                success: false,
-               message: 'User allready exist'
+               data: undefined,
+               error: 'User allready exist'
            });
     }
     const hashedPassword = await bcrypt.hash(password, 12);
@@ -32,12 +34,14 @@ exports.signUp = async (req, res, next) =>{
        user.save();
        return res.send({
             success: true,
-            message: 'User created. Check email'
+            data: undefined,
+            error: ''
         });
     }
     return res.send({
         success: false,
-        message: 'something went wrong'
+        data: undefined,
+        error: 'Something went wrong'
     })
 }
 
@@ -48,7 +52,8 @@ exports.login = async (req, res, next) => {
     if (!userDoc){
         return res.json({
             success: false,
-            message: 'No user found'
+            data: undefined,
+            error: 'No user found'
         })
     }
     else{
@@ -74,7 +79,8 @@ exports.login = async (req, res, next) => {
             } else {
                 res.send({
                     success: false,
-                    message: 'Email or password did not match'
+                    data: undefined,
+                    error: 'Email or password did not match'
                 })
             }
         });
@@ -87,8 +93,8 @@ exports.autoLogin = async (req, res, next) => {
         if(userDoc){
             res.send({
                 success: true,
-                message: 'Auto login',
-                user: userDoc
+                error: '',
+                data: userDoc
             })
         }
     }

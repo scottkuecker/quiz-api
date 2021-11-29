@@ -5,7 +5,8 @@ exports.getAchievements =  async (req, res, next) =>{
 
     return res.send({
       success: true,
-      achievements: achievements || []
+      data: achievements || [],
+      error: ''
     })
   }
 

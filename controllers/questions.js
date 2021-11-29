@@ -43,11 +43,15 @@ exports.publishQuestion = async(req, res, next) => {
     const result = await Question.findByIdAndUpdate(id, {status: 'ODOBRENO'});
     if(result){
         return res.send({
-            success: true
+            success: true,
+            error: undefined,
+            data: undefined
         })
     }
     return res.send({
-        success: false
+        success: false,
+        error: undefined,
+        data: undefined
     })
 }
 
@@ -57,11 +61,15 @@ exports.unpublishQuestion = async (req, res, next) => {
     const result = await Question.findByIdAndUpdate(id, {status: 'NA CEKANJU'});
     if(result){
         return res.send({
-            success: true
+            success: true,
+            error: undefined,
+            data: undefined
         })
     }
     return res.send({
-        success: false
+        success: false, 
+        error: undefined,
+        data: undefined
     })
 }
 
@@ -71,11 +79,15 @@ exports.updateQuestionText = async (req, res, next) =>{
     const result = await Question.findByIdAndUpdate(id, {question: text, status: 'NA CEKANJU'});
     if(result){
         return res.send({
-            success: true
+            success: true,
+            error: undefined,
+            data: undefined
         })
     }
     return res.send({
-        success: false
+        success: false,
+        error: undefined,
+        data: undefined
     })  
 }
 
@@ -83,7 +95,8 @@ exports.getAllQuestions = async (req, res, next) => {
     if(!req.user){
         return res.send({
             success: false,
-            message: 'Something went wrong. Please login again.'
+            data: undefined,
+            error: 'Something went wrong. Please login again.'
         })
     }
     const id = req.user._id.toString();
@@ -151,7 +164,8 @@ exports.addQuestion = async (req, res, next) =>{
     }
     return res.send({
         success: true,
-        message: 'Question added'
+        error: undefined,
+        data: undefined
     })
 }
 
@@ -233,8 +247,8 @@ exports.checkQuestion = async (req, res, next) =>{
     .then(saved =>{
         return res.send({
             success: true,
-            message: correct ? 'Correct' : 'Wrong',
-            correct: correct,
+            error: correct ? 'Correct' : 'Wrong',
+            data: correct,
         })
     })
 }
@@ -263,8 +277,8 @@ exports.reduceLives = async (req, res, next) => {
         }
         return res.send({
             success: true,
-            message: 'Number of attempts',
-            user: userDoc,
+            error: undefined,
+            data: userDoc,
         })
     })
 }

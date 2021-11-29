@@ -13,7 +13,8 @@ exports.resetLives = (req, res, next) => {
             sent = true;
             return res.send({
                 success: false,
-                user: userDoc
+                data: userDoc,
+                error
             })
         }
     })
@@ -21,7 +22,8 @@ exports.resetLives = (req, res, next) => {
         if(!sent){
             return res.send({
                 success: true,
-                user: userDoc
+                data: userDoc,
+                error: undefined
             })
         }
         return;
@@ -30,7 +32,8 @@ exports.resetLives = (req, res, next) => {
         if(!sent){
             return res.send({
                 success: true,
-                user: null
+                data: undefined,
+                error: undefined
             })
         }
     })
@@ -43,11 +46,15 @@ exports.updateScore = async (req, res, next) =>{
        userDoc.score = score;
        userDoc.save();
        return res.send({
-           success: true
+           success: true,
+           error: undefined,
+           data: undefined
        })
    }
    return res.send({
-    success: false
+       success: false,
+       error: undefined,
+       data: undefined
     })
 
 }
@@ -59,11 +66,15 @@ exports.updateName = async (req, res, next) =>{
         userDoc.name = name;
         userDoc.save();
         return res.send({
-            success: true
+            success: true,
+            error: undefined,
+            data: undefined
         })
     }
     return res.send({
-     success: false
+     success: false,
+        error: undefined,
+        data: undefined
      })
  
  }
