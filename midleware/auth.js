@@ -24,7 +24,16 @@ exports.authMidleware = (req, res,next) =>{
             })
         }
         req.user = decodedToken.user;
-        next();
+        if(req.user){
+            next();
+        }else{
+            return res.json({
+                sucess: false,
+                data: undefined,
+                error: 'User not logged in'
+            })
+        }
+        
     }else{
        return res.json({
             sucess: false,

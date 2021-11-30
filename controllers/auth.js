@@ -1,4 +1,5 @@
 const User = require('../db_models/user');
+const Achievements = require('../db_models/achievement');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const environment = require('../environment');
@@ -49,29 +50,18 @@ exports.login = async (req, res, next) => {
     const email = req.body.email;
     const password = req.body.password;
     const userDoc = await User.findOne({ email: email });
-    if (!userDoc){
+    if (!userDoc) {
         return res.json({
             success: false,
             data: undefined,
             error: 'No user found'
         })
     }
-    else{
         bcrypt.compare(password, userDoc.password).then(doMatch =>{
             if (doMatch) {
                 const token = jwt.sign({ user: userDoc }, environment.signingSecret, { expiresIn: '3h' })
                 return res.status(200).json({
-                    data: {
-                        email: userDoc.email,
-                        name: userDoc.name,
-                        title: userDoc.title,
-                        score: userDoc.score,
-                        lives: userDoc.lives,
-                        roles: userDoc.roles,
-                        contributions: userDoc.contributions,
-                        avatar_url: userDoc.avatar_url,
-                        questions: userDoc.questions
-                    },
+                    data: userDoc,
                     token: token,
                     success: true,
                     error: undefined
@@ -84,14 +74,40 @@ exports.login = async (req, res, next) => {
                 })
             }
         });
-    } 
 }
 
 exports.autoLogin = async (req, res, next) => {
     if(req.user){
         const userDoc = await User.findOne({ email: req.user.email });
         if(userDoc){
-            res.send({
+            return res.send({
+                success: true,
+                error: '',
+                data: userDoc
+            })
+        }
+    }
+}
+
+
+exports.refreshUser = async (req, res, next) => {
+    if (req.user) {
+        const userDoc = await User.findOne({ email: req.user.email });
+        const achievements = await Achievements.find();
+        if (userDoc) {
+            for (let i = 0; i < userDoc.achievements.length; i++) {
+                for (let j = 0; j < achievements.length; j++) {
+                    if (!userDoc.achievements[i].achievement_ticket_ids.includes(achievements[j]._id.toString()) &&
+                        userDoc.achievements[i].answered >= achievements[j].achievedAt && 
+                        userDoc.achievements[i].category === achievements[j].category) {
+
+                        userDoc.achievements[i].achievement_ticket_ids.push(achievements[j]._id.toString());
+                        userDoc.tickets += 1;
+                    }
+                }
+            }
+            await userDoc.save()
+            return res.send({
                 success: true,
                 error: '',
                 data: userDoc

@@ -1,4 +1,19 @@
 const User = require('../db_models/user');
+const Achievements = require('../db_models/achievement');
+const Questions = require('./questions');
+
+exports.resetPlayingState = async (req, res, next) =>{
+    const user = await User.findById(req.user._id)
+    user.playing = false;
+    const saved = await user.save()
+    if(saved){
+        res.send({
+            success: true,
+            data: user,
+            error: undefined
+        })
+    }
+}
 
 exports.resetLives = (req, res, next) => {
     let userDoc;
@@ -40,23 +55,23 @@ exports.resetLives = (req, res, next) => {
 
 }
 exports.updateScore = async (req, res, next) =>{
-   const score = req.body.score;
-   const userDoc = await User.findById(req.user._id);
-   if(userDoc){
-       userDoc.score = score;
-       userDoc.save();
-       return res.send({
-           success: true,
-           error: undefined,
-           data: undefined
-       })
-   }
-   return res.send({
-       success: false,
-       error: undefined,
-       data: undefined
+    const score = req.body.score;
+    const user = await User.findById(req.user._id);
+    user.score = score;
+    user.playing = false;
+    const saved = await user.save();
+    if(saved){
+        return res.send({
+            success: true,
+            error: undefined,
+            data: undefined
+        })
+    }
+    return res.send({
+        success: false,
+        error: undefined,
+        data: undefined
     })
-
 }
 
 exports.updateName = async (req, res, next) =>{

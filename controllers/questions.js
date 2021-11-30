@@ -5,6 +5,9 @@ const messages = require('../messages');
 
 exports.getQuestion = async (req, res, next) => {
     const id = req.user._id || null;
+    const user = await Users.findById(req.user._id);
+    user.playing = true;
+    await user.save();
     if(!id){
         return res.json({
             sucess: false,
@@ -210,6 +213,7 @@ exports.checkQuestion = async (req, res, next) =>{
     const userId = req.user._id;
     const correct = req.body.correct;
     const questionID = req.body.questionId;
+    const user = await Users.findById(req.user._id);
     let category = '';
     Question.findById(questionID).then(question =>{
         if (question){
@@ -224,7 +228,6 @@ exports.checkQuestion = async (req, res, next) =>{
         }
     })
     .then(async () =>{
-        const user = await Users.findById(userId);
         if(user){
             let hasAchievement = user.achievements.some(achievement => achievement.category === category)
             if(!hasAchievement){
@@ -241,6 +244,7 @@ exports.checkQuestion = async (req, res, next) =>{
                     })
                 }
             }
+    
             return user.save();
         }
     })
@@ -249,6 +253,7 @@ exports.checkQuestion = async (req, res, next) =>{
             success: true,
             error: correct ? 'Correct' : 'Wrong',
             data: correct,
+            user: user
         })
     })
 }
