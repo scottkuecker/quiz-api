@@ -93,3 +93,29 @@ exports.updateName = async (req, res, next) =>{
      })
  
  }
+
+ exports.getRankingList = async (req, res, next) =>{
+     const filter = req.body.filter;
+     let users;
+     if(!filter){
+         users = await User.find();
+     }else{
+         users = await User.find({score: {$lt: filter + 1}});
+     }
+        
+         console.log(filter)
+         const rankedUsers = users.sort((a, b) => a.score > b.score);
+         let top100;
+         if(rankedUsers.length > 100){
+            top100 = rankedUsers.splice(0, 100);
+         }else{
+             top100 = rankedUsers;
+         }
+         return res.send({
+             success: true,
+             data: top100,
+             error: undefined
+         })
+     
+    
+ }
