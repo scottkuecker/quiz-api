@@ -103,6 +103,7 @@ exports.refreshUser = async (req, res, next) => {
 
                         userDoc.achievements[i].achievement_ticket_ids.push(achievements[j]._id.toString());
                         userDoc.tickets += 1;
+                        userDoc.notifications.achievements = true;
                     }
                 }
             }

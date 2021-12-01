@@ -6,6 +6,8 @@ exports.getAchievements =  async (req, res, next) =>{
     const user = await User.findById(req.user._id);
     const userAchievements = user.achievements
     const modifiedAchievements = [];
+    user.notifications.achievements = false;
+    await user.save()
       if (achievements && achievements.length && userAchievements && userAchievements.length){
         for(let i = 0; i < userAchievements.length; i++){
           for(let j = 0; j < achievements.length; j++){

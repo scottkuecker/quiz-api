@@ -12,6 +12,11 @@ const userSchema = new Schema({
     tickets: {type: Number, required: true, default: 0},
     playing: {type: Boolean, required: true, default: false},
     roles: [{type: String,required: true, default: 'USER'}],
+    notifications:{
+        achievements: {type: Boolean, required: true, default: false},
+        questions: { type: Boolean, required: true, default: false },
+        ranking: { type: Boolean, required: true, default: false }
+    },
     achievements: [
         {
             category: {type: String, required: true},
