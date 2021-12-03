@@ -172,6 +172,54 @@ exports.addQuestion = async (req, res, next) =>{
     })
 }
 
+exports.uploadImage = async (req, res, next) => {
+
+}
+
+exports.addImageQuestion = async (req, res, next) =>{
+    const questionText = req.body.question || 'Some question?';
+    const correct_letter = req.body.correct_letter || 'B';
+    const correctText = req.body.correct_text || 'Some correct answer';
+    const imageUrl = req.body.imageUrl;
+    if (!imageUrl) {
+        return res.send({
+            success: false
+        })
+    }
+    const category = req.body.category.toUpperCase();
+    const allAnswers = req.body.answers;
+    const question = new Question({
+        question: questionText,
+        correct_letter: correct_letter,
+        type: 'PICTURE',
+        correct_text: correctText,
+        imageUrl: imageUrl,
+        posted_by: req.user._id.toString(),
+        category: category,
+        answers: allAnswers
+    });
+    await question.save();
+    const userDoc = await Users.findById(req.user._id.toString());
+    if (userDoc) {
+        const userCat = userDoc.categories.some(cat => cat.category === category);
+        if (!userCat) {
+            userDoc.categories.push({ category: category, questions_added: 1 })
+        } else {
+            userDoc.categories.forEach(cat => {
+                if (cat.category === category) {
+                    cat.questions_added += 1;
+                }
+            })
+        }
+        await userDoc.save();
+    }
+    return res.send({
+        success: true,
+        error: undefined,
+        data: undefined
+    })
+}
+
 exports.deleteQuestion = async (req, res, next) =>{
     const id = req.params.id || null;
     if(!id){

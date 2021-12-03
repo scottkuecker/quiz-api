@@ -9,6 +9,8 @@ const questionSchema = new Schema({
     answered_correctly: { type: Number, required: true, default: 0 },
     posted_by: { type: String, required: true, default: 'ADMIN' },
     category: String,
+    type: {type: String, required: true, default: 'REGULAR'},
+    imageUrl: {type: String, required: false},
     answered_wrong: { type: Number, required: true, default: 0  },
     question_picked: { type: Number, required: true, default: 0  },
     status: { type: String, required: true, default: "ODOBRENO" },
