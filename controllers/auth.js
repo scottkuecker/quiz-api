@@ -27,6 +27,7 @@ exports.signUp = async (req, res, next) =>{
         const user = new User({
             email: email,
             password: hashedPassword,
+            reset_daily_price: Date.now() + 60 * 60 * 1000,
             roles: ['USER'],
             contributions: [],
             questions: []
@@ -94,6 +95,7 @@ exports.refreshUser = async (req, res, next) => {
     if (req.user) {
         const userDoc = await User.findOne({ email: req.user.email });
         const achievements = await Achievements.find();
+        const dailyPrice = Date.now();
         if (userDoc) {
             for (let i = 0; i < userDoc.achievements.length; i++) {
                 for (let j = 0; j < achievements.length; j++) {
@@ -107,6 +109,10 @@ exports.refreshUser = async (req, res, next) => {
                     }
                 }
             }
+            if (dailyPrice > userDoc.reset_daily_price){
+                userDoc.daily_price = true;
+                userDoc.reset_daily_price = dailyPrice + 60 * 60 * 1000;
+            }
             await userDoc.save()
             return res.send({
                 success: true,
@@ -114,5 +120,33 @@ exports.refreshUser = async (req, res, next) => {
                 data: userDoc
             })
         }
+    }
+}
+
+exports.takeDailyPrice = async (req, res, next) =>{
+    const user = User.findById(req.user._id);
+        if (!user){
+            return res.send({
+                success: false,
+                data: undefined,
+                error: undefined
+            })
+        }
+        if (!user.daily_price){
+            return res.send({
+                success: false,
+                data: undefined,
+                error: 'Price received'
+            })
+        }
+    user.tickets++;
+    user.daily_price = false;
+    const success = await user.save();
+    if(success){
+        return res.send({
+            success: true,
+            data: undefined,
+            error: undefined
+        })
     }
 }
