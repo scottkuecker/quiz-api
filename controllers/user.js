@@ -119,3 +119,7 @@ exports.updateName = async (req, res, next) =>{
      
     
  }
+
+exports.takeDailyPrice = (req, res, next) =>{
+    
+}

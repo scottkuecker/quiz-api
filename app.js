@@ -45,7 +45,7 @@ server.use(session({
     saveUninitialized: false,
     store: store
 }))
-server.use(cors({ origin: ['http://localhost:4201', 'http://localhost:4200'] }));
+server.use(cors({ origin: ['http://localhost:4201', 'http://localhost:4200', '*'] }));
 server.post('/add-image-question', upload.single('image'), (req, res, next) => {
     const auth = req.get('Authorization');
     if (!auth) {
