@@ -45,7 +45,7 @@ server.use(session({
     saveUninitialized: false,
     store: store
 }))
-server.use(cors({ origin: '*' }));
+server.use(cors({ origin: ['http:localhost:4200', 'https://kviz-live.web.app', 'https://kviz-live.web.app/'] }));
 server.post('/add-image-question', upload.single('image'), (req, res, next) => {
     const auth = req.get('Authorization');
     if (!auth) {
