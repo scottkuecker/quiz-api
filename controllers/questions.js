@@ -6,6 +6,7 @@ const messages = require('../messages');
 exports.getQuestion = async (req, res, next) => {
     const id = req.user._id || null;
     const user = await Users.findById(req.user._id);
+    const category = req.body.category
     user.playing = true;
     await user.save();
     if(!id){
@@ -14,7 +15,13 @@ exports.getQuestion = async (req, res, next) => {
             message: messages.get_question_missing_id
         })
     }
-    const questions = await Question.find({ status: 'ODOBRENO'});
+    let questions;
+    if(category){
+        questions = await Question.find({ status: 'ODOBRENO', category });
+    }else{
+        questions = await Question.find({ status: 'ODOBRENO' });
+    }
+   
     const questionsByOthers = [];
     questions.forEach(q =>{
         if(q._id.toString() !== id){

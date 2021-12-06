@@ -19,17 +19,10 @@ exports.getAchievements =  async (req, res, next) =>{
                 answered: userAchievements[i].answered,
                 price_received: userAchievements[i].answered > achievements[j].achievedAt
               })
-            }else{
-              modifiedAchievements.push({
-                category: achievements[j].category,
-                achiveText: achievements[j].achiveText,
-                achievedAt: achievements[j].achievedAt,
-                answered: 0,
-                price_received: false
-              })
             }
           }
         }
+        // console.log(modifiedAchievements)
         return res.send({
           success: true,
           data: modifiedAchievements || [],

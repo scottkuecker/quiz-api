@@ -16,6 +16,7 @@ const multer = require('multer');
 const server = express();
 
 const port = process.env.PORT || 3000;
+console.log(process.env.PORT)
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -32,7 +33,7 @@ const upload = multer({storage})
 server.use(express.urlencoded({extended: false}))
 server.use(express.json())
 server.use(express.static(path.join(__dirname, 'public')));
-server.use(cors({ origin: ['http:localhost:4200', 'https://kviz-live.web.app'] }));
+server.use(cors({ origin: ['http://localhost:4200', 'https://kviz-live.web.app', 'http://localhost:4201'] }));
 server.post('/add-image-question', upload.single('image'), (req, res, next) => {
     const auth = req.get('Authorization');
     if (!auth) {

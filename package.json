@@ -4,7 +4,8 @@
   "description": "Quiz backend restAPI with node js and mongoDB",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon ts-node app.ts",
+    "start": "nodemon app.js",
+    "local": "PORT=3000 signingSecret=xDfaskdhJlLklJHojhkjhgjtkhKJHkjhkhKgjfgjkjhKhkhK mongoUrl=mongodb+srv://milancakic:Masterdamus12@quiz-cluster.vopbe.mongodb.net/quiz nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
