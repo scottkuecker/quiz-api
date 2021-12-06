@@ -2,7 +2,6 @@ const User = require('../db_models/user');
 const Achievements = require('../db_models/achievement');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const environment = require('../environment');
 
 exports.signUp = async (req, res, next) =>{
     const email = req.body.email;
@@ -60,7 +59,7 @@ exports.login = async (req, res, next) => {
     }
         bcrypt.compare(password, userDoc.password).then(doMatch =>{
             if (doMatch) {
-                const token = jwt.sign({ user: userDoc }, environment.signingSecret, { expiresIn: '3h' })
+                const token = jwt.sign({ user: userDoc }, process.env.signingSecret, { expiresIn: '3h' })
                 return res.status(200).json({
                     data: userDoc,
                     token: token,
