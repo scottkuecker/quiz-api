@@ -1,7 +1,6 @@
 const path = require('path');
 const express = require('express');
 const mongoose = require('mongoose');
-const environment = require('./environment');
 const jwt = require('jsonwebtoken');
 const session = require('express-session');
 const MongoDBStore= require('connect-mongodb-session')(session);
@@ -18,7 +17,7 @@ const multer = require('multer');
 
 const server = express();
 const store = new MongoDBStore({
-    uri: environment.mongoUrl,
+    uri: process.env.mongoUrl,
     collection: 'sessions'
 })
 
@@ -40,7 +39,7 @@ server.use(express.urlencoded({extended: false}))
 server.use(express.json())
 server.use(express.static(path.join(__dirname, 'public')));
 server.use(session({
-    secret: environment.sessionSecret,
+    secret: process.env.sessionSecret,
     resave: false,
     saveUninitialized: false,
     store: store
@@ -57,7 +56,7 @@ server.post('/add-image-question', upload.single('image'), (req, res, next) => {
     const token = auth.split(' ')[1];
     let decodedToken;
     try {
-        decodedToken = jwt.verify(token, environment.signingSecret);
+        decodedToken = jwt.verify(token, process.env.signingSecret);
         if(!decodedToken){
            throw new Error('Please log in')
         }
@@ -73,7 +72,7 @@ server.post('/add-image-question', upload.single('image'), (req, res, next) => {
         const path = req.file.path.split('/')[1];
         return res.send({
             success: true,
-            data: environment.serverAddress + path
+            data: process.env.serverAddress + path
         })
     }
     return res.send({
@@ -91,7 +90,7 @@ server.use('', (req,res, next)=>{
         })
 })
 
-mongoose.connect(environment.mongoUrl).then(() =>{
+mongoose.connect(process.env.mongoUrl).then(() =>{
     console.log('connected')
     server.listen(port)
 }).catch(()=>{
