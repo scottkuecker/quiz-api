@@ -2,8 +2,6 @@ const path = require('path');
 const express = require('express');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
-const session = require('express-session');
-const MongoDBStore= require('connect-mongodb-session')(session);
 const cors = require('cors');
 const middleware = require('./midleware/auth');
 
@@ -16,12 +14,8 @@ const achievementRoutes = require('./routes/achievement-routes');
 const multer = require('multer');
 
 const server = express();
-const store = new MongoDBStore({
-    uri: process.env.mongoUrl,
-    collection: 'sessions'
-})
 
-const port = 3000;
+const port = process.env.port || 3000;
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -38,12 +32,6 @@ const upload = multer({storage})
 server.use(express.urlencoded({extended: false}))
 server.use(express.json())
 server.use(express.static(path.join(__dirname, 'public')));
-server.use(session({
-    secret: process.env.sessionSecret,
-    resave: false,
-    saveUninitialized: false,
-    store: store
-}))
 server.use(cors({ origin: ['http:localhost:4200', 'https://kviz-live.web.app'] }));
 server.post('/add-image-question', upload.single('image'), (req, res, next) => {
     const auth = req.get('Authorization');
@@ -93,8 +81,8 @@ server.use('', (req,res, next)=>{
 mongoose.connect(process.env.mongoUrl).then(() =>{
     console.log('connected')
     server.listen(port)
-}).catch(()=>{
-    console.error('could not connect')
+}).catch((error)=>{
+    console.error(error)
 })
 
 
