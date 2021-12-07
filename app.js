@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const middleware = require('./midleware/auth');
+const utils = require('./utils/daily-reset');
 
 
 
@@ -80,7 +81,7 @@ server.use('', (req,res, next)=>{
 })
 
 mongoose.connect(process.env.mongoUrl).then(() =>{
-    console.log('connected')
+    utils.initiDailiReset();
     server.listen(port)
 }).catch((error)=>{
     console.error(error)

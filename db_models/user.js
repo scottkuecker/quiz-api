@@ -10,7 +10,6 @@ const userSchema = new Schema({
     score: { type: Number, required: true, default: 0 },
     lives: { type: Number, required: true, default: 3 },
     daily_price: {type: Boolean, required: true, default: true},
-    reset_daily_price: { type: Number, required: true, default: null },
     tickets: {type: Number, required: true, default: 0},
     playing: {type: Boolean, required: true, default: false},
     roles: [{type: String,required: true, default: 'USER'}],

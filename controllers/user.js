@@ -118,6 +118,29 @@ exports.updateName = async (req, res, next) =>{
     
  }
 
-exports.takeDailyPrice = (req, res, next) =>{
-    
+exports.takeDailyPrice = async (req, res, next) =>{
+    const user = await User.findById(req.user._id);
+    let success;
+    let userDoc;
+    if (user && user.daily_price){
+        user.tickets++;
+        user.daily_price = false;
+        userDoc = user;
+        success = await user.save();
+        if(success){
+            return res.send({
+                success: true,
+                data: userDoc,
+                error: undefined
+            })
+        }
+    }
+    return res.send({
+        success: false,
+        data: undefined,
+        error: 'reward allready claimed'
+    })
+
+
 }
+
