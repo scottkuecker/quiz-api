@@ -102,8 +102,6 @@ exports.updateName = async (req, res, next) =>{
      }else{
          users = await User.find({score: {$lt: filter + 1}});
      }
-        
-         console.log(filter)
          const rankedUsers = users.sort((a, b) => a.score > b.score);
          let top100;
          if(rankedUsers.length > 100){

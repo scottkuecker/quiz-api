@@ -7,6 +7,7 @@ const router = require('express').Router();
 
 router.get('/question', middleware.authMidleware ,questions.getQuestion);
 router.get('/all-questions', middleware.authMidleware, questions.getAllQuestions);
+router.get('/all-questions/:filter', middleware.authMidleware, questions.getAllQuestions);
 router.post('/add-question', middleware.authMidleware ,questions.addQuestion);
 router.post('/image-question', middleware.authMidleware, questions.addImageQuestion);
 router.delete('/delete-question/:id', middleware.authMidleware ,questions.deleteQuestion);

@@ -22,7 +22,6 @@ exports.getAchievements =  async (req, res, next) =>{
             }
           }
         }
-        // console.log(modifiedAchievements)
         return res.send({
           success: true,
           data: modifiedAchievements || [],

@@ -110,14 +110,22 @@ exports.getAllQuestions = async (req, res, next) => {
         })
     }
     const id = req.user._id.toString();
-    const root = req.user.roles.some(role => role === 'ADMIN')
+    const root = req.user.roles.some(role => role === 'ADMIN');
+    const filter = req.params.filter;
+    let questions;
     if (!id) {
         return res.json({
             sucess: false,
             message: messages.get_question_missing_id
         })
     }
-    const questions = await Question.find();
+    console.log(filter)
+    if(!filter){
+        questions = await Question.find();
+    }else{
+        questions = await Question.find({category: filter});
+    }
+    
     const questionsByOthers = [];
 
     questions.forEach( async (q, index) => {
@@ -135,6 +143,12 @@ exports.getAllQuestions = async (req, res, next) => {
             success: true,
             data: questionsByOthers,
             message: ''
+        })
+    }else{
+        return res.json({
+            success: true,
+            data: [],
+            message: undefined
         })
     }
     return res.json({
