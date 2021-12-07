@@ -119,7 +119,6 @@ exports.getAllQuestions = async (req, res, next) => {
             message: messages.get_question_missing_id
         })
     }
-    console.log(filter)
     if(!filter){
         questions = await Question.find();
     }else{
