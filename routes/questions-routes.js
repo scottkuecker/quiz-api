@@ -16,7 +16,7 @@ router.post('/quiz-results', middleware.authMidleware, questions.quizResults)
 router.post('/reduce-lives', middleware.authMidleware, questions.reduceLives)
 router.post('/publish', middleware.authMidleware, questions.publishQuestion)
 router.post('/unpublish', middleware.authMidleware, questions.unpublishQuestion)
-router.post('/update-question-text', middleware.authMidleware, questions.updateQuestionText)
+router.post('/update-question-text', middleware.authMidleware, questions.updateQuestionText);
 
 
 

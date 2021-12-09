@@ -162,13 +162,17 @@ exports.addQuestion = async (req, res, next) =>{
     const correctText = req.body.correct_text || 'Some correct answer';
     const category = req.body.category.toUpperCase();
     const allAnswers = req.body.answers;
+    const imageUrl = req.body.imageUrl;
+    const type = req.body.type;
     const question = new Question({
         question: questionText,
         correct_letter: correct_letter,
         correct_text: correctText,
         posted_by: req.user._id.toString(),
         category: category,
-        answers: allAnswers
+        answers: allAnswers,
+        imageUrl: imageUrl,
+        type: type
     });
     await question.save();
     const userDoc = await Users.findById(req.user._id.toString());
@@ -192,11 +196,8 @@ exports.addQuestion = async (req, res, next) =>{
     })
 }
 
-exports.uploadImage = async (req, res, next) => {
-
-}
-
 exports.addImageQuestion = async (req, res, next) =>{
+    console.log(req.body)
     const questionText = req.body.question || 'Some question?';
     const correct_letter = req.body.correct_letter || 'B';
     const correctText = req.body.correct_text || 'Some correct answer';
