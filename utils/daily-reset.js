@@ -1,7 +1,7 @@
 const Users = require('../db_models/user');
 
 const day = {
-    miliseconds: 86400000,
+    miliseconds: 18000000,
     testReset: 20000
 }
 

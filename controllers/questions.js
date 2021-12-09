@@ -2,11 +2,15 @@ const Question = require('../db_models/question');
 const Users = require('../db_models/user');
 const messages = require('../messages');
 
+function getRandomNumber(quantity) {
+    var milliseconds = new Date().getMilliseconds();
+    return Math.floor(milliseconds * quantity / 1000);
+}
 
 exports.getQuestion = async (req, res, next) => {
     const id = req.user._id || null;
     const user = await Users.findById(req.user._id);
-    const category = req.body.category
+    const category = req.params.category;
     user.playing = true;
     await user.save();
     if(!id){
@@ -16,8 +20,8 @@ exports.getQuestion = async (req, res, next) => {
         })
     }
     let questions;
-    if(category){
-        questions = await Question.find({ status: 'ODOBRENO', category });
+    if(category && category !== 'RAZNO'){
+        questions = await Question.find({ status: 'ODOBRENO', category: category });
     }else{
         questions = await Question.find({ status: 'ODOBRENO' });
     }
@@ -28,7 +32,7 @@ exports.getQuestion = async (req, res, next) => {
             questionsByOthers.push(q);
         }
     });
-    let random = Math.floor(Math.random() * questionsByOthers.length);
+    let random = getRandomNumber(questionsByOthers.length);
     if (questionsByOthers && questionsByOthers.length){
         let picked = questionsByOthers[random];
         let timesPicked = picked.question_picked + 1;
