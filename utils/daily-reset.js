@@ -20,5 +20,5 @@ const resetDailyPrice = async () => {
 exports.initiDailiReset = () =>{
     setInterval(reset=>{
         resetDailyPrice();
-    }, day.testReset)
+    }, day.miliseconds)
 }
