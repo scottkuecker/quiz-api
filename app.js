@@ -14,7 +14,7 @@ const achievementRoutes = require('./routes/achievement-routes');
 
 const server = express();
 
-const port = process.env.PORT || 3000;
+const port = 3000;
 
 
 
@@ -35,7 +35,7 @@ server.use('', (req,res, next)=>{
 })
 
 mongoose.connect(process.env.mongoUrl).then(() =>{
-    utils.initiDailiReset();
+    // utils.initiDailiReset();
     server.listen(port)
 }).catch((error)=>{
     console.error(error)
