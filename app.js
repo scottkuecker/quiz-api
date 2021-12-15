@@ -1,5 +1,6 @@
 const path = require('path');
 const express = require('express');
+const http = require("http");
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
@@ -33,6 +34,11 @@ server.use('', (req,res, next)=>{
             error: '404 Page not found'
         })
 })
+
+setInterval( () => {
+    //prevent heroku sleep
+    http.get("https://kviz-znanja.herokuapp.com");
+}, 10 * 60 * 1000);
 
 mongoose.connect(process.env.mongoUrl).then(() =>{
     // utils.initiDailiReset();
