@@ -6,7 +6,7 @@ exports.authMidleware = (req, res,next) =>{
         const token = req.get('Authorization').split(' ')[1];
         let decodedToken;
         try {
-            decodedToken = jwt.verify(token, process.env.signingSecret)
+            decodedToken = jwt.verify(token, process.env.SIGNING_SECRET)
         }
         catch (e) {
             return res.json({

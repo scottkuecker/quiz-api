@@ -15,7 +15,7 @@ const achievementRoutes = require('./routes/achievement-routes');
 
 const server = express();
 
-const port = 3000;
+const port = process.env.PORT;
 
 
 
@@ -36,12 +36,11 @@ server.use('', (req,res, next)=>{
 })
 
 setInterval( () => {
-    //prevent heroku sleep
     http.get("https://kviz-znanja.herokuapp.com");
 }, 10 * 60 * 1000);
 
-mongoose.connect(process.env.mongoUrl).then(() =>{
-    // utils.initiDailiReset();
+mongoose.connect(process.env.MONGO).then(() =>{
+    utils.initiDailiReset()
     server.listen(port)
 }).catch((error)=>{
     console.error(error)

@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "start": "nodemon app.js",
-    "local": "SET signingSecret=xDfaskdhJlLklJHojhkjhgjtkhKJHkjhkhKgjfgjkjhKhkhK SET mongoUrl=mongodb+srv://milancakic:Masterdamus12@quiz-cluster.vopbe.mongodb.net/quiz SET CLIENT_ID=980701032772-vsb105bjfrviibt9fh2klgfspkp3564g.apps.googleusercontent.com SET CLIENT_SECRET=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 SET REFRESH_TOKEN=1//04kkUc3AbAQvZCgYIARAAGAQSNwF-L9IrjN6-DU3mIUIq3gysCAIVjxLAy7uFexHy5j7aNFCRPC1pNy1y8n6unBsxDn4HHKI5780 nodemon app.js",
+    "local": "cross-env MONGO=mongodb+srv://milancakic:Masterdamus12@quiz-cluster.vopbe.mongodb.net/quiz SIGNING_SECRET=xDfaskdhJlLklJHojhkjhgjtkhKJHkjhkhKgjfgjkjhKhkhK PORT=3000 nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -23,6 +23,7 @@
     "connect-mongodb-session": "^3.1.1",
     "connect-multiparty": "^2.2.0",
     "cors": "^2.8.5",
+    "cross-env": "^7.0.3",
     "express": "^4.17.1",
     "express-session": "^1.17.2",
     "googleapis": "^92.0.0",

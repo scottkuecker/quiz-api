@@ -59,7 +59,7 @@ exports.login = async (req, res, next) => {
     }
         bcrypt.compare(password, userDoc.password).then(doMatch =>{
             if (doMatch) {
-                const token = jwt.sign({ user: userDoc }, process.env.signingSecret, { expiresIn: '3h' })
+                const token = jwt.sign({ user: userDoc }, process.env.SIGNING_SECRET, { expiresIn: '3h' })
                 return res.status(200).json({
                     data: userDoc,
                     token: token,
