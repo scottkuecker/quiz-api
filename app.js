@@ -35,12 +35,8 @@ server.use('', (req,res, next)=>{
         })
 })
 
-setInterval( () => {
-    http.get("https://kviz-znanja.herokuapp.com");
-}, 10 * 60 * 1000);
 
 mongoose.connect(process.env.MONGO).then(() =>{
-    utils.initiDailiReset()
     server.listen(port)
 }).catch((error)=>{
     console.error(error)
