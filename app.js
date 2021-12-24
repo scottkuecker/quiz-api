@@ -33,7 +33,12 @@ server.use('', (req,res, next)=>{
         res.send({
             error: '404 Page not found'
         })
-})
+});
+
+
+utils.initiDailiReset();
+
+
 
 
 mongoose.connect(process.env.MONGO).then(() =>{
