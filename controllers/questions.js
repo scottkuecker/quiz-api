@@ -106,45 +106,28 @@ exports.updateQuestionText = async (req, res, next) =>{
 }
 
 exports.getAllQuestions = async (req, res, next) => {
-    if(!req.user){
-        return res.send({
-            success: false,
-            data: undefined,
-            error: 'Something went wrong. Please login again.'
-        })
-    }
     const id = req.user._id.toString();
     const root = req.user.roles.some(role => role === 'ADMIN');
     const filter = req.params.filter;
     let questions;
-    if (!id) {
-        return res.json({
-            sucess: false,
-            message: messages.get_question_missing_id
-        })
-    }
     if(!filter){
-        questions = await Question.find();
-    }else{
-        questions = await Question.find({category: filter});
-    }
-    
-    const questionsByOthers = [];
-
-    questions.forEach( async (q, index) => {
         if(root){
-            if (q.posted_by === id) {
-                questionsByOthers.push(q);
-            }
+            questions = await Question.find();
         }else{
-            questionsByOthers.push(q)
+            questions = await Question.find({posted_by: id});
         }
-     
-    });
-    if (questionsByOthers.length) {
+       
+    }else{
+        if (root) {
+            questions = await Question.find({ category: filter });
+        } else {
+            questions = await Question.find({ posted_by: id, category: filter  });
+        }
+    }
+    if (questions.length) {
         return res.json({
             success: true,
-            data: questionsByOthers,
+            data: questions,
             message: ''
         })
     }else{
@@ -154,10 +137,6 @@ exports.getAllQuestions = async (req, res, next) => {
             message: undefined
         })
     }
-    return res.json({
-        success: false,
-        message: messages.empty_questions_list
-    })
 }
 
 exports.addQuestion = async (req, res, next) =>{
@@ -168,11 +147,13 @@ exports.addQuestion = async (req, res, next) =>{
     const allAnswers = req.body.answers;
     const imageUrl = req.body.imageUrl;
     const type = req.body.type;
+    const id = req.user._id.toString();
+    console.log(id)
     const question = new Question({
         question: questionText,
         correct_letter: correct_letter,
         correct_text: correctText,
-        posted_by: req.user._id.toString(),
+        posted_by: id,
         category: category,
         answers: allAnswers,
         imageUrl: imageUrl,
