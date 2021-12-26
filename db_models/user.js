@@ -9,7 +9,7 @@ const userSchema = new Schema({
     title: { type: String, required: false, default: 'Pocetnik 1' },
     score: { type: Number, required: true, default: 0 },
     lives: { type: Number, required: true, default: 3 },
-    daily_price: {type: Boolean, required: true, default: true},
+    daily_price: {type: Number, required: true, default: Date.now()},
     tickets: {type: Number, required: true, default: 0},
     playing: {type: Boolean, required: true, default: false},
     roles: [{type: String,required: true, default: 'USER'}],

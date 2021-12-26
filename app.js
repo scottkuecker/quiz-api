@@ -6,7 +6,6 @@ const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const fs = require('fs');
 const middleware = require('./midleware/auth');
-const utils = require('./utils/daily-reset');
 
 const questionRoutes = require('./routes/questions-routes');
 const authRoutes = require('./routes/auth-routes');

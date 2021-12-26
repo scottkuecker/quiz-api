@@ -94,7 +94,6 @@ exports.refreshUser = async (req, res, next) => {
     if (req.user) {
         const userDoc = await User.findOne({ email: req.user.email });
         const achievements = await Achievements.find();
-        const dailyPrice = Date.now();
         if (userDoc) {
             for (let i = 0; i < userDoc.achievements.length; i++) {
                 for (let j = 0; j < achievements.length; j++) {
@@ -107,10 +106,6 @@ exports.refreshUser = async (req, res, next) => {
                         userDoc.notifications.achievements = true;
                     }
                 }
-            }
-            if (dailyPrice > userDoc.reset_daily_price){
-                userDoc.daily_price = true;
-                userDoc.reset_daily_price = dailyPrice + 60 * 60 * 1000;
             }
             await userDoc.save()
             return res.send({

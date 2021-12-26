@@ -15,6 +15,32 @@ exports.resetPlayingState = async (req, res, next) =>{
     }
 }
 
+exports.resetDailyPrice = async (req, res, next) => {
+    const id = req.user._id;
+    const user = await Users.findById(id);
+    if (user) {
+      const now = Date.now();
+      if(now >= user.daily_price){
+        const oneDay = 24 * 60 * 60 * 1000;
+        user.tickets++;
+        const tomorow = now + oneDay;
+        user.daily_price = tomorow;
+      }
+      await user.save();
+      return res.send({
+        success: true,
+        data: user,
+        error: ''
+      })
+    }else{
+        return res.send({
+            success: false,
+            data: null,
+            error: 'Doslo je do greske, pokusajte ponovo'
+          })
+    }
+}
+
 exports.resetLives = (req, res, next) => {
     let userDoc;
     let sent = false;
@@ -117,30 +143,3 @@ exports.updateName = async (req, res, next) =>{
      
     
  }
-
-exports.takeDailyPrice = async (req, res, next) =>{
-    const user = await User.findById(req.user._id);
-    let success;
-    let userDoc;
-    if (user && user.daily_price){
-        user.tickets++;
-        user.daily_price = false;
-        userDoc = user;
-        success = await user.save();
-        if(success){
-            return res.send({
-                success: true,
-                data: userDoc,
-                error: undefined
-            })
-        }
-    }
-    return res.send({
-        success: false,
-        data: undefined,
-        error: 'reward allready claimed'
-    })
-
-
-}
-
