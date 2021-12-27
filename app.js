@@ -16,8 +16,6 @@ const server = express();
 
 const port = process.env.PORT;
 
-
-
 server.use(express.urlencoded({extended: false}))
 server.use(express.json())
 server.use(express.static(path.join(__dirname, 'public')));
@@ -33,12 +31,6 @@ server.use('', (req,res, next)=>{
             error: '404 Page not found'
         })
 });
-
-
-utils.initiDailiReset();
-
-
-
 
 mongoose.connect(process.env.MONGO).then(() =>{
     server.listen(port)
