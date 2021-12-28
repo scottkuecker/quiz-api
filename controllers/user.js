@@ -17,7 +17,7 @@ exports.resetPlayingState = async (req, res, next) =>{
 
 exports.resetDailyPrice = async (req, res, next) => {
     const id = req.user._id;
-    const user = await Users.findById(id);
+    const user = await User.findById(id);
     if (user) {
       const now = Date.now();
       if(now >= user.daily_price){
