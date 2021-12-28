@@ -19,7 +19,7 @@ const port = process.env.PORT;
 server.use(express.urlencoded({extended: false}))
 server.use(express.json())
 server.use(express.static(path.join(__dirname, 'public')));
-server.use(cors({ origin: ['http://localhost:4200', 'https://kviz-live.web.app', 'http://localhost:4201'] }));
+server.use(cors({ origin: ['http://localhost:4200', 'https://kviz-live.web.app', 'http://localhost:4201', 'http://kviz-live.web.app'] }));
 
 server.use(questionRoutes);
 server.use(authRoutes);
