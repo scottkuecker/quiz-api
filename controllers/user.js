@@ -41,45 +41,34 @@ exports.resetDailyPrice = async (req, res, next) => {
     }
 }
 
-exports.resetLives = (req, res, next) => {
-    let userDoc;
-    let sent = false;
-    User.findById(req.user._id).then(user =>{
-        if(user){
-            user.lives = 3;
-            userDoc = user;
-            return user.save()
-        }else{
-            userDoc = req.body.user;
-            sent = true;
-            return res.send({
-                success: false,
-                data: userDoc,
-                error
-            })
-        }
-    })
-    .then(saved =>{
-        if(!sent){
+exports.resetLives = async (req, res, next) => {
+    const user = await User.findById(req.user._id)
+    if(user){
+            if (!user.reset_lives_at){
+                user.reset_lives_at = Date.now() + 3600000; 
+            }
+            if (user.lives === 0 && user.reset_lives_at <= Date.now()){
+                user.reset_lives_at = Date.now() + 3600000;
+                user.lives = 3;
+            }
+            await user.save();
             return res.send({
                 success: true,
-                data: userDoc,
-                error: undefined
-            })
-        }
-        return;
-    })
-    .catch(error =>{
-        if(!sent){
-            return res.send({
-                success: true,
-                data: undefined,
-                error: undefined
-            })
-        }
-    })
+                data: user,
+                error: ''
+            })      
+    }else{
+        res.send({
+            success: false,
+            data: undefined,
+            error: undefined
+        })
+    }
+
 
 }
+
+
 exports.updateScore = async (req, res, next) =>{
     const score = req.body.score;
     const user = await User.findById(req.user._id);
