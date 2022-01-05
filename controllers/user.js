@@ -47,9 +47,11 @@ exports.resetLives = async (req, res, next) => {
             if (!user.reset_lives_at){
                 user.reset_lives_at = Date.now() + 3600000; 
             }
-            if (user.lives === 0 && user.reset_lives_at <= Date.now()){
-                user.reset_lives_at = Date.now() + 3600000;
-                user.lives = 3;
+
+             if (user.lives === 0 && !user.lives_reset_timer_set){
+                user.reset_lives_at = Date.now() + 3600000; 
+                user.lives_reset_timer_set = true;
+
             }
             await user.save();
             return res.send({

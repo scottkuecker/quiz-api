@@ -30,7 +30,7 @@ const userSchema = new Schema({
         questions_added: {type: Number, required: true}
     }],
     reset_password_token: {type: String, required: false, default: null},
-    increase_lives_at: {type: Number, required: false, default: null},
+    lives_reset_timer_set: {type: boolean, required: false, default: false},
     reset_lives_at: { type: Number, required: false, default: null },
     contributions: [{type: String, required: true}],
     avatar_url: { type: String, required: false, default: 'https://cdnjs.cloudflare.com/ajax/libs/admin-lte/2.4.0/img/avatar.png'},

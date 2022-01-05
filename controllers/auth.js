@@ -2,6 +2,7 @@ const User = require('../db_models/user');
 const Achievements = require('../db_models/achievement');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const user = require('../db_models/user');
 
 exports.signUp = async (req, res, next) =>{
     const email = req.body.email;
@@ -106,6 +107,10 @@ exports.refreshUser = async (req, res, next) => {
                         userDoc.notifications.achievements = true;
                     }
                 }
+            }
+            if (userDoc.lives === 0 && userDoc.lives_reset_timer_set && userDoc.reset_lives_at <= Date.now()){
+                userDoc.lives = 3;
+                userDoc.lives_reset_timer_set = false;
             }
             await userDoc.save()
             return res.send({
