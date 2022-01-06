@@ -34,12 +34,14 @@ exports.getQuestion = async (req, res, next) => {
     });
     let random = getRandomNumber(questionsByOthers.length);
     if (questionsByOthers && questionsByOthers.length){
-        let picked = questionsByOthers[random];
+        let picked = JSON.parse(JSON.stringify(questionsByOthers[random]));
+        picked.correct_text = 'Ma da neces odgovor mozda :)';
+        picked.correct_letter = 'Saznaces nakon sto izaberes';
         let timesPicked = picked.question_picked + 1;
         await Question.findByIdAndUpdate({ _id: picked._id.toString() }, { question_picked: timesPicked})
         return res.json({
             success: true,
-            data: questionsByOthers[random],
+            data: picked,
             message: ''
         })
     }else{
@@ -148,7 +150,6 @@ exports.addQuestion = async (req, res, next) =>{
     const imageUrl = req.body.imageUrl;
     const type = req.body.type;
     const id = req.user._id.toString();
-    console.log(id)
     const question = new Question({
         question: questionText,
         correct_letter: correct_letter,
@@ -182,7 +183,6 @@ exports.addQuestion = async (req, res, next) =>{
 }
 
 exports.addImageQuestion = async (req, res, next) =>{
-    console.log(req.body)
     const questionText = req.body.question || 'Some question?';
     const correct_letter = req.body.correct_letter || 'B';
     const correctText = req.body.correct_text || 'Some correct answer';
@@ -264,14 +264,15 @@ exports.deleteQuestion = async (req, res, next) =>{
 }
 
 exports.checkQuestion = async (req, res, next) =>{
-    const userId = req.user._id;
-    const correct = req.body.correct;
+    const userPick = req.body.correct;
     const questionID = req.body.questionId;
+    let correct = false;
     const user = await Users.findById(req.user._id);
     let category = '';
     Question.findById(questionID).then(question =>{
         if (question){
-            if(correct){
+            if(userPick === question.correct_text){
+                correct = true;
                 question.answered_correctly++;
                 category = question.category;
             }else{
@@ -324,7 +325,10 @@ exports.reduceLives = async (req, res, next) => {
         if(user){
             if(user.lives > 0){
                 user.lives--;
-                lives = user.lives;
+                if (user.lives === 0 && !user.lives_reset_timer_set){
+                    user.reset_lives_at = Date.now() + 122000; 
+                    user.lives_reset_timer_set = true;
+                }
                 return user.save()
             }
             return user.save();
