@@ -113,7 +113,7 @@ exports.refreshUser = async (req, res, next) => {
                 userDoc.lives_reset_timer_set = false;
             }
             if(userDoc.reset_lives_at > Date.now()){
-                userDoc.lives_timer_ms = userDoc.reset_lives_at - Date.now();
+                userDoc.lives_timer_ms = Math.round(userDoc.reset_lives_at - Date.now()) / 1000;
             }
             await userDoc.save();
             return res.send({
