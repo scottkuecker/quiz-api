@@ -321,12 +321,16 @@ exports.reduceLives = async (req, res, next) => {
     const id = req.user._id;
     let lives = 0;
     let userDoc = null;
+    let lives_timer_ms = 0;
     Users.findById(id).then(user =>{
         if(user){
             if(user.lives > 0){
                 user.lives--;
                 if (user.lives === 0 && !user.lives_reset_timer_set){
-                    user.reset_lives_at = Date.now() + 122000; 
+                    let now = Date.now();
+                    let future = now + 122000;
+                    lives_timer_ms = future - now;
+                    user.reset_lives_at = Date.now() + 122000;
                     user.lives_reset_timer_set = true;
                 }
                 return user.save()
@@ -335,9 +339,9 @@ exports.reduceLives = async (req, res, next) => {
         }
     })
     .then(saved =>{
-        if(saved){
-            userDoc = saved;
-        }
+        userDoc = JSON.parse(JSON.stringify(saved));
+        userDoc.lives_timer_ms = lives_timer_ms;
+        
         return res.send({
             success: true,
             error: undefined,

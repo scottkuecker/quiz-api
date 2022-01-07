@@ -112,7 +112,8 @@ exports.refreshUser = async (req, res, next) => {
                 userDoc.lives = 3;
                 userDoc.lives_reset_timer_set = false;
             }
-            await userDoc.save()
+            await userDoc.save();
+            
             return res.send({
                 success: true,
                 error: '',
