@@ -45,7 +45,7 @@ exports.resetLives = async (req, res, next) => {
     const user = await User.findById(req.user._id)
     if(user){
         if(user.reset_lives_at > Date.now()){
-            user.lives_timer_ms = Math.round(user.reset_lives_at - Date.now()) / 1000;
+            user.lives_timer_ms = Math.round((user.reset_lives_at - Date.now()) / 1000);
         }
             await user.save();
             return res.send({
