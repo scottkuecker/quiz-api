@@ -329,8 +329,8 @@ exports.reduceLives = async (req, res, next) => {
                 if (user.lives === 0 && !user.lives_reset_timer_set){
                     let now = Date.now();
                     let future = now + 122000;
-                    lives_timer_ms = future - now;
-                    user.reset_lives_at = Date.now() + 122000;
+                    user.lives_timer_ms = future - now;
+                    user.reset_lives_at = future;
                     user.lives_reset_timer_set = true;
                 }
                 return user.save()
@@ -339,13 +339,10 @@ exports.reduceLives = async (req, res, next) => {
         }
     })
     .then(saved =>{
-        userDoc = JSON.parse(JSON.stringify(saved));
-        userDoc.lives_timer_ms = lives_timer_ms;
-        
         return res.send({
             success: true,
             error: undefined,
-            data: userDoc,
+            data: saved,
         })
     })
 }
