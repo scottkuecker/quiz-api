@@ -109,15 +109,13 @@ exports.refreshUser = async (req, res, next) => {
                 }
             }
             if (userDoc.lives === 0 && userDoc.lives_reset_timer_set && userDoc.reset_lives_at <= Date.now()){
-                userDoc.lives = 3;
+                userDoc.lives = 1;
                 userDoc.lives_reset_timer_set = false;
             }
             if(userDoc.reset_lives_at > Date.now()){
-                userDoc.reset_timer_ms = userDoc.reset_lives_at - Date.now();
+                userDoc.lives_timer_ms = userDoc.reset_lives_at - Date.now();
             }
-            
             await userDoc.save();
-            
             return res.send({
                 success: true,
                 error: '',

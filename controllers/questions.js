@@ -324,9 +324,6 @@ exports.reduceLives = async (req, res, next) => {
     let lives_timer_ms = 0;
     Users.findById(id).then(user =>{
         if(user){
-            if(user.reset_lives_at > Date.now()){
-                user.reset_timer_ms = user.reset_lives_at - Date.now();
-            }
             if(user.lives > 0){
                 user.lives--;
                 if (user.lives === 0 && !user.lives_reset_timer_set){
@@ -336,7 +333,13 @@ exports.reduceLives = async (req, res, next) => {
                     user.reset_lives_at = future;
                     user.lives_reset_timer_set = true;
                 }
+                if(user.reset_lives_at > Date.now()){
+                    user.lives_timer_ms = user.reset_lives_at - Date.now();
+                }
                 return user.save()
+            }
+            if(user.reset_lives_at > Date.now()){
+                user.lives_timer_ms = user.reset_lives_at - Date.now();
             }
             return user.save();
         }

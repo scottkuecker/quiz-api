@@ -44,6 +44,9 @@ exports.resetDailyPrice = async (req, res, next) => {
 exports.resetLives = async (req, res, next) => {
     const user = await User.findById(req.user._id)
     if(user){
+        if(user.reset_lives_at > Date.now()){
+            user.reset_timer_ms = user.reset_lives_at - Date.now();
+        }
             await user.save();
             return res.send({
                 success: true,
