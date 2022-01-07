@@ -112,6 +112,7 @@ exports.refreshUser = async (req, res, next) => {
                 userDoc.lives = 3;
                 userDoc.lives_reset_timer_set = false;
             }
+            userDoc.reset_timer_ms = userDoc.reset_lives_at - Date.now();
             await userDoc.save();
             
             return res.send({
