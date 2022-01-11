@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
-    email: { type: String, required: true },
-    password: { type: String, required: true },
+    email: { type: String, required: false },
+    password: { type: String, required: false },
     name: { type: String, required: false, default: 'Kvizoman' },
     title: { type: String, required: false, default: 'Pocetnik 1' },
     score: { type: Number, required: true, default: 0 },
@@ -14,6 +14,7 @@ const userSchema = new Schema({
     playing: {type: Boolean, required: true, default: false},
     roles: [{type: String,required: true, default: 'USER'}],
     lives_timer_ms: {type: Number, require: true, default: 0},
+    fbId: {type: Number, required: false},
     notifications:{
         achievements: {type: Boolean, required: true, default: false},
         questions: { type: Boolean, required: true, default: false },

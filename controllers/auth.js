@@ -90,6 +90,35 @@ exports.autoLogin = async (req, res, next) => {
     }
 }
 
+exports.facebookLogin = async (req, res, next) => {
+    const id = req.body.id;
+    const name = req.body.name;
+    const userDoc = await User.findOne({ fbId: id });
+    let token;
+    if (userDoc) {
+        token = jwt.sign({ user: userDoc }, process.env.SIGNING_SECRET, { expiresIn: '3h' });
+            return res.send({
+                success: true,
+                error: '',
+                data: userDoc,
+                token
+            })
+    }else{
+        const newUser = new User({
+            fbId: id,
+            name
+        })
+        await newUser.save();
+        token = jwt.sign({ user: newUser }, process.env.SIGNING_SECRET, { expiresIn: '3h' })
+        return res.send({
+            success: true,
+            error: '',
+            data: newUser,
+            token
+        })
+    }
+}
+
 
 exports.refreshUser = async (req, res, next) => {
     if (req.user) {
