@@ -182,6 +182,41 @@ exports.addQuestion = async (req, res, next) =>{
     })
 }
 
+exports.addFastQuestion = async (req, res, next) => {
+    try{
+        const questionText = req.body.question || 'Some question?';
+        const correct_letter = req.body.correct_letter || 'B';
+        const correctText = req.body.correct_text || 'Some correct answer';
+        const category = req.body.category.toUpperCase();
+        const allAnswers = req.body.answers;
+        const imageUrl = req.body.imageUrl;
+        const type = req.body.type;
+        const question = new Question({
+            question: questionText,
+            correct_letter: correct_letter,
+            correct_text: correctText,
+            category: category,
+            answers: allAnswers,
+            imageUrl: imageUrl,
+            type: type
+        });
+        await question.save();
+        return res.send({
+            success: true,
+            error: undefined,
+            data: undefined
+        })
+    }catch(e){
+        res.status(404);
+        return res.send({
+            success: false,
+            error: 'Question not saved' + req.body.question,
+            data: undefined
+        })
+    }
+
+}
+
 exports.addImageQuestion = async (req, res, next) =>{
     const questionText = req.body.question || 'Some question?';
     const correct_letter = req.body.correct_letter || 'B';
