@@ -35,7 +35,7 @@ const userSchema = new Schema({
     lives_reset_timer_set: {type: Boolean, required: false, default: false},
     reset_lives_at: { type: Number, required: false, default: null },
     contributions: [{type: String, required: true}],
-    avatar_url: { type: String, required: false, default: 'https://cdnjs.cloudflare.com/ajax/libs/admin-lte/2.4.0/img/avatar.png'},
+    avatar_url: { type: String, required: false, default: 'https://firebasestorage.googleapis.com/v0/b/kviz-live.appspot.com/o/1642193033985png-transparent-computer-icons-avatar-user-profile-avatar-heroes-rectangle-black.png?alt=media'},
     questions: []
 });
 
