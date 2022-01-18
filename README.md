@@ -1,2 +1,2 @@
 # quiz
-Quiz backend restAPI with node js and mongoDB
+Quiz backend for quiz-angular with node.js and mongoDB
