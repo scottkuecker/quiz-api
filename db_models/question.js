@@ -7,13 +7,13 @@ const questionSchema = new Schema({
     correct_letter: { type: String, required: true},
     correct_text: { type: String, required: true },
     answered_correctly: { type: Number, required: true, default: 0 },
-    posted_by: { type: String, required: true, default: 'ADMIN' },
+    posted_by: { type: String, required: true, default: 'USER' },
     category: String,
     type: {type: String, required: true, default: 'REGULAR'},
     imageUrl: {type: String, required: false},
     answered_wrong: { type: Number, required: true, default: 0  },
     question_picked: { type: Number, required: true, default: 0  },
-    status: { type: String, required: true, default: "ODOBRENO" },
+    status: { type: String, required: true, default: "NA CEKANJU" },
     answers: [
         { 
             letter: { type: String, required: true }, 

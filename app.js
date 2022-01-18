@@ -7,6 +7,7 @@ const cors = require('cors');
 const fs = require('fs');
 const server = express();
 server.use(cors());
+const achs = require('./controllers/achievements')
 const port = process.env.PORT;
 
 // const middleware = require('./midleware/auth');
@@ -34,10 +35,12 @@ server.use('', (req,res, next)=>{
 });
 
 mongoose.connect(process.env.MONGO).then(() =>{
-    server.listen(port)
+    server.listen(port);
+    achs.createAchievements()
 }).catch((error)=>{
     console.error(error)
 })
+
 
 
 

@@ -142,7 +142,7 @@ exports.getAllQuestions = async (req, res, next) => {
 }
 
 exports.addQuestion = async (req, res, next) =>{
-    const questionText = req.body.question || 'Some question?';
+    const questionText = req.body.question || 'Pitanje sa slikom';
     const correct_letter = req.body.correct_letter || 'B';
     const correctText = req.body.correct_text || 'Some correct answer';
     const category = req.body.category.toUpperCase();

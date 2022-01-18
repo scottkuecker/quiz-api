@@ -37,6 +37,32 @@ exports.getAchievements =  async (req, res, next) =>{
     }
   }
 
-  exports.createAchievements = (req, res, next) =>{
+  exports.createAchievements = async (req, res, next) =>{
+    // const achScores = [30, 60, 100, 200, 500, 1000, 5000, 10000]
+    // let counter = 0;
+    // function save(){
+    //   return new Promise((resolve, reject) =>{
+    //     let ach = new Achievement({
+    //       category: "RAZNO",
+    //       achiveText: `${achScores[counter]} pogodjenih pitanja`,
+    //       achievedAt: achScores[counter]
+    //     })
+    //     ach.save().then(()=>{
+    //       counter++
+    //       console.log('saved')
+    //       resolve(true)
+    //     })
+    //   })
+    // }
 
+    // async function next(){
+    //   console.log('triggering')
+    //   await save();
+    //   console.log('after save')
+    //   if(counter <= achScores.length - 1){
+    //     next();
+    //   }
+    // }
+
+    // next();
   }
