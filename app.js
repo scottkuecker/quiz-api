@@ -40,14 +40,9 @@ server.use('', (req,res, next)=>{
 mongoose.connect(process.env.MONGO).then(() =>{
     const app = server.listen(port);
     const io = require('./socket').init(app);
-    io.on('connection', socket =>{
-        // console.log(socket.conn.id);
+    io.on('connection', socket => {
+        console.log('new connection')
     })
-
-    io.on('test', () =>{
-        console.log('test')
-    })
-    // achs.createAchievements()
 }).catch((error)=>{
     console.error(error)
 })
