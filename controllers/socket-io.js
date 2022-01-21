@@ -19,7 +19,7 @@ exports.somesocketRoute = (req, res,next) =>{
     })
 }
 
-exports.createRoom = async (req, res, next) => {
+exports.createRoom = async (socket) => {
     const roomId = randomValue(6);
     const room = new Room({
         room_id: roomId,
@@ -29,13 +29,6 @@ exports.createRoom = async (req, res, next) => {
         created_by: req.user._id
     })
     await room.save()
-    io.getIO().emit('test', { test: "this is just test" })
-    return res.send({
-        success: true,
-        data: room,
-        error: undefined,
-        message: undefined
-    })
 }
 
 exports.deleteRoom = async (req, res, next) => {
@@ -79,4 +72,29 @@ exports.enterRoom = async (req, res, next) => {
         await room.save();
         io.getIO().emit('user-joined', { room });
     }
+}
+
+function mockResponse(){
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            console.log('response');
+            resolve('35kg65')
+        }, 500)
+    })
+}
+
+async function test(socket){
+    const data = await mockResponse();
+    socket.join(data);
+    console.log(socket.rooms)
+    socket.emit('ROOM-CREATED', {roomName: '35kg65'})
+}
+
+exports.setupListeners = (socket) =>{
+    const socketIo = io.getIO();
+    socketIo.on('connection', socket =>{
+        socket.on('CREATE-ROOM', () =>{
+            test(socket);
+        })
+    })
 }

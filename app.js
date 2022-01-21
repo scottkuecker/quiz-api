@@ -7,7 +7,7 @@ const cors = require('cors');
 const fs = require('fs');
 const server = express();
 server.use(cors());
-const achs = require('./controllers/achievements')
+const ioEvents = require('./controllers/socket-io');
 const port = process.env.PORT;
 
 
@@ -40,11 +40,9 @@ server.use('', (req,res, next)=>{
 mongoose.connect(process.env.MONGO).then(() =>{
     const app = server.listen(port);
     const io = require('./socket').init(app);
-    io.on('connection', socket => {
-        console.log('new connection')
-    })
+    ioEvents.setupListeners();
 }).catch((error)=>{
-    console.error(error)
+    console.error('error connecting')
 })
 
 
