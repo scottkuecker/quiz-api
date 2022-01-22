@@ -85,11 +85,13 @@ exports.updateScore = async (req, res, next) =>{
     })
 }
 
-exports.updateName = async (req, res, next) =>{
+exports.updateSettings = async (req, res, next) =>{
     const name = req.body.name;
+    const avatar = req.body.image || 'https://firebasestorage.googleapis.com/v0/b/kviz-live.appspot.com/o/1642193033985png-transparent-computer-icons-avatar-user-profile-avatar-heroes-rectangle-black.png?alt=media';
     const userDoc = await User.findById(req.user._id);
     if(userDoc){
         userDoc.name = name;
+        userDoc.avatar_url = avatar
         userDoc.save();
         return res.send({
             success: true,

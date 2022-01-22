@@ -4,7 +4,7 @@ const middleware = require('../midleware/auth');
 const router = require('express').Router();
 
 router.post('/score', middleware.authMidleware, user.updateScore);
-router.post('/name', middleware.authMidleware, user.updateName);
+router.post('/update-settings', middleware.authMidleware, user.updateSettings);
 router.get('/reset-lives', middleware.authMidleware, user.resetLives);
 router.post('/ranking-list', middleware.authMidleware, user.getRankingList);
 router.get('/daily-reward', middleware.authMidleware, user.resetDailyPrice);
