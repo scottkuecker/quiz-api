@@ -29,7 +29,6 @@ server.use(questionRoutes);
 server.use(authRoutes);
 server.use(userRoutes);
 server.use(achievementRoutes);
-server.use(socketRoutes);
 
 server.use('', (req,res, next)=>{
         res.send({

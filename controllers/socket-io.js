@@ -1,100 +1,91 @@
-const io = require('../socket');
+const socketCon = require('../socket');
 const crypto = require('crypto')
 const Room = require('../db_models/rooms');
 
 
-function randomValue(len) {
+const  randomValue = (len) => {
     return crypto.randomBytes(Math.ceil(len / 2))
         .toString('hex')
         .slice(0, len).toUpperCase();
 }
 
-exports.somesocketRoute = (req, res,next) =>{
-    io.getIO().emit('test', {test: "this is just test"})
-    return res.send({
-        success: true,
-        data: null,
-        error: undefined,
-        message: undefined
+const createDBRoom = async (socket, room, userData) =>{
+    const newRoom = new Room({
+        room_id: room,
+        users: [],
+        allow_enter: true,
+        created_by: userData.user_id
     })
-}
-
-exports.createRoom = async (socket) => {
-    const roomId = randomValue(6);
-    const room = new Room({
-        room_id: roomId,
-        users: [
-            { user_id: req.user._id, name: req.user.name }
-        ],
-        created_by: req.user._id
-    })
-    await room.save()
-}
-
-exports.deleteRoom = async (req, res, next) => {
-   const roomId = req.body.roomId;
-   const success = await Room.findByIdAndDelete(roomId)
-    if(success){
-        return res.send({
-            success: true,
-            data: null,
-            error: undefined,
-            message: undefined
-        })
+    const result = await newRoom.save();
+    if(result){
+        socket.emit('ROOM-CREATED', {success: true, event: 'ROOM-CREATED', roomName: room})
     }
-    return res.send({
-        success: false,
-        data: null,
-        error: undefined,
-        message: undefined
-    })
 }
 
-exports.enterRoom = async (req, res, next) => {
-    const data = [];
-    const clients = io.getIO().eio.clients;
-    Object.keys(clients).forEach(key =>{
-        data.push(clients['id'])
-    })
-    console.log(data)
-    return res.send({
-        success: true,
-        data: data
-    });
-    const roomId = req.body.roomId;
-    const room = await Room.findById(roomId);
-    const user = {
-        id: req.user._id,
-        name: req.user.name
-    }
+const joinDBRoom = async (io, socket, userAndRoom) => {
+    const rooms = await Room.find({room_id: userAndRoom.roomName});
+    const room = rooms[0];
     if(room){
-        room.users.push(user);
-        await room.save();
-        io.getIO().emit('user-joined', { room });
+        const haveUser = room.users.some(user => user.id === null || user.id === userAndRoom.user_id);
+        if(!haveUser){
+            room.users.push({
+                name: userAndRoom.name,
+                id: userAndRoom.user_id,
+                avatar: userAndRoom.avatar,
+            });
+        }
+        const result = await room.save();
+        if(result){
+            socket.join(`${userAndRoom.roomName}`);
+            io.to(`${userAndRoom.roomName}`).emit('JOINED-ROOM', {users: room.users, event: 'JOINED-ROOM', socked: socket.id})
+        }
+    }else{
+        socket.emit('ROOM-DONT-EXIST', {event: 'ROOM-DONT-EXIST'});
     }
 }
 
-function mockResponse(){
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            console.log('response');
-            resolve('35kg65')
-        }, 500)
-    })
+const leaveDBRoom = async (io, socket, userAndRoom) => {
+    const room = await Room.findOne({room_id: userAndRoom.roomName});
+    if(room){
+        const room_id = room._id;
+        room.users = room.users.filter(user => user.id !== userAndRoom.user_id);
+        await room.save();
+        if(!room.users.length){
+            await Room.findByIdAndDelete(room_id);
+        }
+        socket.leave(`${userAndRoom.roomName}`);
+        io.to(`${userAndRoom.roomName}`).emit('LEAVED-ROOM', {users: room.users, event: 'LEAVED-ROOM'})
+    }
 }
 
-async function test(socket){
-    const data = await mockResponse();
-    socket.join(data);
-    console.log(socket.rooms)
-    socket.emit('ROOM-CREATED', {roomName: '35kg65'})
+const createRoom = (socket, userData) =>{
+    const room =  randomValue(5);
+    if(room){
+        createDBRoom(socket, room, userData)
+    }
 }
 
-exports.setupListeners = (socket) =>{
-    const socketIo = io.getIO();
+const joinRoom = (io, socket, userAndRoom) => {
+    joinDBRoom(io, socket, userAndRoom)
+}
+
+const leaveRoom = (io, socket, userAndRoom) => {
+    leaveDBRoom(io, socket, userAndRoom)
+}
+
+exports.setupListeners = () =>{
+    const socketIo = socketCon.getIO();
     socketIo.on('connection', socket =>{
-        socket.on('CREATE-ROOM', () =>{
-            test(socket);
+        socket.on('CREATE-ROOM', (userData) =>{
+            createRoom(socket, userData);
+        });
+
+        socket.on('JOIN-ROOM', userAndRoom =>{
+            joinRoom(socketIo, socket, userAndRoom);
+        })
+
+        socket.on('LEAVE-ROOM', userAndRoom =>{
+            leaveRoom(socketIo, socket, userAndRoom)
         })
     })
 }
