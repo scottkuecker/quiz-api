@@ -10,6 +10,7 @@ function getRandomNumber(quantity) {
 exports.getQuestion = async (req, res, next) => {
     const id = req.user._id || null;
     const user = await Users.findById(req.user._id);
+    user.allready_answered = user.allready_answered || [];
     const category = req.params.category;
     user.playing = true;
     await user.save();
@@ -26,12 +27,22 @@ exports.getQuestion = async (req, res, next) => {
         questions = await Question.find({ status: 'ODOBRENO' });
     }
    
-    const questionsByOthers = [];
+    let questionsByOthers = [];
     questions.forEach(q =>{
         if(q._id.toString() !== id){
             questionsByOthers.push(q);
         }
     });
+    questionsByOthers = questionsByOthers.filter(question => !user.allready_answered.includes(question._id));
+    if (!questionsByOthers.length){
+        questions.forEach(q => {
+            if (q._id.toString() !== id) {
+                questionsByOthers.push(q);
+            }
+        });
+        user.allready_answered = [];
+        await user.save()
+    }
     let random = getRandomNumber(questionsByOthers.length);
     if (questionsByOthers && questionsByOthers.length){
         let picked = JSON.parse(JSON.stringify(questionsByOthers[random]));
@@ -187,20 +198,23 @@ exports.addFastQuestion = async (req, res, next) => {
         const questionText = req.body.question || 'Some question?';
         const correct_letter = req.body.correct_letter || 'B';
         const correctText = req.body.correct_text || 'Some correct answer';
-        const category = req.body.category.toUpperCase();
-        const allAnswers = req.body.answers;
-        const imageUrl = req.body.imageUrl;
-        const type = req.body.type;
-        const question = new Question({
-            question: questionText,
-            correct_letter: correct_letter,
-            correct_text: correctText,
-            category: category,
-            answers: allAnswers,
-            imageUrl: imageUrl,
-            type: type
+        const allAnswers = req.body.answers || [];
+        let letters = ['A','B', 'C', 'D'];
+        let filtered = allAnswers.map((item, i) =>{
+            return {
+                text: item,
+                letter: letters[i]
+            }
         });
+        const question = new Question({
+                question: questionText,
+                correct_letter: correct_letter,
+                correct_text: correctText,
+                category: 'FILMOVI I SERIJE',
+                answers: filtered,
+            });
         await question.save();
+        console.log('saved')
         return res.send({
             success: true,
             error: undefined,
