@@ -52,9 +52,8 @@ exports.getQuestion = async (req, res, next) => {
         picked.correct_text = 'Ma da neces odgovor mozda :)';
         picked.correct_letter = 'Saznaces nakon sto izaberes';
         let timesPicked = picked.question_picked + 1;
-        await Question.findByIdAndUpdate({ _id: picked._id.toString() }, { question_picked: timesPicked});
-        console.log(user.allready_answered)
-        console.log('Questions until reset: ' + questionsByOthers.length)
+        let difficulty = parseInt((picked.answered_correctly / timesPicked) * 100);
+        await Question.findByIdAndUpdate({ _id: picked._id.toString() }, { question_picked: timesPicked, question_difficulty: difficulty});
         return res.json({
             success: true,
             data: picked,
