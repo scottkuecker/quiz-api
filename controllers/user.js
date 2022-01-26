@@ -2,6 +2,11 @@ const User = require('../db_models/user');
 const Achievements = require('../db_models/achievement');
 const Questions = require('./questions');
 
+function getRandomNumber(quantity) {
+    var milliseconds = new Date().getMilliseconds();
+    return Math.floor(milliseconds * quantity / 1000);
+}
+
 exports.resetPlayingState = async (req, res, next) =>{
     const user = await User.findById(req.user._id)
     user.playing = false;
@@ -18,11 +23,14 @@ exports.resetPlayingState = async (req, res, next) =>{
 exports.resetDailyPrice = async (req, res, next) => {
     const id = req.user._id;
     const user = await User.findById(id);
+    const ticketPrice = [1,5,1,2,3,1,2,1,1,10,1,1,3,1,4,2,1,4,1,2,3,1,1];
+    const random = getRandomNumber(ticketPrice.length - 1);
     if (user) {
       const now = Date.now();
-      if(now >= user.daily_price){
-        const oneDay = 24 * 60 * 60 * 1000;
-        user.tickets++;
+      if(now >= user.daily_price){ 
+        // const oneDay = 24 * 60 * 60 * 1000;
+        const oneDay = 60 * 1000;
+        user.tickets += ticketPrice[random];
         const tomorow = now + oneDay;
         user.daily_price = tomorow;
       }
@@ -30,6 +38,7 @@ exports.resetDailyPrice = async (req, res, next) => {
       return res.send({
         success: true,
         data: user,
+        tickets: ticketPrice[random],
         error: ''
       })
     }else{

@@ -154,30 +154,31 @@ exports.refreshUser = async (req, res, next) => {
     }
 }
 
-exports.takeDailyPrice = async (req, res, next) =>{
-    const user = User.findById(req.user._id);
-        if (!user){
-            return res.send({
-                success: false,
-                data: undefined,
-                error: undefined
-            })
-        }
-        if (!user.daily_price){
-            return res.send({
-                success: false,
-                data: undefined,
-                error: 'Price received'
-            })
-        }
-    user.tickets++;
-    user.daily_price = false;
-    const success = await user.save();
-    if(success){
-        return res.send({
-            success: true,
-            data: undefined,
-            error: undefined
-        })
-    }
-}
+// exports.takeDailyPrice = async (req, res, next) =>{
+//     const user = User.findById(req.user._id);
+//         if (!user){
+//             return res.send({
+//                 success: false,
+//                 data: undefined,
+//                 error: undefined
+//             })
+//         }
+//         if (!user.daily_price){
+//             return res.send({
+//                 success: false,
+//                 data: undefined,
+//                 error: 'Price received'
+//             })
+//         }
+   
+//     user.tickets++;
+//     user.daily_price = false;
+//     const success = await user.save();
+//     if(success){
+//         return res.send({
+//             success: true,
+//             data: undefined,
+//             error: undefined
+//         })
+//     }
+// }
