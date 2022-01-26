@@ -41,15 +41,20 @@ exports.getQuestion = async (req, res, next) => {
             }
         });
         user.allready_answered = [];
+        console.log('RESETED')
         await user.save()
     }
     let random = getRandomNumber(questionsByOthers.length);
     if (questionsByOthers && questionsByOthers.length){
         let picked = JSON.parse(JSON.stringify(questionsByOthers[random]));
+        user.allready_answered.push(picked._id)
+        await user.save();
         picked.correct_text = 'Ma da neces odgovor mozda :)';
         picked.correct_letter = 'Saznaces nakon sto izaberes';
         let timesPicked = picked.question_picked + 1;
-        await Question.findByIdAndUpdate({ _id: picked._id.toString() }, { question_picked: timesPicked})
+        await Question.findByIdAndUpdate({ _id: picked._id.toString() }, { question_picked: timesPicked});
+        console.log(user.allready_answered)
+        console.log('Questions until reset: ' + questionsByOthers.length)
         return res.json({
             success: true,
             data: picked,
