@@ -1,6 +1,7 @@
 const Question = require('../db_models/question');
 const Users = require('../db_models/user');
 const messages = require('../messages');
+const Validators = require('../utils/validations');
 
 function getRandomNumber(quantity) {
     var milliseconds = new Date().getMilliseconds();
@@ -8,7 +9,7 @@ function getRandomNumber(quantity) {
 }
 
 exports.getQuestion = async (req, res, next) => {
-    const id = req.user._id || null;
+    const id = req.user._id;
     const user = await Users.findById(req.user._id);
     user.allready_answered = user.allready_answered || [];
     const category = req.params.category;
@@ -41,7 +42,6 @@ exports.getQuestion = async (req, res, next) => {
             }
         });
         user.allready_answered = [];
-        console.log('RESETED')
         await user.save()
     }
     let random = getRandomNumber(questionsByOthers.length);
