@@ -23,7 +23,7 @@ exports.resetPlayingState = async (req, res, next) =>{
 exports.resetDailyPrice = async (req, res, next) => {
     const id = req.user._id;
     const user = await User.findById(id);
-    const ticketPrice = [1,5,1,2,3,1,2,1,1,10,1,1,3,1,4,2,1,4,1,2,3,1,1];
+    const ticketPrice = [1,1,1,5,1,,1,1,2,1,1,1,3,1,1,1,2,1,1,1,10,1,1,1,3,1,1,1,4,1,1,1,2,1,1,1,4,1,1,1,2,1,1,1,3,1,1];
     const random = getRandomNumber(ticketPrice.length - 1);
     if (user) {
       const now = Date.now();
