@@ -1,6 +1,7 @@
 const socketCon = require('../socket');
 const crypto = require('crypto')
 const Room = require('../db_models/rooms');
+const EVENTS = require('./socket-events');
 
 
 const  randomValue = (len) => {
@@ -18,7 +19,7 @@ const createDBRoom = async (socket, room, userData) =>{
     })
     const result = await newRoom.save();
     if(result){
-        socket.emit('ROOM-CREATED', {success: true, event: 'ROOM-CREATED', roomName: room})
+        socket.emit(EVENTS.ROOM_CREATED(), {success: true, event: EVENTS.ROOM_CREATED(), roomName: room})
     }
 }
 
@@ -37,10 +38,11 @@ const joinDBRoom = async (io, socket, userAndRoom) => {
         const result = await room.save();
         if(result){
             socket.join(`${userAndRoom.roomName}`);
-            io.to(`${userAndRoom.roomName}`).emit('JOINED-ROOM', {users: room.users, event: 'JOINED-ROOM', socked: socket.id})
+            io.to(`${userAndRoom.roomName}`).emit(EVENTS.JOINED_ROOM(), {users: room.users, event: EVENTS.JOINED_ROOM(), socked: socket.id})
         }
     }else{
-        socket.emit('ROOM-DONT-EXIST', {event: 'ROOM-DONT-EXIST'});
+        socket.emit(EVENTS.ROOM_DONT_EXIST(), {
+            event: EVENTS.ROOM_DONT_EXIST()});
     }
 }
 
@@ -54,7 +56,8 @@ const leaveDBRoom = async (io, socket, userAndRoom) => {
             await Room.findByIdAndDelete(room_id);
         }
         socket.leave(`${userAndRoom.roomName}`);
-        io.to(`${userAndRoom.roomName}`).emit('LEAVED-ROOM', {users: room.users, event: 'LEAVED-ROOM'})
+        io.to(`${userAndRoom.roomName}`).emit(EVENTS.LEAVED_ROOM(), 
+            {users: room.users, event: EVENTS.LEAVED_ROOM()})
     }
 }
 
@@ -76,15 +79,15 @@ const leaveRoom = (io, socket, userAndRoom) => {
 exports.setupListeners = () =>{
     const socketIo = socketCon.getIO();
     socketIo.on('connection', socket =>{
-        socket.on('CREATE-ROOM', (userData) =>{
+        socket.on(EVENTS.CREATE_ROOM(), (userData) =>{
             createRoom(socket, userData);
         });
 
-        socket.on('JOIN-ROOM', userAndRoom =>{
+        socket.on(EVENTS.JOIN_ROOM(), userAndRoom =>{
             joinRoom(socketIo, socket, userAndRoom);
         })
 
-        socket.on('LEAVE-ROOM', userAndRoom =>{
+        socket.on(EVENTS.LEAVE_ROOM(), userAndRoom =>{
             leaveRoom(socketIo, socket, userAndRoom)
         })
     })
