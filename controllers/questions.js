@@ -218,7 +218,6 @@ exports.addFastQuestion = async (req, res, next) => {
                 answers: filtered,
             });
         await question.save();
-        console.log('saved')
         return res.send({
             success: true,
             error: undefined,

@@ -5,7 +5,6 @@ const url = 'mongodb+srv://milancakic:Masterdamus12@quiz-cluster.vopbe.mongodb.n
 
 const mongoConnect = (callback) =>{
     MongoClient.connect(url).then(result => {
-        console.log('connected')
         callback(result)
     }).catch(error =>{
         callback(null)

@@ -88,7 +88,7 @@ exports.WAITING_OTHERS_TO_ANSWER = () => 'WAITING_OTHERS_TO_ANSWER';
  * @common_data_to_send {success: boolean, users: room users array, event: 'START_NEXT_TOURNAMENT_QUESTION'}
  * @returns EVENT STRING
  */
-exports.START_NEXT_TOURNAMENT_QUESTION = () => 'START_NEXT_TOURNAMENT_QUESTION';
+exports.START_TOURNAMENT_QUESTION = () => 'START_TOURNAMENT_QUESTION';
 
 
 /**
@@ -97,6 +97,21 @@ exports.START_NEXT_TOURNAMENT_QUESTION = () => 'START_NEXT_TOURNAMENT_QUESTION';
  * @returns EVENT STRING
  */
 exports.TOURNAMENT_FINISHED = () => 'TOURNAMENT_FINISHED';
+
+
+/**
+ * @description Emited from client, contains slected question letter
+ * @common_data_to_send {correct: boolean, users: room users array, event: 'SELECTED_QUESTION_LETTER'}
+ * @returns EVENT STRING
+ */
+exports.SELECTED_QUESTION_LETTER = () => 'SELECTED_QUESTION_LETTER';
+
+/**
+ * @description Emit to room when someone answers question to update waiting status
+ * @common_data_to_send {users: room users array, event: 'UPDATE_WAITING_STATUS'}
+ * @returns EVENT STRING
+ */
+ exports.UPDATE_WAITING_STATUS = () => 'UPDATE_WAITING_STATUS';
 
 
 
