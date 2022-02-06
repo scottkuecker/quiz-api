@@ -8,6 +8,8 @@ const room = new Schema({
     users: [
         { type: Object, required: true }
     ],
+    started: {type: Boolean, required: true, default: false},
+    total_questions: {type: Number, required: true, default: 0},
     allow_enter: { type: Boolean, required: true, default: true },
     created_by: String
 });

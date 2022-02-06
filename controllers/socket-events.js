@@ -114,4 +114,18 @@ exports.SELECTED_QUESTION_LETTER = () => 'SELECTED_QUESTION_LETTER';
  exports.UPDATE_WAITING_STATUS = () => 'UPDATE_WAITING_STATUS';
 
 
+ /**
+ * @description Emit to room when everyone has answered the question
+ * @common_data_to_send {users: room users array, event: 'EVERYONE_ANSWERED'}
+ * @returns EVENT STRING
+ */
+  exports.EVERYONE_ANSWERED = () => 'EVERYONE_ANSWERED';
+
+   /**
+ * @description Emit to client room question
+ * @common_data_to_send {users: room users array, event: 'EVERYONE_ANSWERED'}
+ * @returns EVENT STRING
+ */
+    exports.GET_ROOM_QUESTION = () => 'GET_ROOM_QUESTION';
+
 
