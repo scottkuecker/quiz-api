@@ -39,6 +39,7 @@ const joinDBRoom = async (io, socket, userAndRoom) => {
             room.users.push({
                 name: userAndRoom.name,
                 id: userAndRoom.user_id,
+                score: 0,
                 answered: false,
                 avatar: userAndRoom.avatar,
             });
@@ -121,6 +122,9 @@ const checkDBTournamentQuestion = async (io, socket, data) =>{
     users.forEach(user =>{
         if(user.id === data.user_id){
             user.answered = true;
+            if (data.letter === question.correct_letter){
+                user.score++;
+            }
         }
     });
     room.users = users;
@@ -142,6 +146,11 @@ const checkDBTournamentQuestion = async (io, socket, data) =>{
         io.to(`${data.roomName}`).emit(EVENTS.UPDATE_WAITING_STATUS(), { event: EVENTS.UPDATE_WAITING_STATUS(), users: room.users})
     }
     
+}
+
+const getDBRoomResults = async (socket, data) =>{
+    const room = room.findOne({room_id: data.user_id});
+    socket.emit(EVENTS.GET_ROOM_RESULTS(), { event: EVENTS.GET_ROOM_RESULTS(), data: room.users})
 }
 
 const createRoom = (socket, userData) =>{
@@ -171,6 +180,11 @@ const getQuestion = (socket, data) => {
     getDBQuestion(socket, data)
 }
 
+const getRoomResults = (socket, data) => {
+    getDBRoomResults(socket, data)
+}
+
+
 exports.setupListeners = () =>{
     const socketIo = socketCon.getIO();
     socketIo.on('connection', socket =>{
@@ -194,6 +208,9 @@ exports.setupListeners = () =>{
         })
         socket.on(EVENTS.GET_ROOM_QUESTION(), data =>{
             getQuestion(socket, data)
+        })
+        socket.on(EVENTS.GET_ROOM_RESULTS(), data => {
+            getRoomResults(socket, data)
         })
     })
 }

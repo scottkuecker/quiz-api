@@ -129,3 +129,11 @@ exports.SELECTED_QUESTION_LETTER = () => 'SELECTED_QUESTION_LETTER';
     exports.GET_ROOM_QUESTION = () => 'GET_ROOM_QUESTION';
 
 
+/**
+* @description Emit to client room results
+* @common_data_to_send {users: room users array, event: 'GET_ROOM_RESULTS'}
+* @returns EVENT STRING
+*/
+exports.GET_ROOM_QUESTION = () => 'GET_ROOM_RESULTS';
+
+
