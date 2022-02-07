@@ -127,6 +127,12 @@ const checkDBTournamentQuestion = async (io, socket, data) =>{
     await room.save();
     const everyone_answered = room.users.every(user => user.answered === true);
     if(everyone_answered){
+        const resetUsers = JSON.parse(JSON.stringify(room.users));
+        resetUsers.forEach(user => {
+            user.answered = false;
+        });
+        room.users = resetUsers;
+        await room.save();
         socket.emit(EVENTS.SELECTED_QUESTION_LETTER(), { correct: data.letter === question.correct_letter, event: EVENTS.SELECTED_QUESTION_LETTER(), users: room.users})
         io.to(`${data.roomName}`).emit(EVENTS.EVERYONE_ANSWERED(), { event: EVENTS.EVERYONE_ANSWERED(), users: room.users})
         startDBTournamentQuestion(io, data);
