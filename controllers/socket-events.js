@@ -134,6 +134,6 @@ exports.SELECTED_QUESTION_LETTER = () => 'SELECTED_QUESTION_LETTER';
 * @common_data_to_send {users: room users array, event: 'GET_ROOM_RESULTS'}
 * @returns EVENT STRING
 */
-exports.GET_ROOM_QUESTION = () => 'GET_ROOM_RESULTS';
+ exports.GET_ROOM_RESULTS = () => 'GET_ROOM_RESULTS';
 
 
