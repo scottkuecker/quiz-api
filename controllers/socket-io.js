@@ -149,8 +149,13 @@ const checkDBTournamentQuestion = async (io, socket, data) =>{
 }
 
 const getDBRoomResults = async (socket, data) =>{
-    const room = room.findOne({room_id: data.user_id});
-    socket.emit(EVENTS.GET_ROOM_RESULTS(), { event: EVENTS.GET_ROOM_RESULTS(), data: room.users})
+    const room = await Room.findOne({room_id: data.roomName});
+    if(!room){
+        socket.emit(`${EVENTS.ROOM_DONT_EXIST()}`, {
+            event: `${EVENTS.ROOM_DONT_EXIST()}`
+        });
+    }
+    socket.emit(EVENTS.GET_ROOM_RESULTS(), { event: EVENTS.GET_ROOM_RESULTS(), users: room.users})
 }
 
 const createRoom = (socket, userData) =>{
