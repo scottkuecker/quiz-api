@@ -104,10 +104,15 @@ const startDBTournamentQuestion = async (io, data) =>{
         return;
     }
     const questions = await Questions.find();
-    const random = getRandomNumber(questions.length)
-    const question = questions[random];
-    room.total_questions++;
-    room.current_question = question;
+    const filtered = questions.filter(question => !room.answered_question_ids.contains(question._id));
+    const random = getRandomNumber(filtered.length)
+    const question = filtered[random];
+    if (!room.answered_question_ids.contains(question._id)){
+        room.total_questions++;
+        room.current_question = question;
+        room.answered_question_ids.push(question)
+    }
+   
     await room.save();
     io.to(`${data.roomName}`).emit(EVENTS.EVERYONE_ANSWERED(), { event: EVENTS.EVERYONE_ANSWERED(), users: room.users })
 }
