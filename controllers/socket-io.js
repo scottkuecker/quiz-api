@@ -109,6 +109,7 @@ const startDBTournamentQuestion = async (io, data) =>{
     room.total_questions++;
     room.current_question = question;
     await room.save();
+    io.to(`${data.roomName}`).emit(EVENTS.EVERYONE_ANSWERED(), { event: EVENTS.EVERYONE_ANSWERED(), users: room.users })
 }
 
 const checkDBTournamentQuestion = async (io, socket, data) =>{
@@ -138,7 +139,6 @@ const checkDBTournamentQuestion = async (io, socket, data) =>{
         room.users = resetUsers;
         await room.save();
         socket.emit(EVENTS.SELECTED_QUESTION_LETTER(), { correct: data.letter === question.correct_letter, event: EVENTS.SELECTED_QUESTION_LETTER(), users: room.users})
-        io.to(`${data.roomName}`).emit(EVENTS.EVERYONE_ANSWERED(), { event: EVENTS.EVERYONE_ANSWERED(), users: room.users})
         startDBTournamentQuestion(io, data);
 
     }else{
