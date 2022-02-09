@@ -13,3 +13,31 @@ exports.handleError = (fn) =>{
         }
     }
 }
+
+exports.handleSocketError = (fn) => {
+    return (socket, data) => {
+        try {
+            fn(socket, data)
+        } catch (error) {
+            const err = new ErrorDB({
+                message: String(error),
+                caused_by: fn.name
+            })
+            err.save();
+        }
+    }
+}
+
+exports.handleIOError = (fn) => {
+    return (io, socket, data) => {
+        try {
+            fn(io, socket, data)
+        } catch (error) {
+            const err = new ErrorDB({
+                message: String(error),
+                caused_by: fn.name
+            })
+            err.save();
+        }
+    }
+}

@@ -4,6 +4,7 @@ const Questions = require('../db_models/question');
 const Room = require('../db_models/rooms');
 const Users = require('../db_models/user');
 const Error = require('../db_models/errors');
+const handleError = require('../utils/errorHandler');
 const EVENTS = require('./socket-events');
 
 
@@ -63,6 +64,7 @@ const joinDBRoom = async (io, socket, userAndRoom) => {
         socket.emit(EVENTS.ROOM_DONT_EXIST(), {
             event: EVENTS.ROOM_DONT_EXIST(),
             fn: 'joinDBRoom'});
+        throw new Error('joinDBRoom no room found')  
     }
 }
 
@@ -89,9 +91,10 @@ const leaveDBRoom = async (io, socket, userAndRoom) => {
 const startDBTournament = async (io, socket, data) =>{
     const tournamentRoom = await Room.findOne({room_id: data.roomName});
     if(!tournamentRoom){
-       return socket.emit(`${EVENTS.ROOM_DONT_EXIST()}`, {
+       socket.emit(`${EVENTS.ROOM_DONT_EXIST()}`, {
             event: `${EVENTS.ROOM_DONT_EXIST()}`,
             fn: 'startDBTournament'});
+        throw new Error('startDBTournament no room found')  
     }
     const questions = await Questions.find();
     const room_questions = [];
@@ -125,9 +128,10 @@ const startDBTournament = async (io, socket, data) =>{
 const getDBQuestion = async (socket, data) =>{
     const tournamentRoom = await Room.findOne({room_id: data.roomName});
     if (!tournamentRoom || !tournamentRoom.allow_enter){
-        return socket.emit(`${EVENTS.ROOM_DONT_EXIST()}`, {
+        socket.emit(`${EVENTS.ROOM_DONT_EXIST()}`, {
             event: EVENTS.ROOM_DONT_EXIST(),
             fn: `getDBQuestion()|requestedRoom:${data.roomName}|respondedRoom: ${tournamentRoom.room_id}|allow: ${tournamentRoom.allow_enter}`});
+        throw new Error('getDBQuestion no room found')  
     }
     socket.emit(EVENTS.GET_ROOM_QUESTION(), {event: EVENTS.GET_ROOM_QUESTION(), question: tournamentRoom.questions[data.questionIndex]})
 }
@@ -136,9 +140,10 @@ const getDBQuestion = async (socket, data) =>{
 const startDBTournamentQuestion = async (io, data) =>{
     const room = await Room.findOne({room_id: data.roomName})
     if(!room){
-       return io.to(`${data.roomName}`).emit(`${EVENTS.ROOM_DONT_EXIST()}`, {
+       io.to(`${data.roomName}`).emit(`${EVENTS.ROOM_DONT_EXIST()}`, {
             event: `${EVENTS.ROOM_DONT_EXIST()}`,
            fn: 'startDBTournamentQuestion'});
+        throw new Error('startDBTournamentQuestion no room')    
     }
     if(room.total_questions >= 15){
         room.allow_enter = false;
@@ -153,9 +158,10 @@ const startDBTournamentQuestion = async (io, data) =>{
 const checkDBTournamentQuestion = async (io, socket, data) =>{
     const room = await Room.findOne({room_id: data.roomName})
     if(!room){
-       return socket.emit(`${EVENTS.ROOM_DONT_EXIST()}`, {
+           socket.emit(`${EVENTS.ROOM_DONT_EXIST()}`, {
             event: `${EVENTS.ROOM_DONT_EXIST()}`,
            fn: 'checkDBTournamentQuestion'});
+        throw new Error('checkDBTournamentQuestion no room')
     }
     const question = room.questions[data.questionIndex];
     const users = JSON.parse(JSON.stringify(room.users));
@@ -191,10 +197,11 @@ const checkDBTournamentQuestion = async (io, socket, data) =>{
 const getDBRoomResults = async (socket, data) =>{
     const room = await Room.findOne({room_id: data.roomName});
     if(!room){
-        return socket.emit(`${EVENTS.ROOM_DONT_EXIST()}`, {
+        socket.emit(`${EVENTS.ROOM_DONT_EXIST()}`, {
             event: `${EVENTS.ROOM_DONT_EXIST()}`,
             fn: 'getDBRoomResults'
         });
+        throw new Error('getDBRoomResults no room')  
     }
     socket.emit(EVENTS.GET_ROOM_RESULTS(), { event: EVENTS.GET_ROOM_RESULTS(), users: room.users})
 }
@@ -210,28 +217,28 @@ const createRoom = (socket, userData) =>{
     }
 }
 
-const joinRoom = (io, socket, userAndRoom) => {
-        joinDBRoom(io, socket, userAndRoom);
+const joinRoom = (io, socket, userAndRoom) => {    
+    handleError.handleIOError(joinDBRoom(io, socket, userAndRoom)) 
 }
 
 const leaveRoom = (io, socket, userAndRoom) => {
-    leaveDBRoom(io, socket, userAndRoom);
+    handleError.handleIOError(leaveDBRoom(io, socket, userAndRoom)) 
 }
 
 const startTournament = (io, socket, data) =>{
-    startDBTournament(io, socket, data);
+    handleError.handleIOError(startDBTournament(io, socket, data)) 
 }
 
 const checkTournamentQuestion = (io, socket, data) => {
-    checkDBTournamentQuestion(io, socket, data)
+    handleError.handleIOError(checkDBTournamentQuestion(io, socket, data)) 
 }
 
 const getQuestion = (socket, data) => {
-    getDBQuestion(socket, data)
+    handleError.handleSocketError(getDBQuestion(socket, data)) 
 }
 
 const getRoomResults = (socket, data) => {
-    getDBRoomResults(socket, data)
+    handleError.handleSocketError(getDBRoomResults(socket, data)) 
 }
 
 const disconectSocket = (socket) => {
