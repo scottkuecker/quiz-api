@@ -2,6 +2,7 @@ const socketCon = require('../socket');
 const crypto = require('crypto');
 const Questions = require('../db_models/question');
 const Room = require('../db_models/rooms');
+const Users = require('../db_models/user');
 const EVENTS = require('./socket-events');
 
 
@@ -17,6 +18,7 @@ function getRandomNumber(quantity) {
 }
 
 const createDBRoom = async (socket, room, userData) =>{
+    const user = await Users.findOne({ _id: userData.user_id })
     const newRoom = new Room({
         room_id: room,
         users: [],
@@ -26,15 +28,22 @@ const createDBRoom = async (socket, room, userData) =>{
     })
     const result = await newRoom.save();
     if(result){
+        user.room = room;
+        user.socket = socket.id;
+        await user.save();
         socket.emit(EVENTS.ROOM_CREATED(), {success: true, created_by: newRoom.created_by, event: `${EVENTS.ROOM_CREATED()}`, roomName: room})
     }
 }
 
 const joinDBRoom = async (io, socket, userAndRoom) => {
     const rooms = await Room.find({room_id: userAndRoom.roomName});
+    const user = await Users.findOne({ _id: userAndRoom.user_id})
     const room = rooms[0];
-    if(room){
+    if (room && room.allow_enter){
         const haveUser = room.users.some(user => user.id === null || user.id === userAndRoom.user_id);
+        user.room = userAndRoom.roomName;
+        user.socket = socket.id;
+        await user.save();
         if(!haveUser){
             room.users.push({
                 name: userAndRoom.name,
@@ -55,12 +64,16 @@ const joinDBRoom = async (io, socket, userAndRoom) => {
     }
 }
 
+
 const leaveDBRoom = async (io, socket, userAndRoom) => {
     const room = await Room.findOne({room_id: userAndRoom.roomName});
+    const user = await Users.findOne({ _id: userAndRoom.user_id })
     if(room){
         const room_id = room._id;
         room.users = room.users.filter(user => user.id !== userAndRoom.user_id);
         await room.save();
+        user.room = '';
+        await user.save();
         if(!room.users.length){
             await Room.findByIdAndDelete(room_id);
         }
@@ -70,6 +83,7 @@ const leaveDBRoom = async (io, socket, userAndRoom) => {
     }
 }
 
+
 const startDBTournament = async (io, socket, data) =>{
     const tournamentRoom = await Room.findOne({room_id: data.roomName});
     if(!tournamentRoom){
@@ -78,9 +92,17 @@ const startDBTournament = async (io, socket, data) =>{
     }
     const questions = await Questions.find();
     const room_questions = [];
+    const randomNumbers = [];
     async function generateQuestions(){
         if(room_questions.length < 15){
             let random = getRandomNumber(questions.length);
+            function uniqueNumbers(){
+                if (randomNumbers.includes(random)) {
+                    random = getRandomNumber(questions.length);
+                    uniqueNumbers();
+                }
+            }
+            uniqueNumbers();
             let question = questions[random];
             room_questions.push(question);
             generateQuestions();
@@ -89,17 +111,19 @@ const startDBTournament = async (io, socket, data) =>{
     generateQuestions();
     tournamentRoom.questions = room_questions;
     await tournamentRoom.save();
-    io.to(`${data.roomName}`).emit(EVENTS.TOURNAMENT_STARTING(), {event: EVENTS.TOURNAMENT_STARTING()})
+    io.to(`${data.roomName}`).emit(EVENTS.TOURNAMENT_STARTING(), {event: EVENTS.TOURNAMENT_STARTING()});
 }
+
 
 const getDBQuestion = async (socket, data) =>{
     const tournamentRoom = await Room.findOne({room_id: data.roomName});
-    if(!tournamentRoom){
+    if (!tournamentRoom || !tournamentRoom.allow_enter){
         socket.emit(`${EVENTS.ROOM_DONT_EXIST()}`, {
             event: `${EVENTS.ROOM_DONT_EXIST()}`});
     }
     socket.emit(EVENTS.GET_ROOM_QUESTION(), {event: EVENTS.GET_ROOM_QUESTION(), question: tournamentRoom.questions[data.questionIndex]})
 }
+
 
 const startDBTournamentQuestion = async (io, data) =>{
     const room = await Room.findOne({room_id: data.roomName})
@@ -108,11 +132,14 @@ const startDBTournamentQuestion = async (io, data) =>{
             event: `${EVENTS.ROOM_DONT_EXIST()}`});
     }
     if(room.total_questions >= 15){
+        room.allow_enter = false;
+        room.save();
         io.to(`${data.roomName}`).emit(EVENTS.TOURNAMENT_FINISHED(), { event: EVENTS.TOURNAMENT_FINISHED(), users: room.users});
         return;
     }
     io.to(`${data.roomName}`).emit(EVENTS.EVERYONE_ANSWERED(), { event: EVENTS.EVERYONE_ANSWERED(), users: room.users })
 }
+
 
 const checkDBTournamentQuestion = async (io, socket, data) =>{
     const room = await Room.findOne({room_id: data.roomName})
@@ -160,6 +187,10 @@ const getDBRoomResults = async (socket, data) =>{
     socket.emit(EVENTS.GET_ROOM_RESULTS(), { event: EVENTS.GET_ROOM_RESULTS(), users: room.users})
 }
 
+const disconectDBSocket = async (socket) =>{
+
+}
+
 const createRoom = (socket, userData) =>{
     const room =  randomValue(5);
     if(room){
@@ -191,10 +222,17 @@ const getRoomResults = (socket, data) => {
     getDBRoomResults(socket, data)
 }
 
+const disconectSocket = (socket) => {
+    disconectDBSocket(socket)
+}
+
 
 exports.setupListeners = () =>{
     const socketIo = socketCon.getIO();
     socketIo.on('connection', socket =>{
+        socket.on('disconnect', () => {
+            disconectSocket(socket);
+        })
         socket.on(EVENTS.CREATE_ROOM(), (userData) =>{
             createRoom(socket, userData);
         });
@@ -219,5 +257,6 @@ exports.setupListeners = () =>{
         socket.on(EVENTS.GET_ROOM_RESULTS(), data => {
             getRoomResults(socket, data)
         })
-    })
+    });
+
 }

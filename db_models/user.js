@@ -31,6 +31,8 @@ const userSchema = new Schema({
         category: {type: String, required: true}, 
         questions_added: {type: Number, required: true}
     }],
+    room: String,
+    socket: String,
     reset_password_token: {type: String, required: false, default: null},
     lives_reset_timer_set: {type: Boolean, required: false, default: false},
     reset_lives_at: { type: Number, required: false, default: null },
