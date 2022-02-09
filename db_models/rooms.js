@@ -5,6 +5,7 @@ const Schema = mongoose.Schema;
 const room = new Schema({
     room_id: { type: String, required: true },
     current_question: { type: Object, required: false, default: null},
+    questions: { type: Object, required: false, default: [] },
     answered_question_ids: [],
     users: [
         { type: Object, required: true }

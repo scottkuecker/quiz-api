@@ -77,9 +77,17 @@ const startDBTournament = async (io, socket, data) =>{
             event: `${EVENTS.ROOM_DONT_EXIST()}`});
     }
     const questions = await Questions.find();
-    const random = getRandomNumber(questions.length)
-    const question = questions[random];
-    tournamentRoom.current_question = question;
+    const room_questions = [];
+    async function generateQuestions(){
+        if(room_questions.length < 15){
+            let random = getRandomNumber(questions.length);
+            let question = questions[random];
+            room_questions.push(question);
+            generateQuestions();
+        }
+    }
+    generateQuestions();
+    tournamentRoom.questions = room_questions;
     await tournamentRoom.save();
     io.to(`${data.roomName}`).emit(EVENTS.TOURNAMENT_STARTING(), {event: EVENTS.TOURNAMENT_STARTING()})
 }
@@ -90,7 +98,7 @@ const getDBQuestion = async (socket, data) =>{
         socket.emit(`${EVENTS.ROOM_DONT_EXIST()}`, {
             event: `${EVENTS.ROOM_DONT_EXIST()}`});
     }
-    socket.emit(EVENTS.GET_ROOM_QUESTION(), {event: EVENTS.GET_ROOM_QUESTION(), question: tournamentRoom.current_question})
+    socket.emit(EVENTS.GET_ROOM_QUESTION(), {event: EVENTS.GET_ROOM_QUESTION(), question: tournamentRoom.questions[data.questionIndex]})
 }
 
 const startDBTournamentQuestion = async (io, data) =>{
@@ -103,17 +111,6 @@ const startDBTournamentQuestion = async (io, data) =>{
         io.to(`${data.roomName}`).emit(EVENTS.TOURNAMENT_FINISHED(), { event: EVENTS.TOURNAMENT_FINISHED(), users: room.users});
         return;
     }
-    const questions = await Questions.find();
-    const filtered = questions.filter(question => !room.answered_question_ids.includes(question._id));
-    const random = getRandomNumber(filtered.length)
-    const question = filtered[random];
-    if (!room.answered_question_ids.includes(question._id)){
-        room.total_questions++;
-        room.current_question = question;
-        room.answered_question_ids.push(question)
-    }
-   
-    await room.save();
     io.to(`${data.roomName}`).emit(EVENTS.EVERYONE_ANSWERED(), { event: EVENTS.EVERYONE_ANSWERED(), users: room.users })
 }
 
@@ -123,7 +120,7 @@ const checkDBTournamentQuestion = async (io, socket, data) =>{
         socket.emit(`${EVENTS.ROOM_DONT_EXIST()}`, {
             event: `${EVENTS.ROOM_DONT_EXIST()}`});
     }
-    const question = room.current_question;
+    const question = room.questions[questionIndex];
     const users = JSON.parse(JSON.stringify(room.users));
     users.forEach(user =>{
         if(user.id === data.user_id){
