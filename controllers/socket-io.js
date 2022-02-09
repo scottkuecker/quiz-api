@@ -61,7 +61,8 @@ const joinDBRoom = async (io, socket, userAndRoom) => {
         }
     }else{
         socket.emit(EVENTS.ROOM_DONT_EXIST(), {
-            event: EVENTS.ROOM_DONT_EXIST()});
+            event: EVENTS.ROOM_DONT_EXIST(),
+            fn: 'joinDBRoom'});
     }
 }
 
@@ -89,7 +90,8 @@ const startDBTournament = async (io, socket, data) =>{
     const tournamentRoom = await Room.findOne({room_id: data.roomName});
     if(!tournamentRoom){
        return socket.emit(`${EVENTS.ROOM_DONT_EXIST()}`, {
-            event: `${EVENTS.ROOM_DONT_EXIST()}`});
+            event: `${EVENTS.ROOM_DONT_EXIST()}`,
+            fn: 'startDBTournament'});
     }
     const questions = await Questions.find();
     const room_questions = [];
@@ -124,7 +126,8 @@ const getDBQuestion = async (socket, data) =>{
     const tournamentRoom = await Room.findOne({room_id: data.roomName});
     if (!tournamentRoom || !tournamentRoom.allow_enter){
         return socket.emit(`${EVENTS.ROOM_DONT_EXIST()}`, {
-            event: `${EVENTS.ROOM_DONT_EXIST()}`});
+            event: EVENTS.ROOM_DONT_EXIST(),
+            fn: 'getDBQuestion'});
     }
     socket.emit(EVENTS.GET_ROOM_QUESTION(), {event: EVENTS.GET_ROOM_QUESTION(), question: tournamentRoom.questions[data.questionIndex]})
 }
@@ -134,7 +137,8 @@ const startDBTournamentQuestion = async (io, data) =>{
     const room = await Room.findOne({room_id: data.roomName})
     if(!room){
        return io.to(`${data.roomName}`).emit(`${EVENTS.ROOM_DONT_EXIST()}`, {
-            event: `${EVENTS.ROOM_DONT_EXIST()}`});
+            event: `${EVENTS.ROOM_DONT_EXIST()}`,
+           fn: 'startDBTournamentQuestion'});
     }
     if(room.total_questions >= 15){
         room.allow_enter = false;
@@ -150,7 +154,8 @@ const checkDBTournamentQuestion = async (io, socket, data) =>{
     const room = await Room.findOne({room_id: data.roomName})
     if(!room){
        return socket.emit(`${EVENTS.ROOM_DONT_EXIST()}`, {
-            event: `${EVENTS.ROOM_DONT_EXIST()}`});
+            event: `${EVENTS.ROOM_DONT_EXIST()}`,
+           fn: 'checkDBTournamentQuestion'});
     }
     const question = room.questions[data.questionIndex];
     const users = JSON.parse(JSON.stringify(room.users));
@@ -187,7 +192,8 @@ const getDBRoomResults = async (socket, data) =>{
     const room = await Room.findOne({room_id: data.roomName});
     if(!room){
         return socket.emit(`${EVENTS.ROOM_DONT_EXIST()}`, {
-            event: `${EVENTS.ROOM_DONT_EXIST()}`
+            event: `${EVENTS.ROOM_DONT_EXIST()}`,
+            fn: 'getDBRoomResults'
         });
     }
     socket.emit(EVENTS.GET_ROOM_RESULTS(), { event: EVENTS.GET_ROOM_RESULTS(), users: room.users})
