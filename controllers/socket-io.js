@@ -127,7 +127,7 @@ const getDBQuestion = async (socket, data) =>{
     if (!tournamentRoom || !tournamentRoom.allow_enter){
         return socket.emit(`${EVENTS.ROOM_DONT_EXIST()}`, {
             event: EVENTS.ROOM_DONT_EXIST(),
-            fn: 'getDBQuestion'});
+            fn: `getDBQuestion()|requestedRoom:${data.roomName}|respondedRoom: ${tournamentRoom.room_id}|allow: ${tournamentRoom.allow_enter}`});
     }
     socket.emit(EVENTS.GET_ROOM_QUESTION(), {event: EVENTS.GET_ROOM_QUESTION(), question: tournamentRoom.questions[data.questionIndex]})
 }
