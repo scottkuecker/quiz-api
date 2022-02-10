@@ -71,7 +71,11 @@ const joinDBRoom = async (io, socket, userAndRoom) => {
 
 const leaveDBRoom = async (io, socket, userAndRoom) => {
     const room = await Room.findOne({room_id: userAndRoom.roomName});
-    const user = await Users.findOne({ _id: userAndRoom.user_id })
+    const user = await Users.findOne({ _id: userAndRoom.user_id });
+    const rooms = io.sockets.adapter.sids[socket.id]; 
+    for (var room in rooms){
+         socket.leave(room);
+    }
     if(room){
         const room_id = room._id;
         room.users = room.users.filter(user => user.id !== userAndRoom.user_id);
