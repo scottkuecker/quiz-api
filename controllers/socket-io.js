@@ -85,11 +85,8 @@ const leaveDBRoom = async (io, socket, userAndRoom) => {
         if(!room.users.length){
             await Room.findByIdAndDelete(room_id);
         }
-        socket.leave(`${userAndRoom.roomName}`);
         io.to(`${userAndRoom.roomName}`).emit(EVENTS.LEAVED_ROOM(), 
             {users: room.users, event: EVENTS.LEAVED_ROOM()})
-    }else{
-        socket.leave(`${userAndRoom.roomName}`);
     }
 }
 
