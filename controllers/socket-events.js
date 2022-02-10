@@ -137,3 +137,11 @@ exports.SELECTED_QUESTION_LETTER = () => 'SELECTED_QUESTION_LETTER';
  exports.GET_ROOM_RESULTS = () => 'GET_ROOM_RESULTS';
 
 
+/**
+* @description cleaning the rooms
+* @common_data_to_send {'CLEAN_THE_EMPTY_ROOMS'}
+* @returns EVENT STRING
+*/
+exports.CLEAN_THE_EMPTY_ROOMS = () => 'CLEAN_THE_EMPTY_ROOMS';
+
+

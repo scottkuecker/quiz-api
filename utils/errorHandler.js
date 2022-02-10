@@ -15,7 +15,7 @@ exports.handleError = (fn) =>{
 }
 
 exports.handleSocketError = (fn) => {
-    return (socket, data) => {
+    return async (socket, data) => {
         try {
             fn(socket, data)
         } catch (error) {
@@ -29,7 +29,7 @@ exports.handleSocketError = (fn) => {
 }
 
 exports.handleIOError = (fn) => {
-    return (io, socket, data) => {
+    return async (io, socket, data) => {
         try {
             fn(io, socket, data)
         } catch (error) {
