@@ -19,15 +19,18 @@ function getRandomNumber(quantity) {
 }
 
 const cleanRooms = async () =>{
+    const result = {success: true}
     const rooms = await Room.find();
     for(let i = 0; i < rooms.length; i++){
         if (rooms[i].total_questions === 15 && !rooms[i].allow_enter) {
             await Room.findByIdAndDelete(rooms[i]._id)
         }
     }
+    return result;
 }
 
 const createDBRoom = async (socket, room, userData) =>{
+    const response = { success: false }
     const user = await Users.findOne({ _id: userData.user_id })
     const newRoom = new Room({
         room_id: room,
@@ -41,11 +44,14 @@ const createDBRoom = async (socket, room, userData) =>{
         user.room = room;
         user.socket = socket.id;
         await user.save();
+        result.success = true;
         socket.emit(EVENTS.ROOM_CREATED(), {success: true, created_by: newRoom.created_by, event: `${EVENTS.ROOM_CREATED()}`, roomName: room})
     }
+    return response;
 }
 
 const joinDBRoom = async (io, socket, userAndRoom) => {
+    const response = { success: false }
     const rooms = await Room.find({room_id: userAndRoom.roomName});
     const user = await Users.findOne({ _id: userAndRoom.user_id})
     const room = rooms[0];
@@ -65,14 +71,16 @@ const joinDBRoom = async (io, socket, userAndRoom) => {
         }
         const result = await room.save();
         if(result){
+            result.success = true;
             socket.join(`${userAndRoom.roomName}`);
             io.to(`${userAndRoom.roomName}`).emit(EVENTS.JOINED_ROOM(), {users: room.users, created_by: room.created_by,event: EVENTS.JOINED_ROOM(), socked: socket.id})
         }
     }else{
-        return socket.emit(EVENTS.ROOM_DONT_EXIST(), {
+        socket.emit(EVENTS.ROOM_DONT_EXIST(), {
             event: EVENTS.ROOM_DONT_EXIST(),
             fn: 'joinDBRoom'});
     }
+    return response;
 }
 
 
@@ -132,13 +140,15 @@ const startDBTournament = async (io, socket, data) =>{
 
 
 const getDBQuestion = async (socket, data) =>{
-    const tournamentRoom = await Room.findOne({room_id: data.roomName});
-    if (!tournamentRoom || !tournamentRoom.allow_enter){
-        return socket.emit(`${EVENTS.ROOM_DONT_EXIST()}`, {
-            event: EVENTS.ROOM_DONT_EXIST(),
-            fn: `getDBQuestion()|requestedRoom:${data.roomName}|respondedRoom: ${tournamentRoom.room_id}|allow: ${tournamentRoom.allow_enter}`});
-    }
-    socket.emit(EVENTS.GET_ROOM_QUESTION(), {event: EVENTS.GET_ROOM_QUESTION(), question: tournamentRoom.questions[data.questionIndex]})
+            const tournamentRoom = await Room.findOne({ room_id: data.roomName });
+            if (!tournamentRoom || !tournamentRoom.allow_enter) {
+                socket.emit(`${EVENTS.ROOM_DONT_EXIST()}`, {
+                    event: EVENTS.ROOM_DONT_EXIST(),
+                    fn: `getDBQuestion()|requestedRoom:${data.roomName}|respondedRoom: ${tournamentRoom.room_id}|allow: ${tournamentRoom.allow_enter}`
+                });
+            }
+            socket.emit(EVENTS.GET_ROOM_QUESTION(), { event: EVENTS.GET_ROOM_QUESTION(), question: tournamentRoom.questions[data.questionIndex] })
+            return true
 }
 
 
@@ -221,27 +231,27 @@ const createRoom = (socket, userData) =>{
 }
 
 const joinRoom = (io, socket, userAndRoom) => {    
-    handleError.handleIOError(joinDBRoom(io, socket, userAndRoom)) 
+    handleError.handleIOError(joinDBRoom, io, socket, userAndRoom)
 }
 
 const leaveRoom = (io, socket, userAndRoom) => {
-    handleError.handleIOError(leaveDBRoom(io, socket, userAndRoom)) 
+    handleError.handleIOError(leaveDBRoom, io, socket, userAndRoom) 
 }
 
 const startTournament = (io, socket, data) =>{
-    handleError.handleIOError(startDBTournament(io, socket, data)) 
+    handleError.handleIOError(startDBTournament, io, socket, data) 
 }
 
 const checkTournamentQuestion = (io, socket, data) => {
-    handleError.handleIOError(checkDBTournamentQuestion(io, socket, data)) 
+    handleError.handleIOError(checkDBTournamentQuestion, io, socket, data) 
 }
 
 const getQuestion = (socket, data) => {
-    handleError.handleSocketError(getDBQuestion(socket, data)) 
+    handleError.handleSocketError(getDBQuestion, socket, data) 
 }
 
 const getRoomResults = (socket, data) => {
-    handleError.handleSocketError(getDBRoomResults(socket, data)) 
+    handleError.handleSocketError(getDBRoomResults, socket, data) 
 }
 
 const disconectSocket = (socket) => {
@@ -252,6 +262,7 @@ const disconectSocket = (socket) => {
 exports.setupListeners = () =>{
     const socketIo = socketCon.getIO();
     socketIo.on('connection', socket =>{
+        console.log('connection')
         socket.on('disconnect', () => {
             disconectSocket(socket);
         })
