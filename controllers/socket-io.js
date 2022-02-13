@@ -53,7 +53,11 @@ const createDBRoom = async (socket, room, userData) =>{
 const joinDBRoom = async (io, socket, userAndRoom) => {
     const response = { success: false }
     const rooms = await Room.find({room_id: userAndRoom.roomName});
-    const user = await Users.findOne({ _id: userAndRoom.user_id})
+    const user = await Users.findOne({ _id: userAndRoom.user_id});
+    const socketRooms = socket.rooms;
+    socketRooms.forEach(rm =>{
+        socket.leave(rm)
+    })
     const room = rooms[0];
     if (room && room.allow_enter){
         const haveUser = room.users.some(user => user.id === null || user.id === userAndRoom.user_id);
@@ -73,7 +77,7 @@ const joinDBRoom = async (io, socket, userAndRoom) => {
         if(result){
             result.success = true;
             socket.join(`${userAndRoom.roomName}`);
-            io.to(`${userAndRoom.roomName}`).emit(EVENTS.JOINED_ROOM(), {users: room.users, created_by: room.created_by,event: EVENTS.JOINED_ROOM(), socked: socket.id})
+            io.in(`${userAndRoom.roomName}`).emit(EVENTS.JOINED_ROOM(), {users: room.users, created_by: room.created_by,event: EVENTS.JOINED_ROOM(), socked: socket.id})
         }
     }else{
         socket.emit(EVENTS.ROOM_DONT_EXIST(), {
@@ -87,8 +91,12 @@ const joinDBRoom = async (io, socket, userAndRoom) => {
 const leaveDBRoom = async (io, socket, userAndRoom) => {
     const room = await Room.findOne({room_id: userAndRoom.roomName});
     const socketRooms = socket.rooms;
-    for (let rm in socketRooms){
-        socket.leave(rm);
+    const adapter = socket.adapter.rooms;
+    socketRooms.forEach(rm =>{
+        socket.leave(`${rm}`)
+    })
+    if(userAndRoom.roomName){
+       socket.leave(userAndRoom.roomName);
     }
     if(room){
         const room_id = room._id;
@@ -97,7 +105,7 @@ const leaveDBRoom = async (io, socket, userAndRoom) => {
         if(!room.users.length){
             await Room.findByIdAndDelete(room_id);
         }
-        io.to(`${userAndRoom.roomName}`).emit(EVENTS.LEAVED_ROOM(), 
+        io.in(`${userAndRoom.roomName}`).emit(EVENTS.LEAVED_ROOM(), 
             {users: room.users, event: EVENTS.LEAVED_ROOM()})
     }
 }
@@ -135,7 +143,7 @@ const startDBTournament = async (io, socket, data) =>{
     await generateQuestions();
     tournamentRoom.questions = room_questions;
     await tournamentRoom.save();
-    io.to(`${data.roomName}`).emit(EVENTS.TOURNAMENT_STARTING(), {event: EVENTS.TOURNAMENT_STARTING()});
+    io.in(`${data.roomName}`).emit(EVENTS.TOURNAMENT_STARTING(), {event: EVENTS.TOURNAMENT_STARTING()});
 }
 
 
@@ -155,17 +163,17 @@ const getDBQuestion = async (socket, data) =>{
 const startDBTournamentQuestion = async (io, data) =>{
     const room = await Room.findOne({room_id: data.roomName})
     if(!room){
-       return io.to(`${data.roomName}`).emit(`${EVENTS.ROOM_DONT_EXIST()}`, {
+       return io.in(`${data.roomName}`).emit(`${EVENTS.ROOM_DONT_EXIST()}`, {
             event: `${EVENTS.ROOM_DONT_EXIST()}`,
            fn: 'startDBTournamentQuestion'});   
     }
-    if(room.total_questions >= 15){
+    if(room.total_questions >= 2){
         room.allow_enter = false;
         await room.save();
-        io.to(`${data.roomName}`).emit(EVENTS.TOURNAMENT_FINISHED(), { event: EVENTS.TOURNAMENT_FINISHED(), users: room.users});
+        io.in(`${data.roomName}`).emit(EVENTS.TOURNAMENT_FINISHED(), { event: EVENTS.TOURNAMENT_FINISHED(), users: room.users});
         return;
     }
-    io.to(`${data.roomName}`).emit(EVENTS.EVERYONE_ANSWERED(), { event: EVENTS.EVERYONE_ANSWERED(), users: room.users })
+    io.in(`${data.roomName}`).emit(EVENTS.EVERYONE_ANSWERED(), { event: EVENTS.EVERYONE_ANSWERED(), users: room.users })
 }
 
 
@@ -203,7 +211,7 @@ const checkDBTournamentQuestion = async (io, socket, data) =>{
 
     }else{
         socket.emit(EVENTS.SELECTED_QUESTION_LETTER(), { correct: data.letter === question.correct_letter, event: EVENTS.SELECTED_QUESTION_LETTER(), users: room.users})
-        io.to(`${data.roomName}`).emit(EVENTS.UPDATE_WAITING_STATUS(), { event: EVENTS.UPDATE_WAITING_STATUS(), users: room.users})
+        io.in(`${data.roomName}`).emit(EVENTS.UPDATE_WAITING_STATUS(), { event: EVENTS.UPDATE_WAITING_STATUS(), users: room.users})
     }
     
 }
@@ -262,7 +270,6 @@ const disconectSocket = (socket) => {
 exports.setupListeners = () =>{
     const socketIo = socketCon.getIO();
     socketIo.on('connection', socket =>{
-        console.log('connection')
         socket.on('disconnect', () => {
             disconectSocket(socket);
         })

@@ -21,7 +21,7 @@ exports.isValidStringInput = (str) => {
 
 
 exports.isValidCategory = (req, res, next) => {
-    if (!categories.contain(req.body.category)){
+    if (!categories.includes(req.body.category)){
         res.send({
             success: false,
             data: undefined,

@@ -4,7 +4,6 @@ exports.handleError = (fn) =>{
     return (req,res,next) => {
         try{
             fn(req, res, next)
-            .then(result => console.log('finished'))
         }catch(error){
             const err = new ErrorDB({
                 message: String(error),
