@@ -257,25 +257,14 @@ const acceptDBFriend = async (socket, data) => {
     if (friend && me) {
         const my_friend_requests = me.friendRequests.filter(request => request.id !== requested_friend_ID);
         me.friendRequests = my_friend_requests;
-        const my_new_friend = {
-            id: friend._id,
-            name: friend.name,
-            avatar: friend.avatar_url
-        }
-        const me_as_new_friend = {
-            id: me._id,
-            name: me.name,
-            avatar: me.avatar_url
-        }
-
         //if something fails, we want to reverse friends back to original
         const my_previous_friends = JSON.parse(JSON.stringify(me.friends)) || [];
         const friend_previous_friends = JSON.parse(JSON.stringify(friend.friends)) || [];
         //
         const my_friends = JSON.parse(JSON.stringify(my_previous_friends));
         const friend_friends = JSON.parse(JSON.stringify(friend_previous_friends));
-        my_friends.push(my_new_friend);
-        friend_friends.push(me_as_new_friend)
+        my_friends.push(requested_friend_ID);
+        friend_friends.push(my_id)
 
         me.friends = my_friends;
         friend.friends = friend_friends;
@@ -297,10 +286,19 @@ const acceptDBFriend = async (socket, data) => {
 }
 
 
+const saveDBSocket = async (io, socket, data) =>{
+    const user = await Users.findById(data.user_id);
+    if(user){
+        user.socket = socket.id;
+        socket.join(socket.id);
+        await user.save();
+    }
+}
+
 
 
 const disconectDBSocket = async (socket) =>{
-
+    console.log('leaved: ' + socket)
 }
 
 const createRoom = (socket, userData) =>{
@@ -346,17 +344,23 @@ const acceptFriend = (socket, data) => {
     acceptDBFriend(socket, data)
 }
 
-
+const saveSocket = (io, socket, data) => {
+    saveDBSocket(io, socket, data)
+}
 
 
 exports.setupListeners = () =>{
     const socketIo = socketCon.getIO();
     socketIo.on('connection', socket =>{
-        socket.on('disconnect', () => {
+        socket.on('disconnect', (socket) => {
             disconectSocket(socket);
         })
         socket.on(EVENTS.CREATE_ROOM(), (userData) =>{
             createRoom(socket, userData);
+        });
+
+        socket.on(EVENTS.SAVE_SOCKET(), (userData) => {
+            saveSocket(socketIo, socket, userData);
         });
 
         socket.on(EVENTS.JOIN_ROOM(), userAndRoom =>{

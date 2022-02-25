@@ -1,4 +1,11 @@
 /**
+ * @description Save current socket into db for specific later notification
+ * @returns EVENT STRING
+ */
+exports.SAVE_SOCKET = () => 'SAVE_SOCKET';
+
+
+/**
  * @description Emit to client that room dont exist
  * @common_data_to_send {event: 'ROOM_DONT_EXIST'}
  * @returns EVENT STRING
