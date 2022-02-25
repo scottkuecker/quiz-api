@@ -145,3 +145,34 @@ exports.SELECTED_QUESTION_LETTER = () => 'SELECTED_QUESTION_LETTER';
 exports.CLEAN_THE_EMPTY_ROOMS = () => 'CLEAN_THE_EMPTY_ROOMS';
 
 
+/**
+* @description Receives an id of a user to send friend request to
+* @common_data_to_send {event: 'ADD_FRIEND', success: boolean}
+* @returns EVENT STRING
+*/
+exports.ADD_FRIEND = () => 'ADD_FRIEND';
+
+
+/**
+* @description Inform the user that request has been sent allready
+* @common_data_to_send {event: 'FRIEND_ALLREADY_REQUESTED'}
+* @returns EVENT STRING
+*/
+exports.FRIEND_ALLREADY_REQUESTED = () => 'FRIEND_ALLREADY_REQUESTED';
+
+
+/**
+* @description Emit to client about failed friend acceptance
+* @common_data_to_send {event: 'ADD_FRIEND_FAILED'}
+* @returns EVENT STRING
+*/
+exports.ADD_FRIEND_FAILED = () => 'ADD_FRIEND_FAILED';
+
+/**
+* @description Accepts friend request
+* @common_data_to_send {event: 'ACCEPT_FRIEND', success: boolean}
+* @returns EVENT STRING
+*/
+exports.ACCEPT_FRIEND = () => 'ACCEPT_FRIEND';
+
+

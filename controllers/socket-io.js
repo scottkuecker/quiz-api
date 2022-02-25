@@ -219,6 +219,78 @@ const getDBRoomResults = async (socket, data) =>{
     socket.emit(EVENTS.GET_ROOM_RESULTS(), { event: EVENTS.GET_ROOM_RESULTS(), users: room.users})
 }
 
+const addDBFriend = async (socket, data) => {
+    const requested_friend_ID = data.friend_id;
+    const my_id = data.user_id;
+    const friend = await Users.findById(requested_friend_ID);
+    if(friend){
+        const friend_requests = friend.friendRequests || [];
+        if (!friend_requests.length ||  !friend_requests.includes(my_id)){
+            friend_requests.push(my_id);
+            friend.friendRequests = friend_requests;
+            await friend.save();
+            return socke.emit(EVENTS.ADD_FRIEND(), {event: EVENTS.ADD_FRIEND(), success: true})
+        }else{
+            return socke.emit(EVENTS.FRIEND_ALLREADY_REQUESTED(), { event: EVENTS.FRIEND_ALLREADY_REQUESTED()})
+        }
+       
+
+    }else{
+        return socket.emit(EVENTS.ADD_FRIEND(), {event: EVENTS.ADD_FRIEND(), success: false})
+    }
+}
+
+const acceptDBFriend = async (socket, data) => {
+    const requested_friend_ID = data.friend_id;
+    const my_id = data.user_id;
+    const friend = await Users.findById(requested_friend_ID);
+    const me = await Users.findById(my_id);
+
+    if (friend && me) {
+        const my_friend_requests = me.friendRequests.filter(request => request.id !== requested_friend_ID);
+        me.friendRequests = my_friend_requests;
+        const my_new_friend = {
+            id: friend._id,
+            name: friend.name,
+            avatar: friend.avatar_url
+        }
+        const me_as_new_friend = {
+            id: me._id,
+            name: me.name,
+            avatar: me.avatar_url
+        }
+
+        //if something fails, we want to reverse friends back to original
+        const my_previous_friends = JSON.parse(JSON.stringify(me.friends)) || [];
+        const friend_previous_friends = JSON.parse(JSON.stringify(friend.friends)) || [];
+        //
+        const my_friends = JSON.parse(JSON.stringify(my_previous_friends));
+        const friend_friends = JSON.parse(JSON.stringify(friend_previous_friends));
+        my_friends.push(my_new_friend);
+        friend_friends.push(me_as_new_friend)
+
+        me.friends = my_friends;
+        friend.friends = friend_friends;
+        const my_result = await me.save();
+        const friend_result = await friend.save();
+        if (my_result && friend_result){
+            return socket.emit(EVENTS.ACCEPT_FRIEND(), {success: true})
+        }else{
+            me.friends = previous_friends;
+            friend.friends = friend_previous_friends;
+            await me.save();
+            await friend.save();
+            return socket.emit(EVENTS.ADD_FRIEND_FAILED(), {});
+        }
+
+    } else {
+        return socket.emit(EVENTS.ADD_FRIEND(), { event: EVENTS.ADD_FRIEND(), success: false })
+    }
+}
+
+
+
+
 const disconectDBSocket = async (socket) =>{
 
 }
@@ -258,6 +330,16 @@ const disconectSocket = (socket) => {
     disconectDBSocket(socket)
 }
 
+const addFriend = (socket, data) => {
+    addDBFriend(socket, data)
+}
+
+const acceptFriend = (socket, data) => {
+    acceptDBFriend(socket, data)
+}
+
+
+
 
 exports.setupListeners = () =>{
     const socketIo = socketCon.getIO();
@@ -281,17 +363,29 @@ exports.setupListeners = () =>{
         socket.on(EVENTS.START_TOURNAMENT(), data =>{
             startTournament(socketIo, socket, data)
         })
+
         socket.on(EVENTS.SELECTED_QUESTION_LETTER(), data =>{
             checkTournamentQuestion(socketIo, socket, data)
         })
+
         socket.on(EVENTS.GET_ROOM_QUESTION(), data =>{
             getQuestion(socket, data)
         })
+
         socket.on(EVENTS.GET_ROOM_RESULTS(), data => {
             getRoomResults(socket, data)
         })
+
         socket.on(EVENTS.CLEAN_THE_EMPTY_ROOMS(), data => {
             cleanRooms()
+        })
+
+        socket.on(EVENTS.ADD_FRIEND(), data => {
+            addFriend(socket, data)
+        })
+
+        socket.on(EVENTS.ACCEPT_FRIEND(), data => {
+            acceptFriend(socket, data)
         })
     });
 
