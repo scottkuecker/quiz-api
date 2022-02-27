@@ -139,3 +139,36 @@ exports.updateSettings = async (req, res, next) =>{
      
     
  }
+
+
+ exports.searchUsers = async (req, res, next) =>{
+    const filter = req.body.query.toUpperCase();
+    let allUsers;
+    allUsers = await User.find();
+    const users = allUsers.filter(user =>{
+            if(user.name.toUpperCase().includes(filter)){
+                return true;
+            }
+    })
+        let top100;
+        if(users.length > 100){
+           top100 = users.splice(0, 100);
+        }else{
+            top100 = users;
+        }
+
+       const mapped = top100.map(user =>{
+            return {
+                name: user.name,
+                avatar_url: user.avatar_url,
+                _id: user._id
+            }
+        })
+        return res.send({
+            success: true,
+            data: mapped,
+            error: undefined
+        })
+    
+   
+}

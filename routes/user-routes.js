@@ -4,6 +4,7 @@ const handler = require('../utils/errorHandler');
 const router = require('express').Router();
 
 router.post('/score', handler.handleError(middleware.authMidleware), user.updateScore);
+router.post('/search-users', handler.handleError(middleware.authMidleware), user.searchUsers);
 router.post('/update-settings', handler.handleError(middleware.authMidleware), user.updateSettings);
 router.get('/reset-lives', handler.handleError(middleware.authMidleware), user.resetLives);
 router.post('/ranking-list', handler.handleError(middleware.authMidleware), user.getRankingList);
