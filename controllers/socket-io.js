@@ -15,7 +15,7 @@ const  randomValue = (len) => {
 
 function getRandomNumber(quantity) {
     var milliseconds = new Date().getMilliseconds();
-    return Math.floor(milliseconds * quantity / 1000);
+    return Math.floor(Math.random(Math.floor(milliseconds * quantity / 1000)) * quantity)
 }
 
 const cleanRooms = async () =>{
@@ -130,7 +130,7 @@ const startDBTournament = async (io, socket, data) =>{
                                 let question = questions[random];
                                 room_questions.push(question);
                                 generate();
-                            }, Math.round(Math.random()) * 100)
+                            }, Math.round(Math.random()) * 10)
                         
                         }else{
                             resolve(true)
