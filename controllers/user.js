@@ -202,7 +202,6 @@ exports.getFriendRequests = async (req, res, next) =>{
 exports.getFriendList = async (req, res, next) => {
     const id = req.user._id;
     const me = await User.findById(id);
-    console.log(me)
     const my_friends = me.friends || [];
     const allUsers = await User.find();
     const friends = allUsers.filter(user => {
@@ -215,11 +214,43 @@ exports.getFriendList = async (req, res, next) => {
             avatar_url: user.avatar_url
         }
     });
-    console.log(mapped)
     return res.send(
         {
             success: true,
             data: mapped,
+            error: undefined
+        }
+    )
+
+}
+
+exports.removeFriend = async (req, res, next) => {
+    const my_id = req.user._id;
+    const remove_id = req.body.remove_id;
+    if(my_id === remove_id){
+        const me = await User.findById(my_id);
+        me.friends = me.friends.filter(friend_id => friend_id !== remove_id)
+        await me.save();
+        return res.send(
+            {
+                success: true,
+                data: me.friends,
+                error: undefined
+            }
+        )
+    }
+    const me = await User.findById(my_id);
+    const friend = await User.findById(remove_id);
+
+    me.friends = me.friends.filter(friend_id => friend_id !== remove_id)
+    friend.friends = friend.friends.filter(friend_id => friend_id !== my_id);
+
+    await me.save();
+    await friend.save();
+    return res.send(
+        {
+            success: true,
+            data: me.friends,
             error: undefined
         }
     )

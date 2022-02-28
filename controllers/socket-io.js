@@ -255,33 +255,37 @@ const acceptDBFriend = async (socket, data) => {
     const me = await Users.findById(my_id);
 
     if (friend && me) {
-        const my_friend_requests = me.friendRequests.filter(request => request.id !== requested_friend_ID);
+        const my_friend_requests = me.friendRequests.filter(req_id => req_id !== requested_friend_ID);
         me.friendRequests = my_friend_requests;
         //if something fails, we want to reverse friends back to original
         const my_previous_friends = JSON.parse(JSON.stringify(me.friends)) || [];
         const friend_previous_friends = JSON.parse(JSON.stringify(friend.friends)) || [];
         //
-        const my_friends = JSON.parse(JSON.stringify(my_previous_friends));
-        const friend_friends = JSON.parse(JSON.stringify(friend_previous_friends));
-        my_friends.push(requested_friend_ID);
-        friend_friends.push(my_id)
+        let my_friends = JSON.parse(JSON.stringify(my_previous_friends));
+        let friend_friends = JSON.parse(JSON.stringify(friend_previous_friends));
 
+        if (!my_friends.includes(requested_friend_ID)) {
+            my_friends.push(requested_friend_ID);
+        }
+        if (!friend_friends.includes(my_id)) {
+            friend_friends.push(my_id);
+        }
         me.friends = my_friends;
         friend.friends = friend_friends;
         const my_result = await me.save();
         const friend_result = await friend.save();
         if (my_result && friend_result){
-            return socket.emit(EVENTS.ACCEPT_FRIEND(), {success: true})
+            return socket.emit(EVENTS.ACCEPT_FRIEND(), { event: EVENTS.ACCEPT_FRIEND(), success: true, friendRequest: requested_friend_ID})
         }else{
             me.friends = previous_friends;
             friend.friends = friend_previous_friends;
             await me.save();
             await friend.save();
-            return socket.emit(EVENTS.ADD_FRIEND_FAILED(), {});
+            return socket.emit(EVENTS.ACCEPT_FRIEND(), { event: EVENTS.ACCEPT_FRIEND(), success: false});
         }
 
     } else {
-        return socket.emit(EVENTS.ADD_FRIEND(), { event: EVENTS.ADD_FRIEND(), success: false })
+        return socket.emit(EVENTS.ACCEPT_FRIEND(), { event: EVENTS.ACCEPT_FRIEND(), success: false})
     }
 }
 
@@ -298,7 +302,7 @@ const saveDBSocket = async (io, socket, data) =>{
 
 
 const disconectDBSocket = async (socket) =>{
-    console.log('leaved: ' + socket)
+   
 }
 
 const createRoom = (socket, userData) =>{
