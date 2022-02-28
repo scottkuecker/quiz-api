@@ -236,7 +236,6 @@ const addDBFriend = async (socket, data) => {
         if (!friend_requests.length ||  !friend_requests.includes(my_id)){
             friend_requests.push(my_id);
             friend.friendRequests = friend_requests;
-            console.log(friend.friendRequests)
             await friend.save();
             return socket.emit(EVENTS.ADD_FRIEND(), {event: EVENTS.ADD_FRIEND(), success: true})
         }else{

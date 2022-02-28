@@ -172,3 +172,56 @@ exports.updateSettings = async (req, res, next) =>{
     
    
 }
+
+
+exports.getFriendRequests = async (req, res, next) =>{
+    const id = req.user._id;
+    const me = await User.findById(id);
+    const my_requests = me.friendRequests || [];
+    const allUsers = await User.find();
+    const requests = allUsers.filter(user =>{
+        return my_requests.includes(user._id)
+    });
+    const mapped = requests.map(user =>{
+        return{
+            name: user.name,
+            _id: user._id,
+            avatar_url: user.avatar_url
+        }
+    });
+    return res.send(
+        {
+            success: true,
+            data: mapped,
+            error: undefined
+        }
+    )
+
+}
+
+exports.getFriendList = async (req, res, next) => {
+    const id = req.user._id;
+    const me = await User.findById(id);
+    console.log(me)
+    const my_friends = me.friends || [];
+    const allUsers = await User.find();
+    const friends = allUsers.filter(user => {
+        return my_friends.includes(user._id)
+    });
+    const mapped = friends.map(user => {
+        return {
+            name: user.name,
+            _id: user._id,
+            avatar_url: user.avatar_url
+        }
+    });
+    console.log(mapped)
+    return res.send(
+        {
+            success: true,
+            data: mapped,
+            error: undefined
+        }
+    )
+
+}
