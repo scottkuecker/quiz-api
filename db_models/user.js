@@ -15,13 +15,7 @@ const userSchema = new Schema({
     roles: [{type: String,required: true, default: 'USER'}],
     lives_timer_ms: {type: Number, require: true, default: 0},
     fbId: {type: Number, required: false},
-    friends: [
-        {
-            id: { type: String, required: true }, 
-            name: { type: String, required: true }, 
-            avatar: { type: String, required: true }
-        }
-    ],
+    friends: [],
     friendRequests: [{ type: String, required: false }],
     notifications:{
         achievements: {type: Boolean, required: true, default: false},

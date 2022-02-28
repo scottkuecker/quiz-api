@@ -130,7 +130,7 @@ const startDBTournament = async (io, socket, data) =>{
                                 let question = questions[random];
                                 room_questions.push(question);
                                 generate();
-                            }, 10)
+                            }, Math.round(Math.random()) * 100)
                         
                         }else{
                             resolve(true)
@@ -236,10 +236,11 @@ const addDBFriend = async (socket, data) => {
         if (!friend_requests.length ||  !friend_requests.includes(my_id)){
             friend_requests.push(my_id);
             friend.friendRequests = friend_requests;
+            console.log(friend.friendRequests)
             await friend.save();
-            return socke.emit(EVENTS.ADD_FRIEND(), {event: EVENTS.ADD_FRIEND(), success: true})
+            return socket.emit(EVENTS.ADD_FRIEND(), {event: EVENTS.ADD_FRIEND(), success: true})
         }else{
-            return socke.emit(EVENTS.FRIEND_ALLREADY_REQUESTED(), { event: EVENTS.FRIEND_ALLREADY_REQUESTED()})
+            return socket.emit(EVENTS.FRIEND_ALLREADY_REQUESTED(), { event: EVENTS.FRIEND_ALLREADY_REQUESTED()})
         }
        
 
