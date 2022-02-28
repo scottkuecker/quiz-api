@@ -96,7 +96,7 @@ exports.facebookLogin = async (req, res, next) => {
     const userDoc = await User.findOne({ fbId: id });
     let token;
     if (userDoc) {
-        token = jwt.sign({ user: userDoc }, process.env.SIGNING_SECRET, { expiresIn: '3h' });
+        token = jwt.sign({ user: userDoc }, process.env.SIGNING_SECRET, { expiresIn: '24h' });
             return res.send({
                 success: true,
                 error: '',
