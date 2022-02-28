@@ -118,7 +118,7 @@ const startDBTournament = async (io, socket, data) =>{
             event: `${EVENTS.ROOM_DONT_EXIST()}`,
             fn: 'startDBTournament'});
     }
-    const questions = await Questions.find();
+    const questions = await Questions.find({ status: 'ODOBRENO' });
     const room_questions = [];
 
     async function generateQuestions(){
