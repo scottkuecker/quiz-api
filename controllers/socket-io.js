@@ -294,15 +294,24 @@ const saveDBSocket = async (io, socket, data) =>{
     const user = await Users.findById(data.user_id);
     if(user){
         user.socket = socket.id;
+        user.online = true;
         socket.join(socket.id);
         await user.save();
     }
+
+    return io.emit('USER_CONNECTED', { event: 'USER_CONNECTED', socket_id: socket.id, user_id: data.user_id })
 }
 
 
 
-const disconectDBSocket = async (socket) =>{
-   
+const disconectDBSocket = async (io, socket) =>{
+    const user = await Users.find({socket: socket.id});
+    if (user) {
+        user.online = false;
+        socket.leave(socket.id);
+        await user.save();
+    }
+    return io.emit('USER_DISCONECTED', {event: 'USER_DISCONECTED', socket_id: socket.id})
 }
 
 const createRoom = (socket, userData) =>{
@@ -336,8 +345,8 @@ const getRoomResults = (socket, data) => {
     handleError.handleSocketError(getDBRoomResults, socket, data) 
 }
 
-const disconectSocket = (socket) => {
-    disconectDBSocket(socket)
+const disconectSocket = (io, socket) => {
+    disconectDBSocket(io, socket)
 }
 
 const addFriend = (socket, data) => {
@@ -356,8 +365,8 @@ const saveSocket = (io, socket, data) => {
 exports.setupListeners = () =>{
     const socketIo = socketCon.getIO();
     socketIo.on('connection', socket =>{
-        socket.on('disconnect', (socket) => {
-            disconectSocket(socket);
+        socket.on('disconnect', (data) => {
+            disconectSocket(socketIo, socket);
         })
         socket.on(EVENTS.CREATE_ROOM(), (userData) =>{
             createRoom(socket, userData);

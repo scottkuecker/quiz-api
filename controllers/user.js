@@ -161,7 +161,9 @@ exports.updateSettings = async (req, res, next) =>{
             return {
                 name: user.name,
                 avatar_url: user.avatar_url,
-                _id: user._id
+                _id: user._id,
+                socket: user.socket,
+                online: user.online || false
             }
         })
         return res.send({
@@ -186,7 +188,9 @@ exports.getFriendRequests = async (req, res, next) =>{
         return{
             name: user.name,
             _id: user._id,
-            avatar_url: user.avatar_url
+            avatar_url: user.avatar_url,
+            socket: user.socket,
+            online: user.online || false
         }
     });
     return res.send(
@@ -211,7 +215,9 @@ exports.getFriendList = async (req, res, next) => {
         return {
             name: user.name,
             _id: user._id,
-            avatar_url: user.avatar_url
+            avatar_url: user.avatar_url,
+            socket: user.socket || '123456',
+            online: user.online || false
         }
     });
     return res.send(
