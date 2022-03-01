@@ -183,3 +183,26 @@ exports.ADD_FRIEND_FAILED = () => 'ADD_FRIEND_FAILED';
 exports.ACCEPT_FRIEND = () => 'ACCEPT_FRIEND';
 
 
+/**
+* @description Mark the user offline on user logout
+* @common_data_to_send {event: 'USER_DISCONECTED', user_id: string}
+* @returns EVENT STRING
+*/
+exports.DISCONNECT_USER = () => 'DISCONNECT_USER';
+
+/**
+* @description Mark the user online
+* @common_data_to_send {event: 'USER_CONNECTED', user_id: string}
+* @returns EVENT STRING
+*/
+exports.USER_CONNECTED = () => 'USER_CONNECTED';
+
+
+/**
+* @description Mark the user offline
+* @common_data_to_send {event: 'USER_DISCONECTED', user_id: string}
+* @returns EVENT STRING
+*/
+exports.USER_DISCONECTED = () => 'USER_DISCONECTED';
+
+
