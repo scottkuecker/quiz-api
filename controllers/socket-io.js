@@ -56,8 +56,9 @@ const joinDBRoom = async (io, socket, userAndRoom) => {
     const user = await Users.findOne({ _id: userAndRoom.user_id});
     const socketRooms = socket.rooms;
     socketRooms.forEach(rm =>{
-        socket.leave(rm)
-    })
+        socket.leave(`${rm}`)
+    });
+    socket.join(`${userAndRoom.user_id}`)
     const room = rooms[0];
     if (room && room.allow_enter){
         const haveUser = room.users.some(user => user.id === null || user.id === userAndRoom.user_id);
@@ -94,7 +95,8 @@ const leaveDBRoom = async (io, socket, userAndRoom) => {
     const adapter = socket.adapter.rooms;
     socketRooms.forEach(rm =>{
         socket.leave(`${rm}`)
-    })
+    });
+    socket.join(`${userAndRoom.user_id}`)
     if(userAndRoom.roomName){
        socket.leave(userAndRoom.roomName);
     }
