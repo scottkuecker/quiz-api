@@ -295,7 +295,8 @@ const saveDBSocket = async (io, socket, data) =>{
     if(user){
         user.socket = socket.id;
         user.online = true;
-        socket.join(socket.id);
+        console.log('joined: ' + data.user_id)
+        socket.join(data.user_id);
         await user.save();
         return io.emit(EVENTS.USER_CONNECTED(), { event: EVENTS.USER_CONNECTED(), socket_id: socket.id, user_id: data.user_id })
     }
@@ -309,12 +310,22 @@ const disconectDBSocket = async (io, socket) =>{
     const user = await Users.findOne({socket: socket.id});
     if (user) {
         user.online = false;
-        socket.leave(socket.id);
+        socket.leave(user._id);
         await user.save();
         return io.emit(EVENTS.USER_DISCONECTED(), { event: EVENTS.USER_DISCONECTED(), user_id: user._id })
     }
    
 }
+
+const inviteFriends = (io, socket, data) => {
+    data.friends.forEach(friend =>{
+        console.log('emmiting to: ' + friend._id)
+        io.in(`${friend._id}`).emit(EVENTS.TOURNAMENT_INVITATION(),{event: EVENTS.TOURNAMENT_INVITATION(), roomName: data.roomName, userName: data.userName})
+    })
+    // return io.in(`${data.roomName}`).emit({)
+}
+
+
 
 const createRoom = (socket, userData) =>{
     const room =  randomValue(5);
@@ -364,6 +375,7 @@ const saveSocket = (io, socket, data) => {
 }
 
 
+
 exports.setupListeners = () =>{
     const socketIo = socketCon.getIO();
     socketIo.on('connection', socket =>{
@@ -374,6 +386,11 @@ exports.setupListeners = () =>{
 
         socket.on(EVENTS.DISCONNECT_USER(), (data) => {
             disconectSocket(socketIo, socket);
+        });
+
+        socket.on(EVENTS.INVITE_FRIENDS(), (data) => {
+            console.log('INVITE_FRIENDS emmited')
+            inviteFriends(socketIo, socket, data);
         });
 
         socket.on(EVENTS.CREATE_ROOM(), (userData) =>{

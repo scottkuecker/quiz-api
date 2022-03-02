@@ -205,4 +205,20 @@ exports.USER_CONNECTED = () => 'USER_CONNECTED';
 */
 exports.USER_DISCONECTED = () => 'USER_DISCONECTED';
 
+/**
+* @description Emit this event to roomName
+* @common_data_to_send {event: 'TOURNAMENT_INVITATION', roomName: string}
+* @returns EVENT STRING
+*/
+exports.INVITE_FRIENDS = () => 'INVITE_FRIENDS';
+
+
+/**
+* @description Emit this event to roomName
+* @common_data_to_send {event: 'TOURNAMENT_INVITATION', roomName: string}
+* @returns EVENT STRING
+*/
+exports.TOURNAMENT_INVITATION = () => 'TOURNAMENT_INVITATION';
+
+
 
