@@ -367,11 +367,12 @@ const saveSocket = (io, socket, data) => {
 exports.setupListeners = () =>{
     const socketIo = socketCon.getIO();
     socketIo.on('connection', socket =>{
+
         socket.on('disconnect', (data) => {
             disconectSocket(socketIo, socket);
         })
 
-        socket.on(EVENTS.DISCONNECT_USER(), () => {
+        socket.on(EVENTS.DISCONNECT_USER(), (data) => {
             disconectSocket(socketIo, socket);
         });
 
