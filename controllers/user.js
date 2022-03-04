@@ -262,3 +262,17 @@ exports.removeFriend = async (req, res, next) => {
     )
 
 }
+
+exports.removeNotification = async (req, res, next) =>{
+    const user = await User.findById(req.user._id);
+    if(user){
+        user.requestNotification = false;
+        await user.save()
+        return res.send({
+            success: true,
+            error: undefined,
+            data: user,
+            message: ''
+        })
+    }
+}

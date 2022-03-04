@@ -17,6 +17,7 @@ const userSchema = new Schema({
     fbId: {type: Number, required: false},
     friends: [],
     friendRequests: [{ type: String, required: false }],
+    requestNotification: {type: Boolean, required: false},
     notifications:{
         achievements: {type: Boolean, required: true, default: false},
         questions: { type: Boolean, required: true, default: false },
