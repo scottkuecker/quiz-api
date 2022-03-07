@@ -128,8 +128,15 @@ const startDBTournament = async (io, socket, data) =>{
                     function generate(){
                         if(room_questions.length <= 15){
                             setTimeout(()=>{
-                                let random = getRandomNumber(questions.length);
-                                let question = questions[random];
+                                let filtered = questions.filter(quest =>{
+                                    if(room_questions.some(q => q._id === quest._id)){
+                                        return false;
+                                    }else{
+                                        return true;
+                                    }
+                                })
+                                let random = getRandomNumber(filtered.length);
+                                let question = filtered[random];
                                 room_questions.push(question);
                                 generate();
                             }, Math.round(Math.random()) * 10)
