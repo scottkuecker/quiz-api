@@ -198,24 +198,20 @@ exports.addQuestion = async (req, res, next) =>{
 }
 
 exports.addFastQuestion = async (req, res, next) => {
+    console.log('reached here')
     try{
+        console.log('reched try')
         const questionText = req.body.question || 'Some question?';
         const correct_letter = req.body.correct_letter || 'B';
         const correctText = req.body.correct_text || 'Some correct answer';
         const allAnswers = req.body.answers || [];
-        let letters = ['A','B', 'C', 'D'];
-        let filtered = allAnswers.map((item, i) =>{
-            return {
-                text: item,
-                letter: letters[i]
-            }
-        });
+
         const question = new Question({
                 question: questionText,
                 correct_letter: correct_letter,
                 correct_text: correctText,
-                category: 'FILMOVI I SERIJE',
-                answers: filtered,
+                category: 'MUZIKA',
+                answers: allAnswers,
             });
         await question.save();
         return res.send({
@@ -227,7 +223,8 @@ exports.addFastQuestion = async (req, res, next) => {
         res.status(404);
         return res.send({
             success: false,
-            error: 'Question not saved' + req.body.question,
+            data: req.body,
+            error: 'Question not saved: ' + req.body.question,
             data: undefined
         })
     }

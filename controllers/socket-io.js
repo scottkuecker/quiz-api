@@ -31,12 +31,14 @@ const cleanRooms = async () =>{
 
 const createDBRoom = async (socket, room, userData) =>{
     const response = { success: false }
-    const user = await Users.findOne({ _id: userData.user_id })
+    const user = await Users.findOne({ _id: userData.user_id });
+    const startsAt = userData.startsAt || 0;
     const newRoom = new Room({
         room_id: room,
         users: [],
         allow_enter: true,
         total_questions: 0,
+        startsAt: startsAt,
         created_by: userData.user_id
     })
     const result = await newRoom.save();
@@ -115,6 +117,7 @@ const leaveDBRoom = async (io, socket, userAndRoom) => {
 
 const startDBTournament = async (io, socket, data) =>{
     const tournamentRoom = await Room.findOne({room_id: data.roomName});
+    const amountOfQuestions = data.amountOfQuestions || 15;
     if(!tournamentRoom){
        return socket.emit(`${EVENTS.ROOM_DONT_EXIST()}`, {
             event: `${EVENTS.ROOM_DONT_EXIST()}`,
@@ -126,7 +129,7 @@ const startDBTournament = async (io, socket, data) =>{
     async function generateQuestions(){
         return new Promise((resolve, reject) =>{
                     function generate(){
-                        if(room_questions.length <= 15){
+                        if (room_questions.length <= amountOfQuestions){
                             setTimeout(()=>{
                                 let random = getRandomNumber(questions.length);
                                 let question = questions[random];

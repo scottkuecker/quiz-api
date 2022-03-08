@@ -7,6 +7,7 @@ const room = new Schema({
     current_question: { type: Object, required: false, default: null},
     questions: { type: Object, required: false, default: [] },
     answered_question_ids: [],
+    startsAt: Number,
     users: [
         { type: Object, required: true }
     ],
