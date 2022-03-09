@@ -59,14 +59,14 @@ exports.login = async (req, res, next) => {
             error: 'No user found'
         })
     }
-        bcrypt.compare(password, userDoc.password).then(doMatch =>{
+        bcrypt.compare(password, userDoc.password).then(async doMatch =>{
             if (doMatch) {
                 const token = jwt.sign({ user: userDoc }, process.env.SIGNING_SECRET, { expiresIn: '24h' });
                 const oneOnOne = await oneOnOneRoom.findOne({ room_id: '1on1'})
                 let users = oneOnOne.users || [];
                 users = users.filter(id => id !== userDoc._id)
                 oneOnOne.users = users;
-                await oneOnOneRoom.save();
+                await oneOnOne.save();
                 return res.status(200).json({
                     data: userDoc,
                     token: token,
