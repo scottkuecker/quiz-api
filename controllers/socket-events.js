@@ -221,4 +221,12 @@ exports.INVITE_FRIENDS = () => 'INVITE_FRIENDS';
 exports.TOURNAMENT_INVITATION = () => 'TOURNAMENT_INVITATION';
 
 
+/**
+* @description Emit tournament room to 2 users that are in room
+* @common_data_to_send {event: 'OPONENT_FOUND', roomName: string, oponent: User}
+* @returns EVENT STRING
+*/
+exports.OPONENT_FOUND = () => 'OPONENT_FOUND';
+
+
 

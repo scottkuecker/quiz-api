@@ -4,8 +4,11 @@ const Questions = require('../db_models/question');
 const Room = require('../db_models/rooms');
 const Users = require('../db_models/user');
 const handleError = require('../utils/errorHandler');
+const OneOnOne = require('../db_models/one-on-one');
 const EVENTS = require('./socket-events');
 
+
+//FUNCTIONS TRIGGERED BY EVENT FUNCTIONS
 
 const  randomValue = (len) => {
     return crypto.randomBytes(Math.ceil(len / 2))
@@ -52,7 +55,53 @@ const createDBRoom = async (socket, room, userData) =>{
     return response;
 }
 
+const joinOneOnOne = async (io, socket, userAndRoom) =>{
+    const oneOnOneRoom = await OneOnOne.findOne({ room_id: '1on1'})
+    if (!oneOnOneRoom){
+        const rm = new OneOnOne({
+            room_id: '1on1',
+            users: [],
+        });
+        await rm.save();
+    }
+    let roomUsers = oneOnOneRoom.users || [];
+    roomUsers = roomUsers.filter(id => id !== userAndRoom.user_id)
+    roomUsers.push(userAndRoom.user_id);
+    oneOnOneRoom.users = roomUsers;
+    await oneOnOneRoom.save();
+    if(roomUsers.length && roomUsers.length > 1){
+        const selected = roomUsers.slice(0,2);
+        console.log(selected)
+        roomUsers = roomUsers.filter(id => !selected.includes(id));
+        oneOnOneRoom.users = roomUsers;
+        await oneOnOneRoom.save();
+
+        const oponent = selected.find(user_id => user_id !== userAndRoom.user_id);
+        const me = await Users.findOne({ _id: userAndRoom.user_id });
+        const oponentObj = await Users.findOne({_id: oponent});
+        const randomRoom = randomValue(5);
+        const oponentMapped = {
+            _id: oponent,
+            avatar_url: oponentObj.avatar_url,
+        }
+        
+       console.log('after selected')
+        console.log(oneOnOneRoom.users)
+        selected.forEach(user_id =>{
+            if (user_id === userAndRoom.user_id){
+                return io.in(user_id).emit(EVENTS.OPONENT_FOUND(), {event: EVENTS.OPONENT_FOUND(), roomName: randomRoom, oponent: oponentMapped })
+            }else{
+                return io.in(user_id).emit(EVENTS.OPONENT_FOUND(), {event: EVENTS.OPONENT_FOUND(), roomName: randomRoom, oponent: me })
+            }
+            
+        })
+    }
+}
+
 const joinDBRoom = async (io, socket, userAndRoom) => {
+    if (userAndRoom.roomName === '1on1'){
+        return joinOneOnOne(io, socket, userAndRoom)
+    }
     const response = { success: false }
     const rooms = await Room.find({room_id: userAndRoom.roomName});
     const user = await Users.findOne({ _id: userAndRoom.user_id});
@@ -330,6 +379,10 @@ const disconectDBSocket = async (io, socket) =>{
    
 }
 
+
+
+//EVENT FUNCTIONS
+
 const inviteFriends = (io, socket, data) => {
     data.friends.forEach(friend =>{
         console.log('emmiting to: ' + friend._id)
@@ -387,7 +440,7 @@ const saveSocket = (io, socket, data) => {
     saveDBSocket(io, socket, data)
 }
 
-
+//SOCKETS EVENTS
 
 exports.setupListeners = () =>{
     const socketIo = socketCon.getIO();
@@ -402,9 +455,12 @@ exports.setupListeners = () =>{
         });
 
         socket.on(EVENTS.INVITE_FRIENDS(), (data) => {
-            console.log('INVITE_FRIENDS emmited')
             inviteFriends(socketIo, socket, data);
         });
+
+        // socket.on(EVENTS.OPONENT_FOUND(), (data) => {
+        //     inviteFriends(socketIo, socket, data);
+        // });
 
         socket.on(EVENTS.CREATE_ROOM(), (userData) =>{
             createRoom(socket, userData);
