@@ -6,6 +6,7 @@ const oneOnOneRoom = require('../db_models/one-on-one');
 const user = require('../db_models/user');
 
 exports.signUp = async (req, res, next) =>{
+    console.log('reached auth')
     const email = req.body.email;
     const password = req.body.password;
     if(!password){

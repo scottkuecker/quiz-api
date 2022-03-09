@@ -380,7 +380,7 @@ const disconectDBSocket = async (io, socket) =>{
 }
 
 const leaveDBOneOnOne = async (io, socket, data) =>{
-    const room = await OneOnOne.findOne({_id: '1on1'});
+    const room = await OneOnOne.findOne({ room_id: '1on1'});
     if(room){
         let users = room.users;
         const filtered = users.filter(id => id !== data.user_id);
