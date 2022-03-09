@@ -379,6 +379,17 @@ const disconectDBSocket = async (io, socket) =>{
    
 }
 
+const leaveDBOneOnOne = async (io, socket, data) =>{
+    const room = await OneOnOne.findOne({_id: '1on1'});
+    if(room){
+        let users = room.users;
+        const filtered = users.filter(id => id !== data.user_id);
+        room.users = filtered;
+        console.log(room.users)
+        room.save();
+    }
+}
+
 
 
 //EVENT FUNCTIONS
@@ -440,6 +451,10 @@ const saveSocket = (io, socket, data) => {
     saveDBSocket(io, socket, data)
 }
 
+const leaveOneOnOne = (io, socket, data) =>{
+    leaveDBOneOnOne(io, socket, data)
+}
+
 //SOCKETS EVENTS
 
 exports.setupListeners = () =>{
@@ -458,9 +473,9 @@ exports.setupListeners = () =>{
             inviteFriends(socketIo, socket, data);
         });
 
-        // socket.on(EVENTS.OPONENT_FOUND(), (data) => {
-        //     inviteFriends(socketIo, socket, data);
-        // });
+        socket.on(EVENTS.LEAVE_ONE_ON_ONE(), (data) => {
+            leaveOneOnOne(socketIo, socket, data);
+        });
 
         socket.on(EVENTS.CREATE_ROOM(), (userData) =>{
             createRoom(socket, userData);

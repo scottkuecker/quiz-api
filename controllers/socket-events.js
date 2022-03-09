@@ -229,4 +229,11 @@ exports.TOURNAMENT_INVITATION = () => 'TOURNAMENT_INVITATION';
 exports.OPONENT_FOUND = () => 'OPONENT_FOUND';
 
 
+/**
+* @description Leaves 1on1 room
+* @common_data_to_send no data need to send
+* @returns EVENT STRING
+*/
+exports.LEAVE_ONE_ON_ONE = () => 'LEAVE_ONE_ON_ONE';
+
 
