@@ -2,6 +2,7 @@ const User = require('../db_models/user');
 const Achievements = require('../db_models/achievement');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const oneOnOneRoom = require('../db_models/one-on-one');
 const user = require('../db_models/user');
 
 exports.signUp = async (req, res, next) =>{
@@ -60,7 +61,12 @@ exports.login = async (req, res, next) => {
     }
         bcrypt.compare(password, userDoc.password).then(doMatch =>{
             if (doMatch) {
-                const token = jwt.sign({ user: userDoc }, process.env.SIGNING_SECRET, { expiresIn: '3h' })
+                const token = jwt.sign({ user: userDoc }, process.env.SIGNING_SECRET, { expiresIn: '24h' });
+                const oneOnOne = await oneOnOneRoom.findOne({ room_id: '1on1'})
+                let users = oneOnOne.users || [];
+                users = users.filter(id => id !== userDoc._id)
+                oneOnOne.users = users;
+                await oneOnOneRoom.save();
                 return res.status(200).json({
                     data: userDoc,
                     token: token,
@@ -68,7 +74,7 @@ exports.login = async (req, res, next) => {
                     error: undefined
                 })
             } else {
-                res.send({
+                return res.send({
                     success: false,
                     data: undefined,
                     error: 'Email or password did not match'
