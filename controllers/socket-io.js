@@ -64,29 +64,7 @@ const createDBRoom = async (socket, room, userData) =>{
     return response;
 }
 
-const joinOneOnOne = async (io, socket, userAndRoom) =>{
-    oneOnOneRoom.oneOnOneUsers.push(userAndRoom.user_id);
-    if (oneOnOneRoom.oneOnOneUsers.length && oneOnOneRoom.oneOnOneUsers.length > 1){
-        const selected = oneOnOneRoom.oneOnOneUsers.slice(0,2);
-        oneOnOneRoom.oneOnOneUsers = oneOnOneRoom.oneOnOneUsers.filter(id => !selected.includes(id));
-        const oponent = selected.find(user_id => user_id !== userAndRoom.user_id);
-        const me = await Users.findOne({ _id: userAndRoom.user_id });
-        const oponentObj = await Users.findOne({_id: oponent});
-        const randomRoom = randomValue(5);
-        const oponentMapped = {
-            _id: oponent,
-            avatar_url: oponentObj.avatar_url,
-        }
-        selected.forEach(user_id =>{
-            if (user_id === userAndRoom.user_id){
-                return io.in(user_id).emit(EVENTS.OPONENT_FOUND(), { event: EVENTS.OPONENT_FOUND(), roomName: randomRoom, oponent: oponentMapped })
-            }else{
-                return io.in(user_id).emit(EVENTS.OPONENT_FOUND(), { event: EVENTS.OPONENT_FOUND(), roomName: randomRoom, oponent: me })
-            }
-            
-        })
-    }
-}
+
 
 const joinDBRoom = async (io, socket, userAndRoom) => {
     if (userAndRoom.roomName === '1on1'){
@@ -300,6 +278,41 @@ const addDBFriend = async (socket, data) => {
     }
 }
 
+const joinOneOnOne = async (io, socket, userAndRoom) => {
+    oneOnOneRoom.oneOnOneUsers.push({ _id: userAndRoom.user_id, socket_id: socket.id, blocked: [], gameAccepted: false });
+    if (oneOnOneRoom.oneOnOneUsers.length && oneOnOneRoom.oneOnOneUsers.length > 1) {
+        const selected = oneOnOneRoom.oneOnOneUsers.filter(user => {
+            return user.blocked.every(usr => usr !== userAndRoom.user_id)
+        })
+        if (selected.length < 2) {
+            return;
+        }
+        oneOnOneRoom.oneOnOneUsers = oneOnOneRoom.oneOnOneUsers.filter(user => {
+            return selected.some(usr => usr._id !== user._id)
+        });
+        const oponent = selected.find(user => user._id !== userAndRoom.user_id);
+        const me = await Users.findOne({ _id: userAndRoom.user_id });
+        const oponentObj = await Users.findOne({ _id: oponent._id });
+        const randomRoom = randomValue(5);
+        const oponentMapped = {
+            _id: oponentObj._id,
+            avatar_url: oponentObj.avatar_url,
+        }
+        const meMapped = {
+            _id: me._id,
+            avatar_url: me.avatar_url,
+        }
+        selected.forEach(user => {
+            if (user._id === userAndRoom.user_id) {
+                return io.in(user._id).emit(EVENTS.OPONENT_FOUND(), { event: EVENTS.OPONENT_FOUND(), roomName: randomRoom, oponent: oponentMapped })
+            } else {
+                return io.in(user._id).emit(EVENTS.OPONENT_FOUND(), { event: EVENTS.OPONENT_FOUND(), roomName: randomRoom, oponent: meMapped })
+            }
+
+        })
+    }
+}
+
 const acceptDBFriend = async (socket, data) => {
     const requested_friend_ID = data.friend_id;
     const my_id = data.user_id;
@@ -360,6 +373,7 @@ const saveDBSocket = async (io, socket, data) =>{
 
 const disconectDBSocket = async (io, socket) =>{
     const user = await Users.findOne({socket: socket.id});
+    oneOnOneRoom.oneOnOneUsers = oneOnOneRoom.oneOnOneUsers.filter(user => user.socket_id !== socket.id)
     if (user) {
         user.online = false;
         socket.leave(user._id);
@@ -369,12 +383,36 @@ const disconectDBSocket = async (io, socket) =>{
    
 }
 
-const leaveDBOneOnOne = async (io, socket, data) =>{
+const leaveDBOneOnOne = (io, socket, data) =>{
     if (oneOnOneRoom.oneOnOneUsers.length){
-        oneOnOneRoom.oneOnOneUsers = oneOnOneRoom.oneOnOneUsers.filter(id => id !== data.user_id);
+        oneOnOneRoom.oneOnOneUsers = oneOnOneRoom.oneOnOneUsers.filter(user => user._id !== data.user_id);
         socket.emit(EVENTS.LEAVE_ONE_ON_ONE(), {event: EVENTS.LEAVE_ONE_ON_ONE(), success: true})
     }else{
         socket.emit(EVENTS.LEAVE_ONE_ON_ONE(), { event: EVENTS.LEAVE_ONE_ON_ONE(), success: true })
+    }
+}
+
+const declineOponent = (io, socket, data) => {
+    const me = oneOnOneRoom.oneOnOneUsers.find(user => user._id === data.user_id);
+    if(!me.blocked.includes(data.oponent_id)){
+        me.blocked.push(data.oponent_id)
+    }
+    me.gameAccepted = false;
+    socket.emit(EVENTS.OPONENT_DECLINED(), {event: EVENTS.OPONENT_DECLINED()})
+}
+
+const acceptDBOponent = async (io, socket, data) => {
+    const me = oneOnOneRoom.oneOnOneUsers.find(user => user._id === data.user_id);
+    const oponent = oneOnOneRoom.oneOnOneUsers.find(user => user._id === data.oponent_id);
+    if(!me || !oponent){
+        return;
+    }
+    me.gameAccepted = true;
+    io.in(oponent._id).emit(EVENTS.OPONENT_ACCEPTED(), { event: EVENTS.OPONENT_ACCEPTED(), success: true})
+    if(me.gameAccepted && oponent.gameAccepted){
+        await createDBRoom(socket, data.roomName, data);
+        await startDBTournament(io, socket, data);
+        console.log('emit starting')
     }
 }
 
@@ -442,6 +480,10 @@ const leaveOneOnOne = (io, socket, data) =>{
     leaveDBOneOnOne(io, socket, data)
 }
 
+const acceptOponent = (socketIo, socket, data) =>{
+    acceptDBOponent(socketIo, socket, data)
+}
+
 //SOCKETS EVENTS
 
 exports.setupListeners = () =>{
@@ -465,6 +507,14 @@ exports.setupListeners = () =>{
 
         socket.on(EVENTS.LEAVE_ONE_ON_ONE(), (data) => {
             leaveOneOnOne(socketIo, socket, data);
+        });
+
+        socket.on(EVENTS.OPONENT_ACCEPTED(), (data) => {
+            acceptOponent(socketIo, socket, data);
+        });
+
+        socket.on(EVENTS.OPONENT_DECLINED(), (data) => {
+            declineOponent(socketIo, socket, data);
         });
 
         socket.on(EVENTS.CREATE_ROOM(), (userData) =>{

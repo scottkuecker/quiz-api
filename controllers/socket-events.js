@@ -231,10 +231,25 @@ exports.OPONENT_FOUND = () => 'OPONENT_FOUND';
 
 /**
 * @description Leaves 1on1 room
-* @common_data_to_send no data need to send
+* @common_data_to_send {event: 'LEAVE_ONE_ON_ONE'}
 * @returns EVENT STRING
 */
 exports.LEAVE_ONE_ON_ONE = () => 'LEAVE_ONE_ON_ONE';
+
+/**
+* @description Decline 1on1 oponent
+* @common_data_to_send {event: 'OPONENT_DECLINED'}
+* @returns EVENT STRING
+*/
+exports.OPONENT_DECLINED = () => 'OPONENT_DECLINED';
+
+
+/**
+* @description Accept 1on1 oponent
+* @common_data_to_send {event: 'OPONENT_ACCEPTED'}
+* @returns EVENT STRING
+*/
+exports.OPONENT_ACCEPTED = () => 'OPONENT_ACCEPTED';
 
 /**
 * @description emits number of online users
