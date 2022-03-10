@@ -198,9 +198,8 @@ exports.addQuestion = async (req, res, next) =>{
 }
 
 exports.addFastQuestion = async (req, res, next) => {
-    console.log('reached here')
+
     try{
-        console.log('reched try')
         const questionText = req.body.question || 'Some question?';
         const correct_letter = req.body.correct_letter || 'B';
         const correctText = req.body.correct_text || 'Some correct answer';

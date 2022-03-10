@@ -58,24 +58,17 @@ const createDBRoom = async (socket, room, userData) =>{
 const joinOneOnOne = async (io, socket, userAndRoom) =>{
     const oneOnOneRoom = await OneOnOne.findOne({ room_id: '1on1'})
     if (!oneOnOneRoom){
-        const rm = new OneOnOne({
-            room_id: '1on1',
-            users: [],
-        });
-        await rm.save();
+        return console.log('no 1on1 room found')
     }
     let roomUsers = oneOnOneRoom.users || [];
-    roomUsers = roomUsers.filter(id => id !== userAndRoom.user_id)
     roomUsers.push(userAndRoom.user_id);
     oneOnOneRoom.users = roomUsers;
     await oneOnOneRoom.save();
     if(roomUsers.length && roomUsers.length > 1){
         const selected = roomUsers.slice(0,2);
-        console.log(selected)
         roomUsers = roomUsers.filter(id => !selected.includes(id));
         oneOnOneRoom.users = roomUsers;
         await oneOnOneRoom.save();
-
         const oponent = selected.find(user_id => user_id !== userAndRoom.user_id);
         const me = await Users.findOne({ _id: userAndRoom.user_id });
         const oponentObj = await Users.findOne({_id: oponent});
@@ -84,9 +77,6 @@ const joinOneOnOne = async (io, socket, userAndRoom) =>{
             _id: oponent,
             avatar_url: oponentObj.avatar_url,
         }
-        
-       console.log('after selected')
-        console.log(oneOnOneRoom.users)
         selected.forEach(user_id =>{
             if (user_id === userAndRoom.user_id){
                 return io.in(user_id).emit(EVENTS.OPONENT_FOUND(), {event: EVENTS.OPONENT_FOUND(), roomName: randomRoom, oponent: oponentMapped })
@@ -100,6 +90,7 @@ const joinOneOnOne = async (io, socket, userAndRoom) =>{
 
 const joinDBRoom = async (io, socket, userAndRoom) => {
     if (userAndRoom.roomName === '1on1'){
+        console.log('joining 1on1')
         return joinOneOnOne(io, socket, userAndRoom)
     }
     const response = { success: false }
@@ -382,11 +373,13 @@ const disconectDBSocket = async (io, socket) =>{
 const leaveDBOneOnOne = async (io, socket, data) =>{
     const room = await OneOnOne.findOne({ room_id: '1on1'});
     if(room){
-        let users = room.users;
+        let users = room.users || [];
         const filtered = users.filter(id => id !== data.user_id);
         room.users = filtered;
-        console.log(room.users)
-        room.save();
+        await room.save();
+        socket.emit(EVENTS.LEAVE_ONE_ON_ONE(), {event: EVENTS.LEAVE_ONE_ON_ONE(), success: true})
+    }else{
+        socket.emit(EVENTS.LEAVE_ONE_ON_ONE(), { success: true })
     }
 }
 
@@ -396,7 +389,6 @@ const leaveDBOneOnOne = async (io, socket, data) =>{
 
 const inviteFriends = (io, socket, data) => {
     data.friends.forEach(friend =>{
-        console.log('emmiting to: ' + friend._id)
         io.in(`${friend._id}`).emit(EVENTS.TOURNAMENT_INVITATION(),{event: EVENTS.TOURNAMENT_INVITATION(), roomName: data.roomName, userName: data.userName})
     })
     // return io.in(`${data.roomName}`).emit({)
