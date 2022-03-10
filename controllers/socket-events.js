@@ -1,3 +1,21 @@
+
+
+
+
+/**
+ * @description join 1on1 created room
+ * @common_data_to_send {event: 'JOIN_ONE_ON_ONE'}
+ * @returns EVENT STRING
+ */
+exports.JOIN_ONE_ON_ONE = () => 'JOIN_ONE_ON_ONE';
+
+/**
+ * @description Emit to client that 1 on 1 is ready
+ * @common_data_to_send {event: 'BOTH_ACCEPTEDT'}
+ * @returns EVENT STRING
+ */
+exports.BOTH_ACCEPTED = () => 'BOTH_ACCEPTED';
+
 /**
  * @description Save current socket into db for specific later notification
  * @returns EVENT STRING

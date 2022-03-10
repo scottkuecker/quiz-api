@@ -133,7 +133,9 @@ const leaveDBRoom = async (io, socket, userAndRoom) => {
 
 
 const startDBTournament = async (io, socket, data) =>{
+    console.log(data)
     const tournamentRoom = await Room.findOne({room_id: data.roomName});
+   
     const amountOfQuestions = data.amountOfQuestions || 15;
     if(!tournamentRoom){
        return socket.emit(`${EVENTS.ROOM_DONT_EXIST()}`, {
@@ -172,12 +174,13 @@ const startDBTournament = async (io, socket, data) =>{
     await generateQuestions();
     tournamentRoom.questions = room_questions;
     await tournamentRoom.save();
-    io.in(`${data.roomName}`).emit(EVENTS.TOURNAMENT_STARTING(), {event: EVENTS.TOURNAMENT_STARTING()});
+    io.to(`${data.roomName}`).emit(EVENTS.TOURNAMENT_STARTING(), {event: EVENTS.TOURNAMENT_STARTING()});
 }
 
 
 const getDBQuestion = async (socket, data) =>{
             const tournamentRoom = await Room.findOne({ room_id: data.roomName });
+            console.log(tournamentRoom)
             if (!tournamentRoom || !tournamentRoom.allow_enter) {
                 socket.emit(`${EVENTS.ROOM_DONT_EXIST()}`, {
                     event: EVENTS.ROOM_DONT_EXIST(),
@@ -408,12 +411,54 @@ const acceptDBOponent = async (io, socket, data) => {
         return;
     }
     me.gameAccepted = true;
+    socket.join(data.roomName)
     io.in(oponent._id).emit(EVENTS.OPONENT_ACCEPTED(), { event: EVENTS.OPONENT_ACCEPTED(), success: true})
     if(me.gameAccepted && oponent.gameAccepted){
         await createDBRoom(socket, data.roomName, data);
-        await startDBTournament(io, socket, data);
-        console.log('emit starting')
+        io.to(data.roomName).emit(EVENTS.BOTH_ACCEPTED(), { event: EVENTS.BOTH_ACCEPTED(), success: true })
     }
+}
+
+const joinOneOnOneDBRoom = async (io, socket, data) =>{
+    const response = { success: false }
+    const room = await Room.findOne({ room_id: data.roomName });
+    const user = await Users.findOne({ _id: data.user_id });
+    const socketRooms = socket.rooms;
+    socketRooms.forEach(rm => {
+        socket.leave(`${rm}`)
+    });
+    socket.join(`${data.user_id}`)
+
+    if (room && room.allow_enter) {
+        const haveUser = room.users.some(user => user.id === null || user.id === data.user_id);
+        user.room = data.roomName;
+        user.socket = socket.id;
+        await user.save();
+        if (!haveUser) {
+            room.users.push({
+                name: data.name,
+                id: data.user_id,
+                score: 0,
+                answered: false,
+                avatar: data.avatar,
+            });
+        }
+        const result = await room.save();
+        if (result) {
+            result.success = true;
+            socket.join(`${data.roomName}`);
+            if(room.users.length > 1){
+                startDBTournament(io, socket, data);
+            }
+            
+        }
+    } else {
+        socket.emit(EVENTS.ROOM_DONT_EXIST(), {
+            event: EVENTS.ROOM_DONT_EXIST(),
+            fn: 'joinDBRoom'
+        });
+    }
+    return response;
 }
 
 
@@ -427,7 +472,9 @@ const inviteFriends = (io, socket, data) => {
     // return io.in(`${data.roomName}`).emit({)
 }
 
-
+const joinOneOnOneRoom = (io, socket, data) =>{
+    joinOneOnOneDBRoom(io, socket, data)
+}
 
 const createRoom = (socket, userData) =>{
     const room =  randomValue(5);
@@ -524,6 +571,11 @@ exports.setupListeners = () =>{
         socket.on(EVENTS.SAVE_SOCKET(), (userData) => {
             saveSocket(socketIo, socket, userData);
         });
+
+        socket.on(EVENTS.JOIN_ONE_ON_ONE(), data => {
+            console.log('joining one on one')
+            joinOneOnOneRoom(socketIo, socket, data)
+        })
 
         socket.on(EVENTS.JOIN_ROOM(), userAndRoom =>{
             joinRoom(socketIo, socket, userAndRoom);
