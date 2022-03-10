@@ -236,4 +236,11 @@ exports.OPONENT_FOUND = () => 'OPONENT_FOUND';
 */
 exports.LEAVE_ONE_ON_ONE = () => 'LEAVE_ONE_ON_ONE';
 
+/**
+* @description emits number of online users
+* @common_data_to_send {event: 'ONLINE_USERS_COUNT', online: number}
+* @returns EVENT STRING
+*/
+exports.ONLINE_USERS_COUNT = () => 'ONLINE_USERS_COUNT';
+
 

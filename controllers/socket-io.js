@@ -4,11 +4,20 @@ const Questions = require('../db_models/question');
 const Room = require('../db_models/rooms');
 const Users = require('../db_models/user');
 const handleError = require('../utils/errorHandler');
-const OneOnOne = require('../db_models/one-on-one');
 const EVENTS = require('./socket-events');
 
+/*  this users list should only exist if server is running, 
+    must be reseted on every server restart
+    holds strings only of players currently playing 1 vs 1
+    produces better performance if not held in DB and saves us DB cleaning on restart
+*/
+var oneOnOneRoom = {
+    oneOnOneUsers: [],
+    onlineUsers: 0
+}
 
 //FUNCTIONS TRIGGERED BY EVENT FUNCTIONS
+
 
 const  randomValue = (len) => {
     return crypto.randomBytes(Math.ceil(len / 2))
@@ -56,19 +65,10 @@ const createDBRoom = async (socket, room, userData) =>{
 }
 
 const joinOneOnOne = async (io, socket, userAndRoom) =>{
-    const oneOnOneRoom = await OneOnOne.findOne({ room_id: '1on1'})
-    if (!oneOnOneRoom){
-        return console.log('no 1on1 room found')
-    }
-    let roomUsers = oneOnOneRoom.users || [];
-    roomUsers.push(userAndRoom.user_id);
-    oneOnOneRoom.users = roomUsers;
-    await oneOnOneRoom.save();
-    if(roomUsers.length && roomUsers.length > 1){
-        const selected = roomUsers.slice(0,2);
-        roomUsers = roomUsers.filter(id => !selected.includes(id));
-        oneOnOneRoom.users = roomUsers;
-        await oneOnOneRoom.save();
+    oneOnOneRoom.oneOnOneUsers.push(userAndRoom.user_id);
+    if (oneOnOneRoom.oneOnOneUsers.length && oneOnOneRoom.oneOnOneUsers.length > 1){
+        const selected = oneOnOneRoom.oneOnOneUsers.slice(0,2);
+        oneOnOneRoom.oneOnOneUsers = oneOnOneRoom.oneOnOneUsers.filter(id => !selected.includes(id));
         const oponent = selected.find(user_id => user_id !== userAndRoom.user_id);
         const me = await Users.findOne({ _id: userAndRoom.user_id });
         const oponentObj = await Users.findOne({_id: oponent});
@@ -79,9 +79,9 @@ const joinOneOnOne = async (io, socket, userAndRoom) =>{
         }
         selected.forEach(user_id =>{
             if (user_id === userAndRoom.user_id){
-                return io.in(user_id).emit(EVENTS.OPONENT_FOUND(), {event: EVENTS.OPONENT_FOUND(), roomName: randomRoom, oponent: oponentMapped })
+                return io.in(user_id).emit(EVENTS.OPONENT_FOUND(), { event: EVENTS.OPONENT_FOUND(), roomName: randomRoom, oponent: oponentMapped })
             }else{
-                return io.in(user_id).emit(EVENTS.OPONENT_FOUND(), {event: EVENTS.OPONENT_FOUND(), roomName: randomRoom, oponent: me })
+                return io.in(user_id).emit(EVENTS.OPONENT_FOUND(), { event: EVENTS.OPONENT_FOUND(), roomName: randomRoom, oponent: me })
             }
             
         })
@@ -90,7 +90,6 @@ const joinOneOnOne = async (io, socket, userAndRoom) =>{
 
 const joinDBRoom = async (io, socket, userAndRoom) => {
     if (userAndRoom.roomName === '1on1'){
-        console.log('joining 1on1')
         return joinOneOnOne(io, socket, userAndRoom)
     }
     const response = { success: false }
@@ -371,15 +370,11 @@ const disconectDBSocket = async (io, socket) =>{
 }
 
 const leaveDBOneOnOne = async (io, socket, data) =>{
-    const room = await OneOnOne.findOne({ room_id: '1on1'});
-    if(room){
-        let users = room.users || [];
-        const filtered = users.filter(id => id !== data.user_id);
-        room.users = filtered;
-        await room.save();
+    if (oneOnOneRoom.oneOnOneUsers.length){
+        oneOnOneRoom.oneOnOneUsers = oneOnOneRoom.oneOnOneUsers.filter(id => id !== data.user_id);
         socket.emit(EVENTS.LEAVE_ONE_ON_ONE(), {event: EVENTS.LEAVE_ONE_ON_ONE(), success: true})
     }else{
-        socket.emit(EVENTS.LEAVE_ONE_ON_ONE(), { success: true })
+        socket.emit(EVENTS.LEAVE_ONE_ON_ONE(), { event: EVENTS.LEAVE_ONE_ON_ONE(), success: true })
     }
 }
 
@@ -452,8 +447,11 @@ const leaveOneOnOne = (io, socket, data) =>{
 exports.setupListeners = () =>{
     const socketIo = socketCon.getIO();
     socketIo.on('connection', socket =>{
-
+        oneOnOneRoom.onlineUsers++;
+        socketIo.emit(EVENTS.ONLINE_USERS_COUNT(), { event: EVENTS.ONLINE_USERS_COUNT(), online: oneOnOneRoom.onlineUsers })
         socket.on('disconnect', (data) => {
+            oneOnOneRoom.onlineUsers--;
+            socketIo.emit(EVENTS.ONLINE_USERS_COUNT(), { event: EVENTS.ONLINE_USERS_COUNT(), online: oneOnOneRoom.onlineUsers})
             disconectSocket(socketIo, socket);
         })
 
