@@ -200,7 +200,7 @@ exports.addQuestion = async (req, res, next) =>{
 exports.addFastQuestion = async (req, res, next) => {
 
     try{
-        const questionText = req.body.question || 'Some question?';
+        const questionText = req.body.question_text || 'Some question?';
         const correct_letter = req.body.correct_letter || 'B';
         const correctText = req.body.correct_text || 'Some correct answer';
         const allAnswers = req.body.answers || [];
@@ -209,8 +209,13 @@ exports.addFastQuestion = async (req, res, next) => {
                 question: questionText,
                 correct_letter: correct_letter,
                 correct_text: correctText,
-                category: 'MUZIKA',
-                answers: allAnswers,
+                category: 'ISTORIJA',
+                answers: [
+                    { letter: 'A', text: allAnswers[0]},
+                    { letter: 'B', text: allAnswers[1] },
+                    { letter: 'C', text: allAnswers[2] },
+                    { letter: 'D', text: allAnswers[3] }
+                ],
             });
         await question.save();
         return res.send({
@@ -223,7 +228,7 @@ exports.addFastQuestion = async (req, res, next) => {
         return res.send({
             success: false,
             data: req.body,
-            error: 'Question not saved: ' + req.body.question,
+            error: e,
             data: undefined
         })
     }

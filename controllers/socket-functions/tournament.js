@@ -91,7 +91,6 @@ exports.checkDBTournamentQuestion = async (io, socket, data) => {
             fn: 'checkDBTournamentQuestion'
         });
     }
-
     const question = room.questions[data.questionIndex];
     const users = JSON.parse(JSON.stringify(room.users));
     users.forEach(user => {
@@ -137,7 +136,7 @@ exports.createOneOnOneUsers = async (usersArr) =>{
     const user1 = usersArr[0];
     const user2 = usersArr[1];
 
-    const userOne = await Users.findOne({_id: user1._id});
+    const userOne = await Users.findOne({ _id: user1._id});
     const userTwo = await Users.findOne({ _id: user2._id });
     if(!userOne || !userTwo){
         return;
@@ -151,11 +150,11 @@ exports.createOneOnOneUsers = async (usersArr) =>{
         avatar: userOne.avatar
     }
     const user2Mapped = {
-        name: userOne.name,
-        id: userOne._id,
+        name: userTwo.name,
+        id: userTwo._id,
         score: 0,
         answered: false,
-        avatar: userOne.avatar
+        avatar: userTwo.avatar
     }
     return [user1Mapped, user2Mapped];
 }
