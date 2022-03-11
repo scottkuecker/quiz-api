@@ -1,6 +1,9 @@
 const Room = require('../../db_models/rooms');
-const Questions = require('../../db_models/question');
+const ROOMS = require('../socket-functions/room');
+const QUESTIONS = require('./questions'); //socket event functions
+const Questions = require('../../db_models/question'); //mongoDB model
 const EVENTS = require('../socket-events');
+const Users = require('../../db_models/user');
 
 var oneOnOneRoom = {
     oneOnOneUsers: [],
@@ -17,9 +20,7 @@ exports.getoneOnOneRoom = () => {
 }
 
 exports.startDBTournament = async (io, socket, data) => {
-    console.log(data)
     const tournamentRoom = await Room.findOne({ room_id: data.roomName });
-
     const amountOfQuestions = data.amountOfQuestions || 15;
     if (!tournamentRoom) {
         return socket.emit(`${EVENTS.ROOM_DONT_EXIST()}`, {
@@ -132,6 +133,33 @@ exports.declineOponent = (io, socket, data) => {
     socket.emit(EVENTS.OPONENT_DECLINED(), { event: EVENTS.OPONENT_DECLINED() })
 }
 
+exports.createOneOnOneUsers = async (usersArr) =>{
+    const user1 = usersArr[0];
+    const user2 = usersArr[1];
+
+    const userOne = await Users.findOne({_id: user1._id});
+    const userTwo = await Users.findOne({ _id: user2._id });
+    if(!userOne || !userTwo){
+        return;
+    }
+
+    const user1Mapped = {
+        name: userOne.name,
+        id: userOne._id,
+        score: 0,
+        answered: false,
+        avatar: userOne.avatar
+    }
+    const user2Mapped = {
+        name: userOne.name,
+        id: userOne._id,
+        score: 0,
+        answered: false,
+        avatar: userOne.avatar
+    }
+    return [user1Mapped, user2Mapped];
+}
+
 exports.acceptDBOponent = async (io, socket, data) => {
     const me = oneOnOneRoom.oneOnOneUsers.find(user => user._id === data.user_id);
     const oponent = oneOnOneRoom.oneOnOneUsers.find(user => user._id === data.oponent_id);
@@ -142,7 +170,9 @@ exports.acceptDBOponent = async (io, socket, data) => {
     socket.join(data.roomName)
     io.in(oponent._id).emit(EVENTS.OPONENT_ACCEPTED(), { event: EVENTS.OPONENT_ACCEPTED(), success: true })
     if (me.gameAccepted && oponent.gameAccepted) {
+        const users = await this.createOneOnOneUsers([me, oponent])
         await ROOMS.createDBRoom(socket, data.roomName, data);
+        await QUESTIONS.generateRoomQuestions(data.roomName, 15, users);
         io.to(data.roomName).emit(EVENTS.BOTH_ACCEPTED(), { event: EVENTS.BOTH_ACCEPTED(), success: true })
     }
 }

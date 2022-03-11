@@ -52,7 +52,7 @@ exports.createDBRoom = async (socket, room, userData) => {
 
 exports.joinDBRoom = async (io, socket, userAndRoom) => {
     if (userAndRoom.roomName === '1on1') {
-        return joinOneOnOne(io, socket, userAndRoom)
+        return this.joinOneOnOne(io, socket, userAndRoom)
     }
     const response = { success: false }
     const rooms = await Room.find({ room_id: userAndRoom.roomName });
