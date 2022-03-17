@@ -19,7 +19,10 @@ const userRoutes = require('./routes/user-routes');
 const achievementRoutes = require('./routes/achievement-routes');
 const socketRoutes = require('./routes/socket-routes');
 
-server.options('*', cors())
+server.use('*', cors(), (req, res,next) =>{
+    console.log('trigered cors')
+    next()
+})
 
 server.use(express.urlencoded({extended: false}))
 server.use(express.json())
