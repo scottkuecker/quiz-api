@@ -24,7 +24,7 @@ server.use(cors({
     origin: false,
     methods: "GET,PUT,POST,DELETE",
     allowedHeaders: "Authorization",
-    preflightContinue: true
+    preflightContinue: false
 }))
 server.use(express.urlencoded({extended: false}))
 server.use(express.json())
