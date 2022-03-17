@@ -9,9 +9,7 @@ const server = express();
 const ioEvents = require('./controllers/socket-io');
 const port = process.env.PORT;
 
-
-// const middleware = require('./midleware/auth');
-server.use('', (req,res,next) =>{
+server.use('', cors(), (req,res,next) =>{
     next()
 });
 
@@ -20,13 +18,6 @@ const authRoutes = require('./routes/auth-routes');
 const userRoutes = require('./routes/user-routes');
 const achievementRoutes = require('./routes/achievement-routes');
 const socketRoutes = require('./routes/socket-routes');
-
-
-// server.use('*', (req, res,next) =>{
-//     console.log('trigered cors')
-//     // res.setHeader('Access-Control-Allow-Origin', '*')
-//     next()
-// })
 
 server.use(express.urlencoded({extended: false}))
 server.use(express.json())
