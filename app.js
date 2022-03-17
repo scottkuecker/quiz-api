@@ -19,15 +19,16 @@ const userRoutes = require('./routes/user-routes');
 const achievementRoutes = require('./routes/achievement-routes');
 const socketRoutes = require('./routes/socket-routes');
 
-server.use(
-    cors({
-      allowedHeaders: ["Authorization", "Content-Type"], // you can change the headers
-      exposedHeaders: ["Authorization"], // you can change the headers
-      origin: "*",
-      methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-      preflightContinue: false
-    })
-)
+app.use(function (req, res, next) {
+
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
+    res.setHeader('Access-Control-Allow-Origin', 'https://kviz-live.web.app');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+    res.setHeader('Access-Control-Allow-Credentials', true);
+
+    next();
+});
 server.use(express.urlencoded({extended: false}))
 server.use(express.json())
 server.use(express.static(path.join(__dirname, 'public')));
