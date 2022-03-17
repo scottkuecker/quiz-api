@@ -19,15 +19,16 @@ const userRoutes = require('./routes/user-routes');
 const achievementRoutes = require('./routes/achievement-routes');
 const socketRoutes = require('./routes/socket-routes');
 
-server.use(express.urlencoded({extended: false}))
-server.use(express.json())
-server.use(express.static(path.join(__dirname, 'public')));
-server.use(cors({
+server.options(cors({
     origin: false,
     methods: "GET,PUT,POST,DELETE",
     allowedHeaders: "Authorization",
     preflightContinue: true
 }))
+server.use(express.urlencoded({extended: false}))
+server.use(express.json())
+server.use(express.static(path.join(__dirname, 'public')));
+
 server.use(questionRoutes);
 server.use(authRoutes);
 server.use(userRoutes);
