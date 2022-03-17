@@ -128,6 +128,7 @@ exports.facebookLogin = async (req, res, next) => {
 
 exports.refreshUser = async (req, res, next) => {
     if (req.user) {
+        console.log('refreshing')
         const userDoc = await User.findOne({ email: req.user.email });
         const achievements = await Achievements.find();
         if (userDoc) {
@@ -160,31 +161,31 @@ exports.refreshUser = async (req, res, next) => {
     }
 }
 
-// exports.takeDailyPrice = async (req, res, next) =>{
-//     const user = User.findById(req.user._id);
-//         if (!user){
-//             return res.send({
-//                 success: false,
-//                 data: undefined,
-//                 error: undefined
-//             })
-//         }
-//         if (!user.daily_price){
-//             return res.send({
-//                 success: false,
-//                 data: undefined,
-//                 error: 'Price received'
-//             })
-//         }
+exports.takeDailyPrice = async (req, res, next) =>{
+    const user = User.findById(req.user._id);
+        if (!user){
+            return res.send({
+                success: false,
+                data: undefined,
+                error: undefined
+            })
+        }
+        if (!user.daily_price){
+            return res.send({
+                success: false,
+                data: undefined,
+                error: 'Price received'
+            })
+        }
    
-//     user.tickets++;
-//     user.daily_price = false;
-//     const success = await user.save();
-//     if(success){
-//         return res.send({
-//             success: true,
-//             data: undefined,
-//             error: undefined
-//         })
-//     }
-// }
+    user.tickets++;
+    user.daily_price = false;
+    const success = await user.save();
+    if(success){
+        return res.send({
+            success: true,
+            data: undefined,
+            error: undefined
+        })
+    }
+}

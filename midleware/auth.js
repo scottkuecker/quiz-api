@@ -24,8 +24,10 @@ exports.authMidleware = (req, res,next) =>{
         }
         req.user = decodedToken.user;
         if(req.user){
+            console.log('reached next')
             next();
         }else{
+            console.log('no next')
             return res.json({
                 sucess: false,
                 data: undefined,
