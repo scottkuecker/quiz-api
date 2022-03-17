@@ -19,13 +19,15 @@ const userRoutes = require('./routes/user-routes');
 const achievementRoutes = require('./routes/achievement-routes');
 const socketRoutes = require('./routes/socket-routes');
 
-server.options(function (req, res, next) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-    next();
-});
-
+server.use(
+    cors({
+      allowedHeaders: ["Authorization", "Content-Type"], // you can change the headers
+      exposedHeaders: ["Authorization"], // you can change the headers
+      origin: "*",
+      methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+      preflightContinue: false
+    })
+)
 server.use(express.urlencoded({extended: false}))
 server.use(express.json())
 server.use(express.static(path.join(__dirname, 'public')));
