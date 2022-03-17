@@ -20,12 +20,7 @@ const achievementRoutes = require('./routes/achievement-routes');
 const socketRoutes = require('./routes/socket-routes');
 
 server.options('*', cors())
-server.use(cors({
-    origin: false,
-    methods: "GET,PUT,POST,DELETE",
-    allowedHeaders: "Authorization",
-    preflightContinue: false
-}))
+
 server.use(express.urlencoded({extended: false}))
 server.use(express.json())
 server.use(express.static(path.join(__dirname, 'public')));
