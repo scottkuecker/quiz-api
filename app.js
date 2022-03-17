@@ -22,13 +22,12 @@ const socketRoutes = require('./routes/socket-routes');
 server.use(express.urlencoded({extended: false}))
 server.use(express.json())
 server.use(express.static(path.join(__dirname, 'public')));
-server.use('', function(req,res,next){
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-    res.setHeader('Access-Control-Allow-Credentials', true);
-    next();
-})
+server.use(cors({
+    origin: false,
+    methods: "GET,PUT,POST,DELETE",
+    allowedHeaders: "Authorization",
+    preflightContinue: true
+}))
 server.use(questionRoutes);
 server.use(authRoutes);
 server.use(userRoutes);
