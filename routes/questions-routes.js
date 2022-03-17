@@ -10,7 +10,7 @@ router.get('/question', handler.handleError(middleware.authMidleware) , handler.
 router.get('/question/:category', handler.handleError(middleware.authMidleware), handler.handleError(questions.getQuestion));
 router.get('/all-questions', handler.handleError(middleware.authMidleware), handler.handleError(questions.getAllQuestions));
 router.get('/all-questions/:filter', handler.handleError(middleware.authMidleware), handler.handleError(questions.getAllQuestions));
-router.post('/add-question', /*handler.handleError(middleware.authMidleware),*/ Validator.isValidCategory,  handler.handleError(questions.addQuestion));
+router.post('/add-question', handler.handleError(middleware.authMidleware), Validator.isValidCategory,  handler.handleError(questions.addQuestion));
 router.post('/image-question', handler.handleError(middleware.authMidleware), handler.handleError(questions.addImageQuestion));
 router.delete('/delete-question/:id', handler.handleError(middleware.authMidleware) ,handler.handleError(questions.deleteQuestion))
 router.post('/check-question', handler.handleError(middleware.authMidleware), handler.handleError(questions.checkQuestion))
