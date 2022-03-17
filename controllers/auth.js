@@ -128,7 +128,6 @@ exports.facebookLogin = async (req, res, next) => {
 
 exports.refreshUser = async (req, res, next) => {
     if (req.user) {
-        console.log('refreshing')
         const userDoc = await User.findOne({ email: req.user.email });
         const achievements = await Achievements.find();
         if (userDoc) {

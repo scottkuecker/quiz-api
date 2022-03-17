@@ -6,12 +6,14 @@ const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const fs = require('fs');
 const server = express();
-server.use(cors());
 const ioEvents = require('./controllers/socket-io');
 const port = process.env.PORT;
 
 
 // const middleware = require('./midleware/auth');
+server.use('', (req,res,next) =>{
+    next()
+});
 
 const questionRoutes = require('./routes/questions-routes');
 const authRoutes = require('./routes/auth-routes');
@@ -19,10 +21,12 @@ const userRoutes = require('./routes/user-routes');
 const achievementRoutes = require('./routes/achievement-routes');
 const socketRoutes = require('./routes/socket-routes');
 
-server.use('*', cors(), (req, res,next) =>{
-    console.log('trigered cors')
-    next()
-})
+
+// server.use('*', (req, res,next) =>{
+//     console.log('trigered cors')
+//     // res.setHeader('Access-Control-Allow-Origin', '*')
+//     next()
+// })
 
 server.use(express.urlencoded({extended: false}))
 server.use(express.json())
