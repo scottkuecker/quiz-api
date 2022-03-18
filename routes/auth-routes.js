@@ -5,7 +5,7 @@ const handler = require('../utils/errorHandler');
 const router = require('express').Router();
 
 function cors(req,res,next){
-  res.header('Access-Control-Allow-Origin', 'https://kviz-live.web.app')
+  res.setHeader('Access-Control-Allow-Origin', 'https://kviz-live.web.app')
   next();
 }
 
