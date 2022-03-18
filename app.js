@@ -8,6 +8,7 @@ const fs = require('fs');
 const server = express();
 const ioEvents = require('./controllers/socket-io');
 const port = process.env.PORT;
+server.use(cors())
 
 server.options("", (req,res,next) => {
  res.setHeader("Access-Control-Allow-Origin","https://kviz-live.web.app");
