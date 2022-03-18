@@ -9,14 +9,9 @@ const server = express();
 const ioEvents = require('./controllers/socket-io');
 const port = process.env.PORT;
 
-server.options("/", (req, res) => { 
- res.setHeader("Access-Control-Allow-Origin", "*");
- res.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS"); 
- res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept");
- res.setHeader("Access-Control-Allow-Credentials", "true");
- res.sendStatus(200);
-
- });
+server.use(cors({
+origin: "https://kviz-live.web.app, http://localhost:4200"
+}))
 
 const questionRoutes = require('./routes/questions-routes');
 const authRoutes = require('./routes/auth-routes');
