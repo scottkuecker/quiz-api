@@ -9,7 +9,7 @@ const server = express();
 const ioEvents = require('./controllers/socket-io');
 const port = process.env.PORT;
 
-app.options("/", (req, res) => { 
+server.options("/", (req, res) => { 
  res.setHeader("Access-Control-Allow-Origin", "*");
  res.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE"); 
  res.setHeader("Access-Control-Allow-Headers": "Content-Type");
