@@ -9,11 +9,13 @@ const server = express();
 const ioEvents = require('./controllers/socket-io');
 const port = process.env.PORT;
 
-server.use("", (req, res, next) => { 
+server.options("/", (req, res) => { 
  res.setHeader("Access-Control-Allow-Origin", "*");
  res.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS"); 
  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept");
- next();
+ res.setHeader("Access-Control-Allow-Credentials", "true");
+ res.sendStatus(200);
+
  });
 
 const questionRoutes = require('./routes/questions-routes');
