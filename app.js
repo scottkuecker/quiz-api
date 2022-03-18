@@ -9,9 +9,7 @@ const server = express();
 const ioEvents = require('./controllers/socket-io');
 const port = process.env.PORT;
 
-server.use(cors({
-origin: "https://kviz-live.web.app, http://localhost:4200"
-}))
+server.use(cors());
 
 const questionRoutes = require('./routes/questions-routes');
 const authRoutes = require('./routes/auth-routes');
