@@ -9,9 +9,11 @@ const server = express();
 const ioEvents = require('./controllers/socket-io');
 const port = process.env.PORT;
 
-server.use('', cors(), (req,res,next) =>{
-    next()
-});
+app.options("/", (req, res) => { 
+ res.setHeader("Access-Control-Allow-Origin", "*");
+ res.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE"); 
+ res.setHeader("Access-Control-Allow-Headers": "Content-Type");
+ res.sendStatus(204); });
 
 const questionRoutes = require('./routes/questions-routes');
 const authRoutes = require('./routes/auth-routes');
