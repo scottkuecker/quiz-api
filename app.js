@@ -27,10 +27,10 @@ server.use(express.urlencoded({extended: false}))
 server.use(express.json())
 server.use(express.static(path.join(__dirname, 'public')));
 
-server.use(questionRoutes);
-server.use(authRoutes);
-server.use(userRoutes);
-server.use(achievementRoutes);
+server.use(cors(), questionRoutes);
+server.use(cors(), authRoutes);
+server.use(cors(), userRoutes);
+server.use(cors(), achievementRoutes);
 
 server.use('', (req,res, next)=>{
         res.send({
