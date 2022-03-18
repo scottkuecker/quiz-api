@@ -12,7 +12,7 @@ const port = process.env.PORT;
 server.options("/", (req, res) => { 
  res.setHeader("Access-Control-Allow-Origin", "*");
  res.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE"); 
- res.setHeader("Access-Control-Allow-Headers": "Content-Type");
+ res.setHeader("Access-Control-Allow-Headers", "Content-Type");
  res.sendStatus(204); });
 
 const questionRoutes = require('./routes/questions-routes');
