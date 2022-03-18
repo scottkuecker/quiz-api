@@ -9,11 +9,11 @@ const server = express();
 const ioEvents = require('./controllers/socket-io');
 const port = process.env.PORT;
 
-server.use("", (req,res,next) => {
- res.header("Access-Control-Allow-Origin","https://kviz-live.web.app");
- res.header("Access-Control-Allow-Methods","PUT, GET, DELETE, POST");
- res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
- next();
+server.options("", (req,res,next) => {
+ res.setHeader("Access-Control-Allow-Origin","https://kviz-live.web.app");
+ res.setHeader("Access-Control-Allow-Methods","PUT, GET, DELETE, POST");
+ res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+ res.sendHeader(204);
 });
 
 const questionRoutes = require('./routes/questions-routes');
