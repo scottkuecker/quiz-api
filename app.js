@@ -9,7 +9,12 @@ const server = express();
 const ioEvents = require('./controllers/socket-io');
 const port = process.env.PORT;
 
-server.use(cors());
+server.options("/", (req,res) => {
+ res.setHeader("Access-Control-Allow-Origin","https://kviz-live.web.app");
+ res.setHeader("Access-Control-Allow-Methods","PUT, GET, DELETE, POST");
+ res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+ res.sendStatus(200);
+});
 
 const questionRoutes = require('./routes/questions-routes');
 const authRoutes = require('./routes/auth-routes');
