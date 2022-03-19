@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const error = require('../db_models/errors');
+const ErrorDB = require('../db_models/errors');
 
 exports.authMidleware = async (req, res,next) =>{
     const error = new ErrorDB({
