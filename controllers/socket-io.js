@@ -6,6 +6,7 @@ const ROOMS = require ('./socket-functions/room');
 const FRIEND_REQUESTS = require('./socket-functions/friend-requests');
 const TOURNAMENT = require('./socket-functions/tournament');
 const QUESTIONS = require('./socket-functions/questions');
+const AUTH = require('./auth');
 
 const saveDBSocket = async (io, socket, data) =>{
     const user = await Users.findById(data.user_id);
@@ -83,6 +84,10 @@ const leaveOneOnOne = (io, socket, data) =>{
 
 const acceptOponent = (socketIo, socket, data) =>{
     TOURNAMENT.acceptDBOponent(socketIo, socket, data)
+}
+
+const refreshUser = (socket, data) => {
+    AUTH.refreshTEST(socket, data)
 }
 
 //SOCKETS EVENTS
@@ -165,6 +170,10 @@ exports.setupListeners = () =>{
 
         socket.on(EVENTS.ACCEPT_FRIEND(), data => {
             acceptFriend(socket, data)
+        });
+
+        socket.on(EVENTS.REFRESH_USER(), data => {
+            refreshUser(socket, data)
         })
     });
 

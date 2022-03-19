@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const oneOnOneRoom = require('../db_models/one-on-one');
 const user = require('../db_models/user');
+const EVENTS = require('../controllers/socket-events');
 
 exports.signUp = async (req, res, next) =>{
     const email = req.body.email;
@@ -156,6 +157,36 @@ exports.refreshUser = async (req, res, next) => {
                 error: '',
                 data: userDoc
             })
+        }
+    }
+}
+
+exports.refreshTEST = async (socket, data) => {
+    if (data.user_id) {
+        const userDoc = await User.findOne({ email: data.user_id });
+        const achievements = await Achievements.find();
+        if (userDoc) {
+            for (let i = 0; i < userDoc.achievements.length; i++) {
+                for (let j = 0; j < achievements.length; j++) {
+                    if (!userDoc.achievements[i].achievement_ticket_ids.includes(achievements[j]._id.toString()) &&
+                        userDoc.achievements[i].answered >= achievements[j].achievedAt && 
+                        userDoc.achievements[i].category === achievements[j].category) {
+
+                        userDoc.achievements[i].achievement_ticket_ids.push(achievements[j]._id.toString());
+                        userDoc.tickets += 1;
+                        userDoc.notifications.achievements = true;
+                    }
+                }
+            }
+            if (userDoc.lives === 0 && userDoc.lives_reset_timer_set && userDoc.reset_lives_at <= Date.now()){
+                userDoc.lives = 1;
+                userDoc.lives_reset_timer_set = false;
+            }
+            if(userDoc.reset_lives_at > Date.now()){
+                userDoc.lives_timer_ms = Math.round((userDoc.reset_lives_at - Date.now()) / 1000);
+            }
+            await userDoc.save();
+            return socket.emit(EVENTS.REFRESH_USER(), {event: EVENTS.REFRESH_USER(), data: userDoc})
         }
     }
 }
