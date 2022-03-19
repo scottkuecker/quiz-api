@@ -6,14 +6,12 @@ const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const fs = require('fs');
 const server = express();
+server.use(cors({
+ origin:"https://kviz-live.web.app"
+}))
 const ioEvents = require('./controllers/socket-io');
 const port = process.env.PORT;
-server.all("*", (req,res,next) => {
- res.setHeader("Access-Control-Allow-Origin","https://kviz-live.web.app");
- res.setHeader("Access-Control-Allow-Methods","PUT, GET, DELETE, POST");
- res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
- res.sendHeader(204);
-});
+
 
 const questionRoutes = require('./routes/questions-routes');
 const authRoutes = require('./routes/auth-routes');
@@ -25,10 +23,10 @@ server.use(express.urlencoded({extended: false}))
 server.use(express.json())
 server.use(express.static(path.join(__dirname, 'public')));
 
-server.use(cors(), questionRoutes);
-server.use(cors(), authRoutes);
-server.use(cors(), userRoutes);
-server.use(cors(), achievementRoutes);
+server.use(questionRoutes);
+server.use(authRoutes);
+server.use(userRoutes);
+server.use(achievementRoutes);
 
 server.use('', (req,res, next)=>{
         res.send({
