@@ -6,18 +6,10 @@ const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const fs = require('fs');
 const server = express();
-server.use(cors({
- origin:["https://kviz-live.web.app", "http://localhost:4200"],
- allowedHeaders: ["Authorization", "Content-Type", "X-Requested-With", "authorization", "Credentials", "content-type"],
- credentials: true
-}))
+server.use(cors())
 const ioEvents = require('./controllers/socket-io');
 const port = process.env.PORT;
 
-server.use('', (req,res,next) =>{
-    console.log(req.get('host'))
-    next()
-})
 const questionRoutes = require('./routes/questions-routes');
 const authRoutes = require('./routes/auth-routes');
 const userRoutes = require('./routes/user-routes');

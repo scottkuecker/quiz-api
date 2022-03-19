@@ -24,7 +24,7 @@
     "connect-multiparty": "^2.2.0",
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "express-session": "^1.17.2",
     "googleapis": "^92.0.0",
     "jsonwebtoken": "^8.5.1",
