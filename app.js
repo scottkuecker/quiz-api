@@ -8,9 +8,7 @@ const fs = require('fs');
 const server = express();
 const ioEvents = require('./controllers/socket-io');
 const port = process.env.PORT;
-server.use(cors())
-
-server.options("", (req,res,next) => {
+server.all("*", (req,res,next) => {
  res.setHeader("Access-Control-Allow-Origin","https://kviz-live.web.app");
  res.setHeader("Access-Control-Allow-Methods","PUT, GET, DELETE, POST");
  res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
