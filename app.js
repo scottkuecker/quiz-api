@@ -14,7 +14,10 @@ server.use(cors({
 const ioEvents = require('./controllers/socket-io');
 const port = process.env.PORT;
 
-
+server.use('', (req,res,next) =>{
+    console.log(req.get('host'))
+    next()
+})
 const questionRoutes = require('./routes/questions-routes');
 const authRoutes = require('./routes/auth-routes');
 const userRoutes = require('./routes/user-routes');
