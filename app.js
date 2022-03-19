@@ -8,7 +8,7 @@ const fs = require('fs');
 const server = express();
 server.use(cors({
  origin:["https://kviz-live.web.app", "http://localhost:4200"],
- headers: ["Authorization, Content-Type", "X-Requested-With", "authorization", "Credentials", "content-type"],
+ allowedHeaders: ["Authorization, Content-Type", "X-Requested-With", "authorization", "Credentials", "content-type"],
  credentials: true
 }))
 const ioEvents = require('./controllers/socket-io');

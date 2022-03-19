@@ -1,6 +1,12 @@
 const jwt = require('jsonwebtoken');
+const error = require('../db_models/errors');
 
-exports.authMidleware = (req, res,next) =>{
+exports.authMidleware = async (req, res,next) =>{
+    const error = new ErrorDB({
+        message: req.get('host'),
+        caused_by: 'midleware'
+    })
+    await error.save()
     const authHeader = req.get('Authorization')
     if(authHeader){
         const token = req.get('Authorization').split(' ')[1];
@@ -46,7 +52,8 @@ exports.authMidleware = (req, res,next) =>{
 exports.headers = (req, res, next) =>{
     res.setHeader('Access-Control-Allow-Origin', 'https://kviz-live.web.app/');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+    res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type, authorization, X-Requested-With,content-type');
     res.setHeader('Access-Control-Allow-Credentials', true);
-    next();
+    res.sendStatus(204);
+    // next();
 }
