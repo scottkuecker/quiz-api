@@ -1,12 +1,8 @@
 const jwt = require('jsonwebtoken');
 const ErrorDB = require('../db_models/errors');
+const EVENTS = require('../controllers/socket-events');
 
 exports.authMidleware = async (req, res,next) =>{
-    const error = new ErrorDB({
-        message: req.get('host'),
-        caused_by: 'midleware'
-    })
-    await error.save()
     const authHeader = req.get('Authorization')
     if(authHeader){
         const token = req.get('Authorization').split(' ')[1];
@@ -49,11 +45,25 @@ exports.authMidleware = async (req, res,next) =>{
     }
    
 }
-exports.headers = (req, res, next) =>{
-    res.setHeader('Access-Control-Allow-Origin', 'https://kviz-live.web.app/');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type, authorization, X-Requested-With,content-type');
-    res.setHeader('Access-Control-Allow-Credentials', true);
-    res.sendStatus(204);
-    // next();
+
+exports.socketMidleware = async (data) =>{
+    const authHeader = data.Authorization;
+    if(authHeader){
+        const token = authHeader.split(' ')[1];
+        let decodedToken;
+        try {
+            decodedToken = jwt.verify(token, process.env.SIGNING_SECRET)
+        }
+        catch (e) {
+           return null;
+        }
+        if (!decodedToken) {
+            return null;
+        }
+        return decodedToken.user
+        
+    }else{
+       return null;
+    }
+   
 }

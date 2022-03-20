@@ -277,10 +277,25 @@ exports.OPONENT_ACCEPTED = () => 'OPONENT_ACCEPTED';
 exports.ONLINE_USERS_COUNT = () => 'ONLINE_USERS_COUNT';
 
 /**
-* @description emits number of online users
-* @common_data_to_send {event: 'ONLINE_USERS_COUNT', online: number}
+* @description refresh user
+* @common_data_to_send {event: 'REFRESH_USER', data: user}
 * @returns EVENT STRING
 */
 exports.REFRESH_USER = () => 'REFRESH_USER';
 
+/**
+* @description Atempts autologin with token
+* @common_data_to_send {event: 'AUTOLOGIN', data: user}
+* @returns EVENT STRING
+*/
+exports.AUTOLOGIN = () => 'AUTOLOGIN';
+
+
+
+/**
+* @description Emits failed autologin
+* @common_data_to_send {event: 'AUTOLOGINFAILED', data: null}
+* @returns EVENT STRING
+*/
+exports.AUTOLOGINFAILED = () => 'AUTOLOGINFAILED';
 

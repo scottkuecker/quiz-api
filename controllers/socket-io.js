@@ -1,5 +1,6 @@
 const socketCon = require('../socket');
 const Users = require('../db_models/user');
+const midleware = require('../midleware/auth');
 const handleError = require('../utils/errorHandler');
 const EVENTS = require('./socket-events');
 const ROOMS = require ('./socket-functions/room');
@@ -87,9 +88,12 @@ const acceptOponent = (socketIo, socket, data) =>{
 }
 
 const refreshUser = (socket, data) => {
-    AUTH.refreshTEST(socket, data)
+    AUTH.refresh(socket, data)
 }
 
+const autoLogin = (socket, data) => {
+    AUTH.autoLogin(socket, data)
+}
 //SOCKETS EVENTS
 
 exports.setupListeners = () =>{
@@ -174,6 +178,14 @@ exports.setupListeners = () =>{
 
         socket.on(EVENTS.REFRESH_USER(), data => {
             refreshUser(socket, data)
+        })
+        socket.on(EVENTS.AUTOLOGIN(), data => {
+            const user = midleware.socketMidleware(data);
+            if(user){
+                data.data = user;
+                return autoLogin(socket, data)
+            }
+           return socket.emit(EVENTS.AUTOLOGINFAILED(), {event: EVENTS.AUTOLOGINFAILED(), data: null})
         })
     });
 

@@ -84,17 +84,12 @@ exports.login = async (req, res, next) => {
         });
 }
 
-exports.autoLogin = async (req, res, next) => {
-    if(req.user){
-        const userDoc = await User.findOne({ email: req.user.email });
+exports.autoLogin = async (socket, data) => {
+        const userDoc = await User.findOne({ email: data.data.email });
         if(userDoc){
-            return res.send({
-                success: true,
-                error: '',
-                data: userDoc
-            })
+           return  socket.emit(EVENTS.AUTOLOGIN(), {event: EVENTS.AUTOLOGIN(), data: userDoc})
         }
-    }
+        return socket.emit(EVENTS.AUTOLOGINFAILED(), {event: EVENTS.AUTOLOGINFAILED(), data: null})
 }
 
 exports.facebookLogin = async (req, res, next) => {
@@ -126,42 +121,7 @@ exports.facebookLogin = async (req, res, next) => {
     }
 }
 
-
-exports.refreshUser = async (req, res, next) => {
-    if (req.user) {
-        const userDoc = await User.findOne({ email: req.user.email });
-        const achievements = await Achievements.find();
-        if (userDoc) {
-            for (let i = 0; i < userDoc.achievements.length; i++) {
-                for (let j = 0; j < achievements.length; j++) {
-                    if (!userDoc.achievements[i].achievement_ticket_ids.includes(achievements[j]._id.toString()) &&
-                        userDoc.achievements[i].answered >= achievements[j].achievedAt && 
-                        userDoc.achievements[i].category === achievements[j].category) {
-
-                        userDoc.achievements[i].achievement_ticket_ids.push(achievements[j]._id.toString());
-                        userDoc.tickets += 1;
-                        userDoc.notifications.achievements = true;
-                    }
-                }
-            }
-            if (userDoc.lives === 0 && userDoc.lives_reset_timer_set && userDoc.reset_lives_at <= Date.now()){
-                userDoc.lives = 1;
-                userDoc.lives_reset_timer_set = false;
-            }
-            if(userDoc.reset_lives_at > Date.now()){
-                userDoc.lives_timer_ms = Math.round((userDoc.reset_lives_at - Date.now()) / 1000);
-            }
-            await userDoc.save();
-            return res.send({
-                success: true,
-                error: '',
-                data: userDoc
-            })
-        }
-    }
-}
-
-exports.refreshTEST = async (socket, data) => {
+exports.refresh = async (socket, data) => {
     if (data.user_id) {
         const userDoc = await User.findOne({ _id: data.user_id });
         const achievements = await Achievements.find();
