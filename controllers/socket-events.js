@@ -299,3 +299,24 @@ exports.AUTOLOGIN = () => 'AUTOLOGIN';
 */
 exports.AUTOLOGINFAILED = () => 'AUTOLOGINFAILED';
 
+/**
+* @description Emits users list
+* @common_data_to_send {event: 'GET_ALL_USERS', data: User[]}
+* @returns EVENT STRING
+*/
+exports.GET_ALL_USERS = () => 'GET_ALL_USERS';
+
+/**
+* @description Emits friend list
+* @common_data_to_send {event: 'GET_FRIEND_LIST', data: User[]}
+* @returns EVENT STRING
+*/
+exports.GET_FRIEND_LIST = () => 'GET_FRIEND_LIST';
+
+
+/**
+* @description Emits friend requests
+* @common_data_to_send {event: 'GET_FRIEND_REQUESTS', data: User[]}
+* @returns EVENT STRING
+*/
+exports.GET_FRIEND_REQUESTS = () => 'GET_FRIEND_REQUESTS';

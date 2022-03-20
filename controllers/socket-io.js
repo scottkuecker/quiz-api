@@ -94,6 +94,18 @@ const refreshUser = (socket, data) => {
 const autoLogin = (socket, data) => {
     AUTH.autoLogin(socket, data)
 }
+
+const getAllUsers = (socket, data) => {
+    FRIEND_REQUESTS.searchUsers(socket, data)
+}
+
+const getFriendList = (socket, data) => {
+    FRIEND_REQUESTS.getFriendList(socket, data)
+}
+
+const getFriendRequests = (socket, data) =>{
+    FRIEND_REQUESTS.getFriendRequests(socket, data)
+}
 //SOCKETS EVENTS
 
 exports.setupListeners = () =>{
@@ -179,14 +191,38 @@ exports.setupListeners = () =>{
         socket.on(EVENTS.REFRESH_USER(), data => {
             refreshUser(socket, data)
         })
-        socket.on(EVENTS.AUTOLOGIN(), data => {
-            const user = midleware.socketMidleware(data);
+        socket.on(EVENTS.AUTOLOGIN(), async data => {
+            const user = await midleware.socketMidleware(data);
             if(user){
                 data.data = user;
                 return autoLogin(socket, data)
             }
            return socket.emit(EVENTS.AUTOLOGINFAILED(), {event: EVENTS.AUTOLOGINFAILED(), data: null})
+        });
+        socket.on(EVENTS.GET_ALL_USERS(), async data => {
+            const user = await midleware.socketMidleware(data);
+            if(user){
+                data.data = user;
+                return getAllUsers(socket, data)
+            }
+        });
+
+        socket.on(EVENTS.GET_FRIEND_LIST(), async data => {
+            const user = await midleware.socketMidleware(data);
+            if(user){
+                data.data = user;
+                return getFriendList(socket, data)
+            }
+        });
+
+        socket.on(EVENTS.GET_FRIEND_REQUESTS(), async data => {
+            const user = await midleware.socketMidleware(data);
+            if(user){
+                data.data = user;
+                return getFriendRequests(socket, data)
+            }
         })
+
     });
 
 }

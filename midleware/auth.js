@@ -49,7 +49,7 @@ exports.authMidleware = async (req, res,next) =>{
 exports.socketMidleware = async (data) =>{
     const authHeader = data.Authorization;
     if(authHeader){
-        const token = authHeader.split(' ')[1];
+        const token = authHeader;
         let decodedToken;
         try {
             decodedToken = jwt.verify(token, process.env.SIGNING_SECRET)
