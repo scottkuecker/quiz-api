@@ -163,7 +163,7 @@ exports.refreshUser = async (req, res, next) => {
 
 exports.refreshTEST = async (socket, data) => {
     if (data.user_id) {
-        const userDoc = await User.findOne({ email: data.user_id });
+        const userDoc = await User.findOne({ _id: data.user_id });
         const achievements = await Achievements.find();
         if (userDoc) {
             for (let i = 0; i < userDoc.achievements.length; i++) {
