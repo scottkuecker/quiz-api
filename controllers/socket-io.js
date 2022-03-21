@@ -95,17 +95,6 @@ const autoLogin = (socket, data) => {
     AUTH.autoLogin(socket, data)
 }
 
-const getAllUsers = (socket, data) => {
-    FRIEND_REQUESTS.searchUsers(socket, data)
-}
-
-const getFriendList = (socket, data) => {
-    FRIEND_REQUESTS.getFriendList(socket, data)
-}
-
-const getFriendRequests = (socket, data) =>{
-    FRIEND_REQUESTS.getFriendRequests(socket, data)
-}
 //SOCKETS EVENTS
 
 exports.setupListeners = () =>{
@@ -192,35 +181,22 @@ exports.setupListeners = () =>{
             refreshUser(socket, data)
         })
         socket.on(EVENTS.AUTOLOGIN(), async data => {
-            const user = await midleware.socketMidleware(data);
-            if(user){
-                data.data = user;
-                return autoLogin(socket, data)
-            }
-           return socket.emit(EVENTS.AUTOLOGINFAILED(), {event: EVENTS.AUTOLOGINFAILED(), data: null})
+            midleware.socketMiddleware(socket, data, autoLogin);
         });
         socket.on(EVENTS.GET_ALL_USERS(), async data => {
-            const user = await midleware.socketMidleware(data);
-            if(user){
-                data.data = user;
-                return getAllUsers(socket, data)
-            }
+            midleware.socketMiddleware(socket, data, FRIEND_REQUESTS.searchUsers);
         });
 
         socket.on(EVENTS.GET_FRIEND_LIST(), async data => {
-            const user = await midleware.socketMidleware(data);
-            if(user){
-                data.data = user;
-                return getFriendList(socket, data)
-            }
+            midleware.socketMiddleware(socket, data, FRIEND_REQUESTS.getFriendList)
         });
 
         socket.on(EVENTS.GET_FRIEND_REQUESTS(), async data => {
-            const user = await midleware.socketMidleware(data);
-            if(user){
-                data.data = user;
-                return getFriendRequests(socket, data)
-            }
+            midleware.socketMiddleware(socket, data, FRIEND_REQUESTS.getFriendRequests)
+        })
+
+        socket.on(EVENTS.REMOVE_FRIEND(), async data => {
+            midleware.socketMiddleware(socket, data, FRIEND_REQUESTS.removeFriend)
         })
 
     });

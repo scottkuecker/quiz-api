@@ -333,3 +333,32 @@ exports.GET_FRIEND_LIST = () => 'GET_FRIEND_LIST';
 * @returns EVENT STRING
 */
 exports.GET_FRIEND_REQUESTS = () => 'GET_FRIEND_REQUESTS';
+
+
+/**
+* @description Emits friend list
+* @common_data_to_send {event: 'REMOVE_FRIEND', data: User[]}
+* @returns EVENT STRING
+*/
+exports.REMOVE_FRIEND = () => 'REMOVE_FRIEND';
+
+
+/**
+* @description Emited from client with login data
+* @returns EVENT STRING
+*/
+exports.LOGIN = () => 'LOGIN';
+
+/**
+* @description Emited to client with login status success
+* @common_data_to_send {event: 'LOGIN_SUCCESSFUL', data: User, message: string}
+* @returns EVENT STRING
+*/
+exports.LOGIN_SUCCESSFUL = () => 'LOGIN_SUCCESSFUL';
+
+/**
+* @description Emited to client with login status failed
+* @common_data_to_send {event: 'LOGIN_FAILED', data: null, message: string}
+* @returns EVENT STRING
+*/
+exports.LOGIN_FAILED = () => 'LOGIN_FAILED';

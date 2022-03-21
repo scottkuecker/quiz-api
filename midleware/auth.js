@@ -46,24 +46,24 @@ exports.authMidleware = async (req, res,next) =>{
    
 }
 
-exports.socketMidleware = async (data) =>{
+exports.socketMiddleware = (socket, data, fn) =>{
     const authHeader = data.Authorization;
-    if(authHeader){
+    if (authHeader) {
         const token = authHeader;
         let decodedToken;
         try {
             decodedToken = jwt.verify(token, process.env.SIGNING_SECRET)
         }
         catch (e) {
-           return null;
+            return null;
         }
         if (!decodedToken) {
             return null;
         }
-        return decodedToken.user
-        
-    }else{
-       return null;
+        data.data = decodedToken.user;
+        return fn(socket, data)
+
+    } else {
+        return null;
     }
-   
 }
