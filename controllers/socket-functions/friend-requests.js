@@ -144,20 +144,14 @@ exports.getFriendList = async (socket, data) => {
     return socket.emit(EVENTS.GET_FRIEND_LIST(), {event: EVENTS.GET_FRIEND_LIST(), data: mapped })
 }
 
-exports.removeFriend = async (req, res, next) => {
-    const my_id = req.user._id;
-    const remove_id = req.body.remove_id;
+exports.removeFriend = async (socket, data) => {
+    const my_id = data.data._id;
+    const remove_id = data.remove_id;
     if(my_id === remove_id){
         const me = await Users.findById(my_id);
         me.friends = me.friends.filter(friend_id => friend_id !== remove_id)
         await me.save();
-        return res.send(
-            {
-                success: true,
-                data: me.friends,
-                error: undefined
-            }
-        )
+        socket.emit(EVENTS.REMOVE_FRIEND(), { event: EVENTS.REMOVE_FRIEND(), data: me.friends})
     }
     const me = await Users.findById(my_id);
     const friend = await Users.findById(remove_id);
@@ -167,12 +161,6 @@ exports.removeFriend = async (req, res, next) => {
 
     await me.save();
     await friend.save();
-    return res.send(
-        {
-            success: true,
-            data: me.friends,
-            error: undefined
-        }
-    )
+    socket.emit(EVENTS.REMOVE_FRIEND(), { event: EVENTS.REMOVE_FRIEND(), data: me.friends })
 
 }
