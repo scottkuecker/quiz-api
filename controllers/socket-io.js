@@ -183,6 +183,9 @@ exports.setupListeners = () =>{
         socket.on(EVENTS.AUTOLOGIN(), async data => {
             midleware.socketMiddleware(socket, data, autoLogin);
         });
+        socket.on(EVENTS.LOGIN(), async data => {
+            AUTH.login(socket, data);
+        });
         socket.on(EVENTS.GET_ALL_USERS(), async data => {
             midleware.socketMiddleware(socket, data, FRIEND_REQUESTS.searchUsers);
         });

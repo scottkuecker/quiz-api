@@ -6,15 +6,11 @@ const oneOnOneRoom = require('../db_models/one-on-one');
 const user = require('../db_models/user');
 const EVENTS = require('../controllers/socket-events');
 
-exports.signUp = async (req, res, next) =>{
-    const email = req.body.email;
-    const password = req.body.password;
+exports.signUp = async (socket, data) =>{
+    const email = data.email;
+    const password = data.password;
     if(!password){
-        return res.send({
-            success: false,
-            data: undefined,
-            error: 'Password is required'
-        });
+        return;
     }
     const user = await User.findOne({email: email});
     if(user){
@@ -36,17 +32,8 @@ exports.signUp = async (req, res, next) =>{
 
         });
        user.save();
-       return res.send({
-            success: true,
-            data: undefined,
-            error: ''
-        });
+       return socket.emit(EVENTS.REGISTER(), {event: EVENTS.REGISTER(), data: true})
     }
-    return res.send({
-        success: false,
-        data: undefined,
-        error: 'Something went wrong'
-    })
 }
 
 exports.login = async (socket, data) => {
@@ -54,7 +41,7 @@ exports.login = async (socket, data) => {
     const password = data.password;
     const userDoc = await User.findOne({ email: email });
     if (!userDoc) {
-        return;)
+        return;
     }
         bcrypt.compare(password, userDoc.password).then(async doMatch =>{
             if (doMatch) {
@@ -64,19 +51,14 @@ exports.login = async (socket, data) => {
                 users = users.filter(id => id !== userDoc._id)
                 oneOnOne.users = users;
                 await oneOnOne.save();
-                socket.emit()
-                return res.status(200).json({
+                const data = {
                     data: userDoc,
-                    token: token,
-                    success: true,
-                    error: undefined
-                })
+                    token: token
+                }
+                return socket.emit(EVENTS.LOGIN(), {event: EVENTS.LOGIN(), data: data})
+
             } else {
-                return res.send({
-                    success: false,
-                    data: undefined,
-                    error: 'Email or password did not match'
-                })
+                return ;
             }
         });
 }
