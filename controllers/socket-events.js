@@ -291,6 +291,19 @@ exports.REFRESH_USER = () => 'REFRESH_USER';
 exports.AUTOLOGIN = () => 'AUTOLOGIN';
 
 
+/**
+* @description Emits login requests
+* @common_data_to_send {event: 'LOGIN', data: User}
+* @returns EVENT STRING
+*/
+exports.LOGIN = () => 'LOGIN';
+
+/**
+* @description Emits register requests
+* @common_data_to_send {event: 'REGISTER', data: boolean}
+* @returns EVENT STRING
+*/
+exports.REGISTER = () => 'REGISTER';
 
 /**
 * @description Emits failed autologin

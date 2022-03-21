@@ -49,16 +49,12 @@ exports.signUp = async (req, res, next) =>{
     })
 }
 
-exports.login = async (req, res, next) => {
-    const email = req.body.email;
-    const password = req.body.password;
+exports.login = async (socket, data) => {
+    const email = data.email;
+    const password = data.password;
     const userDoc = await User.findOne({ email: email });
     if (!userDoc) {
-        return res.json({
-            success: false,
-            data: undefined,
-            error: 'No user found'
-        })
+        return;)
     }
         bcrypt.compare(password, userDoc.password).then(async doMatch =>{
             if (doMatch) {
@@ -68,6 +64,7 @@ exports.login = async (req, res, next) => {
                 users = users.filter(id => id !== userDoc._id)
                 oneOnOne.users = users;
                 await oneOnOne.save();
+                socket.emit()
                 return res.status(200).json({
                     data: userDoc,
                     token: token,
