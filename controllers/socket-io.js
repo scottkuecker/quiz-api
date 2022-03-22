@@ -186,6 +186,9 @@ exports.setupListeners = () =>{
         socket.on(EVENTS.LOGIN(), async data => {
             AUTH.login(socket, data);
         });
+        socket.on(EVENTS.REGISTER(), async data => {
+            AUTH.signUp(socket, data)
+        })
         socket.on(EVENTS.GET_ALL_USERS(), async data => {
             midleware.socketMiddleware(socket, data, FRIEND_REQUESTS.searchUsers);
         });

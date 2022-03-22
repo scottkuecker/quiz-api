@@ -349,6 +349,7 @@ exports.REMOVE_FRIEND = () => 'REMOVE_FRIEND';
 */
 exports.LOGIN = () => 'LOGIN';
 
+
 /**
 * @description Emited to client with login status success
 * @common_data_to_send {event: 'LOGIN_SUCCESSFUL', data: User, message: string}

@@ -14,11 +14,7 @@ exports.signUp = async (socket, data) =>{
     }
     const user = await User.findOne({email: email});
     if(user){
-          return res.send({
-               success: false,
-               data: undefined,
-               error: 'User allready exist'
-           });
+          return //allready exist
     }
     const hashedPassword = await bcrypt.hash(password, 12);
     if(hashedPassword){
