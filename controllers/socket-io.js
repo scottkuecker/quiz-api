@@ -97,6 +97,7 @@ const autoLogin = (socket, data) => {
 
 exports.setupListeners = () =>{
     const socketIo = socketCon.getIO();
+    TOURNAMENT.startListeningOneOnOne(socketIo);
     socketIo.on('connection', socket =>{
         const oneOnOneRoom = TOURNAMENT.getoneOnOneRoom();
         oneOnOneRoom.onlineUsers++;

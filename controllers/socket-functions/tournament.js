@@ -6,13 +6,45 @@ const EVENTS = require('../socket-events');
 const Users = require('../../db_models/user');
 
 var oneOnOneRoom = {
-    oneOnOneUsers: [],
+    oneOnOneUsers: ['61c5bda384d3a98790c4488c', '61d5f974c0fde410643662e9','61dd72e9019067b25abc2673'],
     onlineUsers: 0
 }
+var interval = null;
 
-function getRandomNumber(quantity) {
+const getRandomNumber = (quantity) => {
     var milliseconds = new Date().getMilliseconds();
     return Math.floor(Math.random(Math.floor(milliseconds * quantity / 1000)) * quantity)
+}
+
+const searchPlayersToOneOnOne = async (io) =>{
+    if(oneOnOneRoom.oneOnOneUsers.length >= 2){
+        clearInterval(interval);
+        const usersArr = [];
+        oneOnOneRoom.oneOnOneUsers = oneOnOneRoom.oneOnOneUsers.filter((user, index) =>{
+            if(index === 0 || index === 1){
+                usersArr.push(user)
+                return false;
+            }
+            return true;
+        });
+        startOneOnOneMatch(io, usersArr)
+    }
+    
+}
+
+const startOneOnOneMatch = async (io, arrOfTwo) => {
+    const users = await this.createOneOnOneUsers(arrOfTwo);
+    if(!users){
+        this.startListeningOneOnOne();
+    }
+    io.in(users[0].socket).emit('', {data: users})
+    io.in(users[0].socket).emit('', { data: users })
+
+}
+
+exports.startListeningOneOnOne = (io) =>{
+    searchPlayersToOneOnOne(io);
+    interval = setInterval(searchPlayersToOneOnOne, 5000, io);
 }
 
 exports.getoneOnOneRoom = () => {
@@ -135,11 +167,12 @@ exports.declineOponent = (io, socket, data) => {
 exports.createOneOnOneUsers = async (usersArr) =>{
     const user1 = usersArr[0];
     const user2 = usersArr[1];
-
-    const userOne = await Users.findOne({ _id: user1._id});
-    const userTwo = await Users.findOne({ _id: user2._id });
+    const users = await Users.find();
+    const userOne = users[0];
+    const userTwo = users[1];
     if(!userOne || !userTwo){
-        return;
+        console.log('id of users not exist')
+        return null;
     }
 
     const user1Mapped = {
@@ -147,33 +180,35 @@ exports.createOneOnOneUsers = async (usersArr) =>{
         id: userOne._id,
         score: 0,
         answered: false,
-        avatar: userOne.avatar
+        avatar: userOne.avatar,
+        socket: userOne.socket
     }
     const user2Mapped = {
         name: userTwo.name,
         id: userTwo._id,
         score: 0,
         answered: false,
-        avatar: userTwo.avatar
+        avatar: userTwo.avatar,
+        socket: userTwo.socket
     }
     return [user1Mapped, user2Mapped];
 }
 
 exports.acceptDBOponent = async (io, socket, data) => {
-    const me = oneOnOneRoom.oneOnOneUsers.find(user => user._id === data.user_id);
-    const oponent = oneOnOneRoom.oneOnOneUsers.find(user => user._id === data.oponent_id);
-    if (!me || !oponent) {
-        return;
-    }
-    me.gameAccepted = true;
-    socket.join(data.roomName)
-    io.in(oponent._id).emit(EVENTS.OPONENT_ACCEPTED(), { event: EVENTS.OPONENT_ACCEPTED(), success: true })
-    if (me.gameAccepted && oponent.gameAccepted) {
-        const users = await this.createOneOnOneUsers([me, oponent])
-        await ROOMS.createDBRoom(socket, data.roomName, data);
-        await QUESTIONS.generateRoomQuestions(data.roomName, 15, users);
-        io.to(data.roomName).emit(EVENTS.BOTH_ACCEPTED(), { event: EVENTS.BOTH_ACCEPTED(), success: true })
-    }
+    // const me = oneOnOneRoom.oneOnOneUsers.find(user => user._id === data.user_id);
+    // const oponent = oneOnOneRoom.oneOnOneUsers.find(user => user._id === data.oponent_id);
+    // if (!me || !oponent) {
+    //     return;
+    // }
+    // me.gameAccepted = true;
+    // socket.join(data.roomName)
+    // io.in(oponent._id).emit(EVENTS.OPONENT_ACCEPTED(), { event: EVENTS.OPONENT_ACCEPTED(), success: true })
+    // if (me.gameAccepted && oponent.gameAccepted) {
+    //     const users = await this.createOneOnOneUsers([me, oponent])
+    //     await ROOMS.createDBRoom(socket, data.roomName, data);
+    //     await QUESTIONS.generateRoomQuestions(data.roomName, 15, users);
+    //     io.to(data.roomName).emit(EVENTS.BOTH_ACCEPTED(), { event: EVENTS.BOTH_ACCEPTED(), success: true })
+    // }
 }
 exports.leaveDBOneOnOne = (io, socket, data) => {
     if (oneOnOneRoom.oneOnOneUsers.length) {
