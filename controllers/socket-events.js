@@ -363,3 +363,66 @@ exports.LOGIN_SUCCESSFUL = () => 'LOGIN_SUCCESSFUL';
 * @returns EVENT STRING
 */
 exports.LOGIN_FAILED = () => 'LOGIN_FAILED';
+
+/**
+* @description Emited to client that daily price is received
+* @common_data_to_send {event: 'DAILY_PRICE', data: boolean, message: string}
+* @returns EVENT STRING
+*/
+exports.DAILY_PRICE = () => 'DAILY_PRICE';
+
+/**
+* @description Emit achievements to client 
+* @common_data_to_send {event: 'GET_ACHIEVEMENTS', data: achievemens[]}
+* @returns EVENT STRING
+*/
+exports.GET_ACHIEVEMENTS = () => 'GET_ACHIEVEMENTS';
+
+/**
+* @description Emit questions to client 
+* @common_data_to_send {event: 'GET_QUESTION', data: questions}
+* @returns EVENT STRING
+*/
+exports.GET_QUESTION = () => 'GET_QUESTION';
+
+/**
+* @description Emit questions to client 
+* @common_data_to_send {event: 'GET_QUESTIONS', data: questions[]}
+* @returns EVENT STRING
+*/
+exports.GET_QUESTIONS = () => 'GET_QUESTIONS';
+
+/**
+* @description Add new question
+* @common_data_to_send {event: 'ADD_QUESTION', data: boolean}
+* @returns EVENT STRING
+*/
+exports.ADD_QUESTION = () => 'ADD_QUESTION';
+
+/**
+* @description Add new question
+* @common_data_to_send {event: 'ADD_IMAGE_QUESTION', data: boolean}
+* @returns EVENT STRING
+*/
+exports.ADD_IMAGE_QUESTION = () => 'ADD_IMAGE_QUESTION';
+
+/**
+* @description Emit that question is published
+* @common_data_to_send {event: 'PUBLISH_QUESTION', data: boolean}
+* @returns EVENT STRING
+*/
+exports.PUBLISH_QUESTION = () => 'PUBLISH_QUESTION';
+
+/**
+* @description Emit that question is unpublished
+* @common_data_to_send {event: 'UNPUBLISH_QUESTION', data: boolean}
+* @returns EVENT STRING
+*/
+exports.UNPUBLISH_QUESTION = () => 'UNPUBLISH_QUESTION';
+
+/**
+* @description Emit that question is updated
+* @common_data_to_send {event: 'UPDATE_QUESTION_TEXT', data: boolean}
+* @returns EVENT STRING
+*/
+exports.UPDATE_QUESTION_TEXT = () => 'UPDATE_QUESTION_TEXT';

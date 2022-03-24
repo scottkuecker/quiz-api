@@ -3,7 +3,6 @@ const Achievements = require('../db_models/achievement');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const oneOnOneRoom = require('../db_models/one-on-one');
-const user = require('../db_models/user');
 const EVENTS = require('../controllers/socket-events');
 
 exports.signUp = async (socket, data) =>{
@@ -60,11 +59,13 @@ exports.login = async (socket, data) => {
 }
 
 exports.autoLogin = async (socket, data) => {
-        const userDoc = await User.findOne({ email: data.data.email });
-        if(userDoc){
-           return  socket.emit(EVENTS.AUTOLOGIN(), {event: EVENTS.AUTOLOGIN(), data: userDoc})
-        }
-        return socket.emit(EVENTS.AUTOLOGINFAILED(), {event: EVENTS.AUTOLOGINFAILED(), data: null})
+    const email = data.data.email;
+    const user = await User.findOne({ email: email });
+    if (!user) {
+        socket.emit(EVENTS.AUTOLOGINFAILED(), { event: EVENTS.AUTOLOGINFAILED(), data: null })
+        return;
+    }
+    return socket.emit(EVENTS.AUTOLOGIN(), { event: EVENTS.AUTOLOGIN(), data: user })
 }
 
 exports.facebookLogin = async (req, res, next) => {
@@ -97,7 +98,7 @@ exports.facebookLogin = async (req, res, next) => {
 }
 
 exports.refresh = async (socket, data) => {
-    if (data.user_id) {
+    if (data.data._id) {
         const userDoc = await User.findOne({ _id: data.user_id });
         const achievements = await Achievements.find();
         if (userDoc) {
@@ -126,31 +127,20 @@ exports.refresh = async (socket, data) => {
     }
 }
 
-exports.takeDailyPrice = async (req, res, next) =>{
-    const user = User.findById(req.user._id);
+exports.takeDailyPrice = async (socket, data) =>{
+    console.log(data)
+    const user = User.findById(data.data._id);
         if (!user){
-            return res.send({
-                success: false,
-                data: undefined,
-                error: undefined
-            })
+            return 
         }
         if (!user.daily_price){
-            return res.send({
-                success: false,
-                data: undefined,
-                error: 'Price received'
-            })
+            return ;
         }
    
     user.tickets++;
     user.daily_price = false;
     const success = await user.save();
     if(success){
-        return res.send({
-            success: true,
-            data: undefined,
-            error: undefined
-        })
+        return socket.emit(EVENTS.DAILY_PRICE(), {event: EVENTS.DAILY_PRICE(), data: true})
     }
 }

@@ -1,10 +1,11 @@
 const Achievement = require('../db_models/achievement');
 const User = require('../db_models/user');
+const EVENTS = require('../controllers/socket-events');
 
-exports.getAchievements =  async (req, res, next) =>{
+exports.getAchievements =  async (socket, data) =>{
     const achievements = await Achievement.find();
-    const user = await User.findById(req.user._id);
-    const userAchievements = user.achievements
+    const user = await User.findById(data.data._id);
+    const userAchievements = user.achievements;
     const modifiedAchievements = [];
     user.notifications.achievements = false;
     await user.save()
@@ -22,18 +23,10 @@ exports.getAchievements =  async (req, res, next) =>{
             }
           }
         }
-        return res.send({
-          success: true,
-          data: modifiedAchievements || [],
-          error: ''
-        })
+        socket.emit(EVENTS.GET_ACHIEVEMENTS(), { event: EVENTS.GET_ACHIEVEMENTS(), data: modifiedAchievements || []})
 
       }else{
-          return res.send({
-            success: false,
-            data: [],
-            error: ''
-         })
+        socket.emit(EVENTS.GET_ACHIEVEMENTS(), { event: EVENTS.GET_ACHIEVEMENTS(), data: [] })
     }
   }
 

@@ -87,9 +87,7 @@ const acceptOponent = (socketIo, socket, data) =>{
     TOURNAMENT.acceptDBOponent(socketIo, socket, data)
 }
 
-const refreshUser = (socket, data) => {
-    AUTH.refresh(socket, data)
-}
+
 
 const autoLogin = (socket, data) => {
     AUTH.autoLogin(socket, data)
@@ -178,10 +176,10 @@ exports.setupListeners = () =>{
         });
 
         socket.on(EVENTS.REFRESH_USER(), data => {
-            refreshUser(socket, data)
+            midleware.socketMiddleware(socket, data, AUTH.refresh)
         })
         socket.on(EVENTS.AUTOLOGIN(), async data => {
-            midleware.socketMiddleware(socket, data, autoLogin);
+            midleware.socketMiddleware(socket, data, AUTH.autoLogin);
         });
         socket.on(EVENTS.LOGIN(), async data => {
             AUTH.login(socket, data);
@@ -203,6 +201,12 @@ exports.setupListeners = () =>{
 
         socket.on(EVENTS.REMOVE_FRIEND(), async data => {
             midleware.socketMiddleware(socket, data, FRIEND_REQUESTS.removeFriend)
+        })
+        socket.on(EVENTS.ADD_QUESTION(), async data => {
+            midleware.socketMiddleware(socket, data, QUESTIONS.addQuestion)
+        })
+        socket.on(EVENTS.GET_QUESTIONS(), async data => {
+            midleware.socketMiddleware(socket, data, QUESTIONS.getAllQuestions)
         })
 
     });
