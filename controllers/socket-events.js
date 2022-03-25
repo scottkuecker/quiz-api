@@ -426,3 +426,13 @@ exports.UNPUBLISH_QUESTION = () => 'UNPUBLISH_QUESTION';
 * @returns EVENT STRING
 */
 exports.UPDATE_QUESTION_TEXT = () => 'UPDATE_QUESTION_TEXT';
+
+
+/**
+* @description Emit that 1on1 match is found
+* @common_data_to_send {event: 'MATCH_FOUND', data: {me: user, oponent: user}}
+* @returns EVENT STRING
+*/
+exports.MATCH_FOUND = () => 'MATCH_FOUND';
+
+//MATCH_FOUND

@@ -14,9 +14,12 @@ const saveDBSocket = async (io, socket, data) =>{
     if(user){
         user.socket = socket.id;
         user.online = true;
-        socket.join(data.user_id);
+        socket.join(user._id.toString());
         await user.save();
+        console.log('saved socket', user._id.toString())
         return io.emit(EVENTS.USER_CONNECTED(), { event: EVENTS.USER_CONNECTED(), socket_id: socket.id, user_id: data.user_id })
+    }else{
+        console.log('socket not saved')
     }
 }
 

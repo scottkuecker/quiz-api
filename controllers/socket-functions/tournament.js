@@ -6,7 +6,7 @@ const EVENTS = require('../socket-events');
 const Users = require('../../db_models/user');
 
 var oneOnOneRoom = {
-    oneOnOneUsers: ['61c5bda384d3a98790c4488c', '61d5f974c0fde410643662e9','61dd72e9019067b25abc2673'],
+    oneOnOneUsers: [],
     onlineUsers: 0
 }
 var interval = null;
@@ -27,6 +27,8 @@ const searchPlayersToOneOnOne = async (io) =>{
             }
             return true;
         });
+        console.log('starting')
+        console.log(oneOnOneRoom.oneOnOneUsers)
         startOneOnOneMatch(io, usersArr)
     }
     
@@ -35,10 +37,11 @@ const searchPlayersToOneOnOne = async (io) =>{
 const startOneOnOneMatch = async (io, arrOfTwo) => {
     const users = await this.createOneOnOneUsers(arrOfTwo);
     if(!users){
-        this.startListeningOneOnOne();
+        return this.startListeningOneOnOne();
     }
-    io.in(users[0].socket).emit('', {data: users})
-    io.in(users[0].socket).emit('', { data: users })
+    console.log(users)
+    io.in(users[0].id.toString()).emit(EVENTS.MATCH_FOUND(), {event: EVENTS.MATCH_FOUND(), me: users[0], oponent: users[1] })
+    io.in(users[1].id.toString()).emit(EVENTS.MATCH_FOUND(), {event: EVENTS.MATCH_FOUND(), me: users[1], oponent: users[0] })
 
 }
 
@@ -156,20 +159,19 @@ exports.checkDBTournamentQuestion = async (io, socket, data) => {
 
 
 exports.declineOponent = (io, socket, data) => {
-    const me = oneOnOneRoom.oneOnOneUsers.find(user => user._id === data.user_id);
-    if (!me.blocked.includes(data.oponent_id)) {
-        me.blocked.push(data.oponent_id)
-    }
+   
     me.gameAccepted = false;
     socket.emit(EVENTS.OPONENT_DECLINED(), { event: EVENTS.OPONENT_DECLINED() })
 }
 
 exports.createOneOnOneUsers = async (usersArr) =>{
-    const user1 = usersArr[0];
-    const user2 = usersArr[1];
-    const users = await Users.find();
-    const userOne = users[0];
-    const userTwo = users[1];
+    console.log('********')
+    console.log(usersArr)
+    console.log('********')
+    const user1 = JSON.parse(JSON.stringify(usersArr[0]));
+    const user2 = JSON.parse(JSON.stringify(usersArr[1]));
+    const userOne = await Users.findById({ _id: user1._id });
+    const userTwo = await Users.findById({ _id: user2._id });
     if(!userOne || !userTwo){
         console.log('id of users not exist')
         return null;
@@ -180,7 +182,7 @@ exports.createOneOnOneUsers = async (usersArr) =>{
         id: userOne._id,
         score: 0,
         answered: false,
-        avatar: userOne.avatar,
+        avatar: userOne.avatar_url,
         socket: userOne.socket
     }
     const user2Mapped = {
@@ -188,7 +190,7 @@ exports.createOneOnOneUsers = async (usersArr) =>{
         id: userTwo._id,
         score: 0,
         answered: false,
-        avatar: userTwo.avatar,
+        avatar: userTwo.avatar_url,
         socket: userTwo.socket
     }
     return [user1Mapped, user2Mapped];

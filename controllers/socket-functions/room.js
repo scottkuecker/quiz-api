@@ -170,36 +170,38 @@ exports.joinOneOnOneDBRoom = async (io, socket, data) => {
 }
 exports.joinOneOnOne = async (io, socket, userAndRoom) => {
     const users = TOURNAMENT.getoneOnOneRoom();
-    users.oneOnOneUsers.push({ _id: userAndRoom.user_id, socket_id: socket.id, blocked: [], gameAccepted: false });
-    if (users.oneOnOneUsers.length && users.oneOnOneUsers.length > 1) {
-        const selected = users.oneOnOneUsers.filter(user => {
-            return user.blocked.every(usr => usr !== userAndRoom.user_id)
-        })
-        if (selected.length < 2) {
-            return;
-        }
-        users.oneOnOneUsers = users.oneOnOneUsers.filter(user => {
-            return selected.some(usr => usr._id !== user._id)
-        });
-        const oponent = selected.find(user => user._id !== userAndRoom.user_id);
-        const me = await Users.findOne({ _id: userAndRoom.user_id });
-        const oponentObj = await Users.findOne({ _id: oponent._id });
-        const randomRoom = randomValue(5);
-        const oponentMapped = {
-            _id: oponentObj._id,
-            avatar_url: oponentObj.avatar_url,
-        }
-        const meMapped = {
-            _id: me._id,
-            avatar_url: me.avatar_url,
-        }
-        selected.forEach(user => {
-            if (user._id === userAndRoom.user_id) {
-                return io.in(user._id).emit(EVENTS.OPONENT_FOUND(), { event: EVENTS.OPONENT_FOUND(), roomName: randomRoom, oponent: oponentMapped })
-            } else {
-                return io.in(user._id).emit(EVENTS.OPONENT_FOUND(), { event: EVENTS.OPONENT_FOUND(), roomName: randomRoom, oponent: meMapped })
-            }
+    console.log('joining')
+    users.oneOnOneUsers.push({ _id: userAndRoom.user_id, socket: socket.id, blocked: [], gameAccepted: false });
+    console.log(users.oneOnOneUsers)
+    // if (users.oneOnOneUsers.length && users.oneOnOneUsers.length > 1) {
+    //     const selected = users.oneOnOneUsers.filter(user => {
+    //         return user.blocked.every(usr => usr !== userAndRoom.user_id)
+    //     })
+    //     if (selected.length < 2) {
+    //         return;
+    //     }
+    //     users.oneOnOneUsers = users.oneOnOneUsers.filter(user => {
+    //         return selected.some(usr => usr._id !== user._id)
+    //     });
+    //     const oponent = selected.find(user => user._id !== userAndRoom.user_id);
+    //     const me = await Users.findOne({ _id: userAndRoom.user_id });
+    //     const oponentObj = await Users.findOne({ _id: oponent._id });
+    //     const randomRoom = randomValue(5);
+    //     const oponentMapped = {
+    //         _id: oponentObj._id,
+    //         avatar_url: oponentObj.avatar_url,
+    //     }
+    //     const meMapped = {
+    //         _id: me._id,
+    //         avatar_url: me.avatar_url,
+    //     }
+    //     selected.forEach(user => {
+    //         if (user._id === userAndRoom.user_id) {
+    //             return io.in(user._id).emit(EVENTS.OPONENT_FOUND(), { event: EVENTS.OPONENT_FOUND(), roomName: randomRoom, oponent: oponentMapped })
+    //         } else {
+    //             return io.in(user._id).emit(EVENTS.OPONENT_FOUND(), { event: EVENTS.OPONENT_FOUND(), roomName: randomRoom, oponent: meMapped })
+    //         }
 
-        })
-    }
+    //     })
+    // }
 }
