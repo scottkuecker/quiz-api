@@ -18,7 +18,6 @@ const saveDBSocket = async (io, socket, data) =>{
         user.online = true;
         socket.join(user._id.toString());
         await user.save();
-        console.log('saved socket', user._id.toString())
         return io.emit(EVENTS.USER_CONNECTED(), { event: EVENTS.USER_CONNECTED(), socket_id: socket.id, user_id: data.user_id })
     }else{
         console.log('socket not saved')
@@ -31,7 +30,7 @@ const disconectDBSocket = async (io, socket) =>{
     oneOnOneRoom.oneOnOneUsers = oneOnOneRoom.oneOnOneUsers.filter(user => user.socket_id !== socket.id)
     if (user) {
         user.online = false;
-        socket.leave(user._id);
+        socket.leave(user._id.toString());
         await user.save();
         return io.emit(EVENTS.USER_DISCONECTED(), { event: EVENTS.USER_DISCONECTED(), user_id: user._id })
     }
