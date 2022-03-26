@@ -407,6 +407,22 @@ exports.ADD_QUESTION = () => 'ADD_QUESTION';
 exports.ADD_IMAGE_QUESTION = () => 'ADD_IMAGE_QUESTION';
 
 /**
+* @description emit deleted question
+* @common_data_to_send {event: 'DELETE_QUESTION', data: boolean}
+* @returns EVENT STRING
+*/
+exports.DELETE_QUESTION = () => 'DELETE_QUESTION';
+
+
+/**
+* @description emit deleted question
+* @common_data_to_send {event: 'CHECK_QUESTION', data: boolean}
+* @returns EVENT STRING
+*/
+exports.CHECK_QUESTION = () => 'CHECK_QUESTION';
+
+
+/**
 * @description Emit that question is published
 * @common_data_to_send {event: 'PUBLISH_QUESTION', data: boolean}
 * @returns EVENT STRING
@@ -435,4 +451,63 @@ exports.UPDATE_QUESTION_TEXT = () => 'UPDATE_QUESTION_TEXT';
 */
 exports.MATCH_FOUND = () => 'MATCH_FOUND';
 
-//MATCH_FOUND
+/**
+* @description Emit top 100 users with highest score
+* @common_data_to_send {event: 'GET_RANKING_LIST', data: User[]}
+* @returns EVENT STRING
+*/
+exports.GET_RANKING_LIST = () => 'GET_RANKING_LIST';
+
+
+/**
+* @description Emit that daily reward is picked
+* @common_data_to_send {event: 'GET_DAILY_REWARD', data: boolean}
+* @returns EVENT STRING
+*/
+exports.GET_DAILY_REWARD = () => 'GET_DAILY_REWARD';
+
+
+/**
+* @description Emit reseted playing state
+* @common_data_to_send {event: 'RESET_PLAYING_STATE', data: boolean}
+* @returns EVENT STRING
+*/
+exports.RESET_PLAYING_STATE = () => 'RESET_PLAYING_STATE';
+
+
+/**
+* @description Emit reseted lives
+* @common_data_to_send {event: 'RESET_LIVES', data: User}
+* @returns EVENT STRING
+*/
+exports.RESET_LIVES = () => 'RESET_LIVES';
+
+
+/**
+* @description Emit updated score
+* @common_data_to_send {event: 'UPDATE_SCORE', data: User}
+* @returns EVENT STRING
+*/
+exports.UPDATE_SCORE = () => 'UPDATE_SCORE';
+
+/**
+* @description Emit updated settings
+* @common_data_to_send {event: 'UPDATE_SETTINGS', data: User}
+* @returns EVENT STRING
+*/
+exports.UPDATE_SETTINGS = () => 'UPDATE_SETTINGS';
+
+/**
+* @description Emit removed notification
+* @common_data_to_send {event: 'REMOVE_NOTIFICATION', data: user, success: boolean}
+* @returns EVENT STRING
+*/
+exports.REMOVE_NOTIFICATION = () => 'REMOVE_NOTIFICATION';
+
+
+/**
+* @description Emit reduced life
+* @common_data_to_send {event: 'REDUCE_LIVES', data: user, success: boolean}
+* @returns EVENT STRING
+*/
+exports.REDUCE_LIVES = () => 'REDUCE_LIVES';

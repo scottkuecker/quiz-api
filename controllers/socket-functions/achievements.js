@@ -1,6 +1,6 @@
-const Achievement = require('../db_models/achievement');
-const User = require('../db_models/user');
-const EVENTS = require('../controllers/socket-events');
+const Achievement = require('../../db_models/achievement');
+const User = require('../../db_models/user');
+const EVENTS = require('../socket-events');
 
 exports.getAchievements =  async (socket, data) =>{
     const achievements = await Achievement.find();

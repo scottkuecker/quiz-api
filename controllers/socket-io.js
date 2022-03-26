@@ -7,7 +7,9 @@ const ROOMS = require ('./socket-functions/room');
 const FRIEND_REQUESTS = require('./socket-functions/friend-requests');
 const TOURNAMENT = require('./socket-functions/tournament');
 const QUESTIONS = require('./socket-functions/questions');
+const ACHIEVEMENTS = require('./socket-functions/achievements');
 const AUTH = require('./auth');
+const USERS = require('./socket-functions/user');
 
 const saveDBSocket = async (io, socket, data) =>{
     const user = await Users.findById(data.user_id);
@@ -90,11 +92,6 @@ const acceptOponent = (socketIo, socket, data) =>{
     TOURNAMENT.acceptDBOponent(socketIo, socket, data)
 }
 
-
-
-const autoLogin = (socket, data) => {
-    AUTH.autoLogin(socket, data)
-}
 
 //SOCKETS EVENTS
 
@@ -211,6 +208,39 @@ exports.setupListeners = () =>{
         })
         socket.on(EVENTS.GET_QUESTIONS(), async data => {
             midleware.socketMiddleware(socket, data, QUESTIONS.getAllQuestions)
+        })
+        socket.on(EVENTS.GET_RANKING_LIST(), async data => {
+            midleware.socketMiddleware(socket, data, USERS.getRankingList)
+        })
+        socket.on(EVENTS.GET_DAILY_REWARD(), async data => {
+            midleware.socketMiddleware(socket, data, USERS.resetDailyPrice)
+        })
+        socket.on(EVENTS.RESET_PLAYING_STATE(), async data => {
+            midleware.socketMiddleware(socket, data, USERS.resetPlayingState)
+        })
+        socket.on(EVENTS.RESET_LIVES(), async data => {
+            midleware.socketMiddleware(socket, data, USERS.resetLives)
+        })
+        socket.on(EVENTS.UPDATE_SCORE(), async data => {
+            midleware.socketMiddleware(socket, data, USERS.updateScore)
+        })
+        socket.on(EVENTS.UPDATE_SETTINGS(), async data => {
+            midleware.socketMiddleware(socket, data, USERS.updateSettings)
+        })
+        socket.on(EVENTS.CHECK_QUESTION(), async data => {
+            midleware.socketMiddleware(socket, data, QUESTIONS.checkQuestion)
+        })
+        socket.on(EVENTS.DELETE_QUESTION(), async data => {
+            midleware.socketMiddleware(socket, data, QUESTIONS.deleteQuestion)
+        })
+        socket.on(EVENTS.REMOVE_NOTIFICATION(), async data => {
+            midleware.socketMiddleware(socket, data, USERS.removeNotification)
+        })
+        socket.on(EVENTS.REDUCE_LIVES(), async data => {
+            midleware.socketMiddleware(socket, data, QUESTIONS.reduceLives)
+        })
+        socket.on(EVENTS.GET_ACHIEVEMENTS(), async data => {
+            midleware.socketMiddleware(socket, data, ACHIEVEMENTS.getAchievements)
         })
 
     });

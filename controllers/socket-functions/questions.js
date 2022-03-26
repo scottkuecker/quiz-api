@@ -206,3 +206,153 @@ exports.addQuestion = async (socket, data) => {
     }
     socket.emit(EVENTS.ADD_QUESTION(), {event: EVENTS.ADD_QUESTION(), data: true})
 }
+
+
+// exports.addImageQuestion = async (req, res, next) =>{
+//     const questionText = req.body.question || 'Some question?';
+//     const correct_letter = req.body.correct_letter || 'B';
+//     const correctText = req.body.correct_text || 'Some correct answer';
+//     const imageUrl = req.body.imageUrl;
+//     if (!imageUrl) {
+//         return res.send({
+//             success: false
+//         })
+//     }
+//     const category = req.body.category.toUpperCase();
+//     const allAnswers = req.body.answers;
+//     const question = new Question({
+//         question: questionText,
+//         correct_letter: correct_letter,
+//         type: 'PICTURE',
+//         correct_text: correctText,
+//         imageUrl: imageUrl,
+//         posted_by: req.user._id.toString(),
+//         category: category,
+//         answers: allAnswers
+//     });
+//     await question.save();
+//     const userDoc = await Users.findById(req.user._id.toString());
+//     if (userDoc) {
+//         const userCat = userDoc.categories.some(cat => cat.category === category);
+//         if (!userCat) {
+//             userDoc.categories.push({ category: category, questions_added: 1 })
+//         } else {
+//             userDoc.categories.forEach(cat => {
+//                 if (cat.category === category) {
+//                     cat.questions_added += 1;
+//                 }
+//             })
+//         }
+//         await userDoc.save();
+//     }
+//     return res.send({
+//         success: true,
+//         error: undefined,
+//         data: undefined
+//     })
+// }
+
+exports.deleteQuestion = async (socket, data) =>{
+    const id = data.question_id || null;
+    if(!id){
+        return;
+    }
+    await Question.findByIdAndDelete(id);
+    const userId = data.data._id;
+    const root = data.data.roles.some(role => role === 'ADMIN')
+    const questions = await Question.find();
+    const questionsByOthers = [];
+    questions.forEach(q => {
+        if (!root) {
+            if (q._id.toString() === userId) {
+                questionsByOthers.push(q);
+            }
+        } else {
+            questionsByOthers.push(q)
+        }
+
+    });
+    if (questionsByOthers.length) {
+        return socket.emit(EVENTS.DELETE_QUESTION(), {event: EVENTS.DELETE_QUESTION(), success: true, data: questionsByOthers})
+    }
+    return socket.emit(EVENTS.DELETE_QUESTION(), {event: EVENTS.DELETE_QUESTION(), success: true, data: []})
+    
+}
+
+exports.checkQuestion = async (socket, data) =>{
+    const userPick = data.correct;
+    const questionID = data.questionId;
+    let correct = false;
+    const user = await Users.findById(data.data._id);
+    let category = '';
+    Question.findById(questionID).then(question =>{
+        if (question){
+            if(userPick === question.correct_text){
+                correct = true;
+                question.answered_correctly++;
+                category = question.category;
+            }else{
+                question.answered_wrong++;
+                category = question.category;
+            }
+            return question.save();
+        }
+    })
+    .then(async () =>{
+        if(user){
+            let hasAchievement = user.achievements.some(achievement => achievement.category === category)
+            if(!hasAchievement){
+                user.achievements.push({
+                    category: category,
+                    answered: 1
+                })
+            }else{
+                if(correct){
+                    user.achievements.forEach(achievement =>{
+                        if(achievement.category === category){
+                            achievement.answered += 1;
+                        }
+                    })
+                }
+            }
+    
+            return user.save();
+        }
+    })
+    .then(saved =>{
+        return socket.emit(EVENTS.CHECK_QUESTION(), {event: EVENTS.CHECK_QUESTION(), data: correct})
+    })
+}
+
+exports.quizResults = async (req, res, next) =>{
+
+}
+
+exports.reduceLives = async (socket, data) => {
+    const id = data.data._id;
+    Users.findById(id).then(user =>{
+        if(user){
+            if(user.lives > 0){
+                user.lives--;
+                if (user.lives === 0 && !user.lives_reset_timer_set){
+                    let now = Date.now();
+                    let future = now + 122000;
+                    user.lives_timer_ms = future - now;
+                    user.reset_lives_at = future;
+                    user.lives_reset_timer_set = true;
+                }
+                if(user.reset_lives_at > Date.now()){
+                    user.lives_timer_ms = user.reset_lives_at - Date.now();
+                }
+                return user.save()
+            }
+            if(user.reset_lives_at > Date.now()){
+                user.lives_timer_ms = Math.round((user.reset_lives_at - Date.now()) / 1000);
+            }
+            return user.save();
+        }
+    })
+    .then(saved =>{
+        return socket.emit(EVENTS.REDUCE_LIVES(), {event: EVENTS.REDUCE_LIVES(), data: saved})
+    })
+}
