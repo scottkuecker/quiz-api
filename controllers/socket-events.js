@@ -263,11 +263,18 @@ exports.OPONENT_DECLINED = () => 'OPONENT_DECLINED';
 
 
 /**
-* @description Accept 1on1 oponent
+* @description Oponent acepted
 * @common_data_to_send {event: 'OPONENT_ACCEPTED'}
 * @returns EVENT STRING
 */
 exports.OPONENT_ACCEPTED = () => 'OPONENT_ACCEPTED';
+
+/**
+* @description I accepted oponent
+* @common_data_to_send {event: 'OPONENT_ACCEPTED'}
+* @returns EVENT STRING
+*/
+exports.I_ACCEPTED = () => 'I_ACCEPTED';
 
 /**
 * @description emits number of online users

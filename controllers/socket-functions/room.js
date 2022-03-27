@@ -4,16 +4,16 @@ const TOURNAMENT = require('./tournament');
 const crypto = require('crypto');
 const EVENTS = require('../socket-events');
 
-const randomValue = (len) => {
+exports.randomValue = (len) => {
     return crypto.randomBytes(Math.ceil(len / 2))
         .toString('hex')
         .slice(0, len).toUpperCase();
 }
 
 exports.createRoom = (socket, userData) => {
-    const room = randomValue(5);
+    const room = this.randomValue(5);
     if (room) {
-        this.createDBRoom(socket, room, userData)
+        return this.createDBRoom(socket, room, userData)
     }
 }
 exports.cleanRooms = async () => {
@@ -170,38 +170,5 @@ exports.joinOneOnOneDBRoom = async (io, socket, data) => {
 }
 exports.joinOneOnOne = async (io, socket, userAndRoom) => {
     const users = TOURNAMENT.getoneOnOneRoom();
-    console.log('joining')
-    users.oneOnOneUsers.push({ _id: userAndRoom.user_id, socket: socket.id, blocked: [], gameAccepted: false });
-    console.log(users.oneOnOneUsers)
-    // if (users.oneOnOneUsers.length && users.oneOnOneUsers.length > 1) {
-    //     const selected = users.oneOnOneUsers.filter(user => {
-    //         return user.blocked.every(usr => usr !== userAndRoom.user_id)
-    //     })
-    //     if (selected.length < 2) {
-    //         return;
-    //     }
-    //     users.oneOnOneUsers = users.oneOnOneUsers.filter(user => {
-    //         return selected.some(usr => usr._id !== user._id)
-    //     });
-    //     const oponent = selected.find(user => user._id !== userAndRoom.user_id);
-    //     const me = await Users.findOne({ _id: userAndRoom.user_id });
-    //     const oponentObj = await Users.findOne({ _id: oponent._id });
-    //     const randomRoom = randomValue(5);
-    //     const oponentMapped = {
-    //         _id: oponentObj._id,
-    //         avatar_url: oponentObj.avatar_url,
-    //     }
-    //     const meMapped = {
-    //         _id: me._id,
-    //         avatar_url: me.avatar_url,
-    //     }
-    //     selected.forEach(user => {
-    //         if (user._id === userAndRoom.user_id) {
-    //             return io.in(user._id).emit(EVENTS.OPONENT_FOUND(), { event: EVENTS.OPONENT_FOUND(), roomName: randomRoom, oponent: oponentMapped })
-    //         } else {
-    //             return io.in(user._id).emit(EVENTS.OPONENT_FOUND(), { event: EVENTS.OPONENT_FOUND(), roomName: randomRoom, oponent: meMapped })
-    //         }
-
-    //     })
-    // }
+    users.oneOnOneUsers.push({ _id: userAndRoom.user_id, socket: socket.id, blocked: [], gameAccepted: false, avatar_url: userAndRoom.avatar_url });
 }

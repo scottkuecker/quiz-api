@@ -17,6 +17,7 @@ const saveDBSocket = async (io, socket, data) =>{
         user.socket = socket.id;
         user.online = true;
         socket.join(user._id.toString());
+        TOURNAMENT.increaseOnlineUsers();
         await user.save();
         return io.emit(EVENTS.USER_CONNECTED(), { event: EVENTS.USER_CONNECTED(), socket_id: socket.id, user_id: data.user_id })
     }else{
@@ -31,6 +32,7 @@ const disconectDBSocket = async (io, socket) =>{
     if (user) {
         user.online = false;
         socket.leave(user._id.toString());
+        TOURNAMENT.decreaseOnlineUsers();
         await user.save();
         return io.emit(EVENTS.USER_DISCONECTED(), { event: EVENTS.USER_DISCONECTED(), user_id: user._id })
     }
@@ -96,13 +98,12 @@ const acceptOponent = (socketIo, socket, data) =>{
 
 exports.setupListeners = () =>{
     const socketIo = socketCon.getIO();
+    TOURNAMENT.setIOReady();
     TOURNAMENT.startListeningOneOnOne(socketIo);
     socketIo.on('connection', socket =>{
         const oneOnOneRoom = TOURNAMENT.getoneOnOneRoom();
-        oneOnOneRoom.onlineUsers++;
         socketIo.emit(EVENTS.ONLINE_USERS_COUNT(), { event: EVENTS.ONLINE_USERS_COUNT(), online: oneOnOneRoom.onlineUsers })
         socket.on('disconnect', (data) => {
-            oneOnOneRoom.onlineUsers--;
             socketIo.emit(EVENTS.ONLINE_USERS_COUNT(), { event: EVENTS.ONLINE_USERS_COUNT(), online: oneOnOneRoom.onlineUsers})
             disconectSocket(socketIo, socket);
         })

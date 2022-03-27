@@ -78,8 +78,8 @@ exports.updateScore = async (socket, data) =>{
 }
 
 exports.updateSettings = async (socket, data) =>{
-    const name = data.name;
-    const avatar = data.image || 'https://firebasestorage.googleapis.com/v0/b/kviz-live.appspot.com/o/1642193033985png-transparent-computer-icons-avatar-user-profile-avatar-heroes-rectangle-black.png?alt=media';
+    const name = data.settings.name;
+    const avatar = data.settings.image || 'https://firebasestorage.googleapis.com/v0/b/kviz-live.appspot.com/o/1642193033985png-transparent-computer-icons-avatar-user-profile-avatar-heroes-rectangle-black.png?alt=media';
     const userDoc = await User.findById(data.data._id);
     if(userDoc){
         userDoc.name = name;

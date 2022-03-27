@@ -4,6 +4,9 @@ const QUESTIONS = require('./questions'); //socket event functions
 const Questions = require('../../db_models/question'); //mongoDB model
 const EVENTS = require('../socket-events');
 const Users = require('../../db_models/user');
+const socketCon = require('../../socket');
+
+var IO;
 
 var oneOnOneRoom = {
     oneOnOneUsers: [],
@@ -11,15 +14,28 @@ var oneOnOneRoom = {
 }
 var interval = null;
 
+
+
 const getRandomNumber = (quantity) => {
     var milliseconds = new Date().getMilliseconds();
     return Math.floor(Math.random(Math.floor(milliseconds * quantity / 1000)) * quantity)
 }
 
+exports.setIOReady = () => {
+    IO = socketCon.getIO();
+}
+
+exports.increaseOnlineUsers = () => {
+    oneOnOneRoom.onlineUsers++;
+}
+exports.decreaseOnlineUsers = () => {
+    oneOnOneRoom.onlineUsers--;
+}
+
 const searchPlayersToOneOnOne = async (io) =>{
     if(oneOnOneRoom.oneOnOneUsers.length >= 2){
         clearInterval(interval);
-        const usersArr = [];
+        let usersArr = [];
         oneOnOneRoom.oneOnOneUsers = oneOnOneRoom.oneOnOneUsers.filter((user, index) =>{
             if(index === 0 || index === 1){
                 usersArr.push(user)
@@ -27,22 +43,29 @@ const searchPlayersToOneOnOne = async (io) =>{
             }
             return true;
         });
-        console.log('starting')
-        console.log(oneOnOneRoom.oneOnOneUsers)
-        startOneOnOneMatch(io, usersArr)
+        startOneOnOneMatch(usersArr);
+
     }
     
 }
 
-const startOneOnOneMatch = async (io, arrOfTwo) => {
-    const users = await this.createOneOnOneUsers(arrOfTwo);
-    if(!users){
-        return this.startListeningOneOnOne();
-    }
-    console.log(users)
-    io.in(users[0].id.toString()).emit(EVENTS.MATCH_FOUND(), {event: EVENTS.MATCH_FOUND(), me: users[0], oponent: users[1] })
-    io.in(users[1].id.toString()).emit(EVENTS.MATCH_FOUND(), {event: EVENTS.MATCH_FOUND(), me: users[1], oponent: users[0] })
-
+const startOneOnOneMatch = async (arrOfTwo) => {
+    this.startListeningOneOnOne();
+    const roomName = ROOMS.randomValue(5);
+    const user1 = JSON.parse(JSON.stringify(arrOfTwo[0]));
+    const user2 = JSON.parse(JSON.stringify(arrOfTwo[1]));
+    const room = new Room({
+        room_id: roomName,
+        users: [],
+        allow_enter: true,
+        total_questions: 0,
+        created_by: 'SERVER'
+    });
+    await room.save();
+    IO.in(user1._id.toString()).emit(EVENTS.MATCH_FOUND(), {event: EVENTS.MATCH_FOUND(), me: arrOfTwo[0], oponent: arrOfTwo[1], roomName })
+    IO.in(user2._id.toString()).emit(EVENTS.MATCH_FOUND(), {event: EVENTS.MATCH_FOUND(), me: arrOfTwo[1], oponent: arrOfTwo[0], roomName })
+    return true;
+    
 }
 
 exports.startListeningOneOnOne = (io) =>{
@@ -159,15 +182,10 @@ exports.checkDBTournamentQuestion = async (io, socket, data) => {
 
 
 exports.declineOponent = (io, socket, data) => {
-   
-    me.gameAccepted = false;
     socket.emit(EVENTS.OPONENT_DECLINED(), { event: EVENTS.OPONENT_DECLINED() })
 }
 
 exports.createOneOnOneUsers = async (usersArr) =>{
-    console.log('********')
-    console.log(usersArr)
-    console.log('********')
     const user1 = JSON.parse(JSON.stringify(usersArr[0]));
     const user2 = JSON.parse(JSON.stringify(usersArr[1]));
     const userOne = await Users.findById({ _id: user1._id });
@@ -197,21 +215,16 @@ exports.createOneOnOneUsers = async (usersArr) =>{
 }
 
 exports.acceptDBOponent = async (io, socket, data) => {
-    // const me = oneOnOneRoom.oneOnOneUsers.find(user => user._id === data.user_id);
-    // const oponent = oneOnOneRoom.oneOnOneUsers.find(user => user._id === data.oponent_id);
-    // if (!me || !oponent) {
-    //     return;
-    // }
-    // me.gameAccepted = true;
-    // socket.join(data.roomName)
-    // io.in(oponent._id).emit(EVENTS.OPONENT_ACCEPTED(), { event: EVENTS.OPONENT_ACCEPTED(), success: true })
-    // if (me.gameAccepted && oponent.gameAccepted) {
-    //     const users = await this.createOneOnOneUsers([me, oponent])
-    //     await ROOMS.createDBRoom(socket, data.roomName, data);
-    //     await QUESTIONS.generateRoomQuestions(data.roomName, 15, users);
-    //     io.to(data.roomName).emit(EVENTS.BOTH_ACCEPTED(), { event: EVENTS.BOTH_ACCEPTED(), success: true })
-    // }
+    socket.join(data.roomName);
+    io.in(data.oponent._id).emit(EVENTS.OPONENT_ACCEPTED(), { event: EVENTS.OPONENT_ACCEPTED(), success: true })
+    const room = await io.in(data.roomName).allSockets();
+    if(room.size === 2){
+        const users = await this.createOneOnOneUsers([data.me, data.oponent])
+        await QUESTIONS.generateRoomQuestions(data.roomName, 15, users);
+        io.to(data.roomName).emit(EVENTS.BOTH_ACCEPTED(), { event: EVENTS.BOTH_ACCEPTED(), success: true })
+    }
 }
+
 exports.leaveDBOneOnOne = (io, socket, data) => {
     if (oneOnOneRoom.oneOnOneUsers.length) {
         oneOnOneRoom.oneOnOneUsers = oneOnOneRoom.oneOnOneUsers.filter(user => user._id !== data.user_id);
