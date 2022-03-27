@@ -17,6 +17,7 @@ const saveDBSocket = async (io, socket, data) =>{
         user.socket = socket.id;
         user.online = true;
         socket.join(user._id.toString());
+        const oneOnOneRoom = TOURNAMENT.getoneOnOneRoom();
         TOURNAMENT.increaseOnlineUsers();
         io.emit(EVENTS.ONLINE_USERS_COUNT(), { event: EVENTS.ONLINE_USERS_COUNT(), online: oneOnOneRoom.onlineUsers})
         await user.save();
