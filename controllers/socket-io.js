@@ -103,6 +103,7 @@ exports.setupListeners = () =>{
     TOURNAMENT.setIOReady();
     TOURNAMENT.startListeningOneOnOne(socketIo);
     socketIo.on('connection', socket =>{
+        console.log('connections')
         const oneOnOneRoom = TOURNAMENT.getoneOnOneRoom();
         socketIo.emit(EVENTS.ONLINE_USERS_COUNT(), { event: EVENTS.ONLINE_USERS_COUNT(), online: oneOnOneRoom.onlineUsers })
         socket.on('disconnect', (data) => {

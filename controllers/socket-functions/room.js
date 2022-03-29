@@ -170,6 +170,7 @@ exports.joinOneOnOneDBRoom = async (io, socket, data) => {
 }
 exports.joinOneOnOne = async (io, socket, userAndRoom) => {
     const users = TOURNAMENT.getoneOnOneRoom();
-    users.oneOnOneUsers.push({ _id: userAndRoom.user_id, socket: socket.id, blocked: [], gameAccepted: false, avatar_url: userAndRoom.avatar_url });
+    const user = { _id: userAndRoom.user_id, socket: socket.id, blocked: [], gameAccepted: false, avatar_url: userAndRoom.avatar_url }
+    users.join(user)
     socket.emit(EVENTS.JOINED_ROOM(), { event: EVENTS.JOINED_ROOM()})
 }
