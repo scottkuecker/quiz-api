@@ -518,3 +518,11 @@ exports.REMOVE_NOTIFICATION = () => 'REMOVE_NOTIFICATION';
 * @returns EVENT STRING
 */
 exports.REDUCE_LIVES = () => 'REDUCE_LIVES';
+
+
+/**
+* @description For debugging purposes only
+* @common_data_to_send {event: 'TRACK_ONE_ON_ONE', data: oneOneOneRoom.oneonOneusers}
+* @returns EVENT STRING
+*/
+exports.TRACK_ONE_ON_ONE = () => 'TRACK_ONE_ON_ONE';

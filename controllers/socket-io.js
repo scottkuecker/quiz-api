@@ -100,6 +100,7 @@ const acceptOponent = (socketIo, socket, data) =>{
 
 exports.setupListeners = () =>{
     const socketIo = socketCon.getIO();
+    const oneOneOne = TOURNAMENT.getoneOnOneRoom()
     TOURNAMENT.setIOReady();
     TOURNAMENT.startListeningOneOnOne(socketIo);
     socketIo.on('connection', socket =>{
@@ -160,6 +161,9 @@ exports.setupListeners = () =>{
 
         socket.on(EVENTS.GET_ROOM_QUESTION(), data =>{
             getQuestion(socket, data)
+        })
+        socket.on(EVENTS.TRACK_ONE_ON_ONE(), (data) =>{
+            socket.emit(EVENTS.TRACK_ONE_ON_ONE(), {data: oneOnOneRoom.oneOnOneUsers})
         })
 
         socket.on(EVENTS.GET_ROOM_RESULTS(), data => {
