@@ -151,7 +151,7 @@ exports.startDBTournamentQuestion = async (io, data) => {
             fn: 'startDBTournamentQuestion'
         });
     }
-    if (room.total_questions >= 2) {
+    if (room.total_questions >= 15) {
         room.allow_enter = false;
         await room.save();
         io.in(`${data.roomName}`).emit(EVENTS.TOURNAMENT_FINISHED(), { event: EVENTS.TOURNAMENT_FINISHED(), users: room.users });
