@@ -163,7 +163,7 @@ exports.setupListeners = () =>{
             getQuestion(socket, data)
         })
         socket.on(EVENTS.TRACK_ONE_ON_ONE(), (data) =>{
-            socket.emit(EVENTS.TRACK_ONE_ON_ONE(), {data: oneOnOneRoom.oneOnOneUsers})
+            socket.emit(EVENTS.TRACK_ONE_ON_ONE(), { event: EVENTS.TRACK_ONE_ON_ONE() , data: oneOnOneRoom.oneOnOneUsers})
         })
 
         socket.on(EVENTS.GET_ROOM_RESULTS(), data => {
