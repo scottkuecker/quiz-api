@@ -35,7 +35,6 @@ exports.decreaseOnlineUsers = () => {
 const searchPlayersToOneOnOne = async (io) =>{
     io.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: oneOnOneRoom.oneOnOneUsers})
     if(oneOnOneRoom.oneOnOneUsers.length >= 2){
-        clearInterval(interval);
         let usersArr = [];
         oneOnOneRoom.oneOnOneUsers = oneOnOneRoom.oneOnOneUsers.filter((user, index) =>{
             if(index === 0 || index === 1){
@@ -44,6 +43,8 @@ const searchPlayersToOneOnOne = async (io) =>{
             }
             return true;
         });
+        io.emit(EVENTS.TRACK_ONE_ON_ONE(), { event: EVENTS.TRACK_ONE_ON_ONE(), data: oneOnOneRoom.oneOnOneUsers })
+        clearInterval(interval);
         startOneOnOneMatch(usersArr);
 
     }
@@ -63,6 +64,7 @@ const startOneOnOneMatch = async (arrOfTwo) => {
         created_by: 'SERVER'
     });
     await room.save();
+    IO.emit(EVENTS.MATCH_FOUND(), {data: oneOnOneRoom.oneOnOneUsers})
     IO.in(user1._id.toString()).emit(EVENTS.MATCH_FOUND(), {event: EVENTS.MATCH_FOUND(), me: arrOfTwo[0], oponent: arrOfTwo[1], roomName })
     IO.in(user2._id.toString()).emit(EVENTS.MATCH_FOUND(), {event: EVENTS.MATCH_FOUND(), me: arrOfTwo[1], oponent: arrOfTwo[0], roomName })
     return true;
