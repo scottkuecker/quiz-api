@@ -33,6 +33,7 @@ exports.decreaseOnlineUsers = () => {
 }
 
 const searchPlayersToOneOnOne = async (io) =>{
+    io.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: oneOnOneRoom.oneOnOneUsers})
     if(oneOnOneRoom.oneOnOneUsers.length >= 2){
         clearInterval(interval);
         let usersArr = [];
