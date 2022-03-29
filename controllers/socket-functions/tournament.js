@@ -247,5 +247,5 @@ exports.acceptDBOponent = async (io, socket, data) => {
 
 exports.leaveDBOneOnOne = (io, socket, data) => {
     oneOnOneRoom.leave(data.user_id);
-    // socket.emit(EVENTS.LEAVE_ONE_ON_ONE(), { event: EVENTS.LEAVE_ONE_ON_ONE(), success: true })
+    socket.emit(EVENTS.LEAVE_ONE_ON_ONE(), { event: EVENTS.LEAVE_ONE_ON_ONE(), success: true })
 }
