@@ -128,49 +128,55 @@ exports.getDBRoomResults = async (socket, data) => {
 }
 
 exports.joinOneOnOneDBRoom = async (io, socket, data) => {
-    const response = { success: false }
-    const room = await Room.findOne({ room_id: data.roomName });
-    const user = await Users.findOne({ _id: data.user_id });
+    // const response = { success: false }
+    // const room = await Room.findOne({ room_id: data.roomName });
+    // const user = await Users.findOne({ _id: data.user_id });
+    // const socketRooms = socket.rooms;
+    // socketRooms.forEach(rm => {
+    //     socket.leave(`${rm}`)
+    // });
+    // socket.join(`${data.user_id}`)
+
+    // if (room && room.allow_enter) {
+    //     const haveUser = room.users.some(user => user.id === null || user.id === data.user_id);
+    //     user.room = data.roomName;
+    //     user.socket = socket.id;
+    //     await user.save();
+    //     if (!haveUser) {
+    //         room.users.push({
+    //             name: data.name,
+    //             id: data.user_id,
+    //             score: 0,
+    //             answered: false,
+    //             avatar: data.avatar,
+    //         });
+    //     }
+    //     const result = await room.save();
+    //     if (result) {
+    //         result.success = true;
+    //         socket.join(`${data.roomName}`);
+    //         if (room.users.length > 1) {
+    //             this.startDBTournament(io, socket, data);
+    //         }
+
+    //     }
+    // } else {
+    //     socket.emit(EVENTS.ROOM_DONT_EXIST(), {
+    //         event: EVENTS.ROOM_DONT_EXIST(),
+    //         fn: 'joinDBRoom'
+    //     });
+    // }
+    // return response;
+}
+exports.joinOneOnOne = async (io, socket, userAndRoom) => {
+    const users = TOURNAMENT.getoneOnOneRoom();
+    const length = users.length || 1;
+    const user = { _id: userAndRoom.user_id, socket: socket.id, blocked: [], priority: length,  playing: false, gameAccepted: false, avatar_url: userAndRoom.avatar_url }
     const socketRooms = socket.rooms;
     socketRooms.forEach(rm => {
         socket.leave(`${rm}`)
     });
-    socket.join(`${data.user_id}`)
-
-    if (room && room.allow_enter) {
-        const haveUser = room.users.some(user => user.id === null || user.id === data.user_id);
-        user.room = data.roomName;
-        user.socket = socket.id;
-        await user.save();
-        if (!haveUser) {
-            room.users.push({
-                name: data.name,
-                id: data.user_id,
-                score: 0,
-                answered: false,
-                avatar: data.avatar,
-            });
-        }
-        const result = await room.save();
-        if (result) {
-            result.success = true;
-            socket.join(`${data.roomName}`);
-            if (room.users.length > 1) {
-                this.startDBTournament(io, socket, data);
-            }
-
-        }
-    } else {
-        socket.emit(EVENTS.ROOM_DONT_EXIST(), {
-            event: EVENTS.ROOM_DONT_EXIST(),
-            fn: 'joinDBRoom'
-        });
-    }
-    return response;
-}
-exports.joinOneOnOne = async (io, socket, userAndRoom) => {
-    const users = TOURNAMENT.getoneOnOneRoom();
-    const user = { _id: userAndRoom.user_id, socket: socket.id, blocked: [], gameAccepted: false, avatar_url: userAndRoom.avatar_url }
+    socket.join(`${userAndRoom.user_id}`)
     users.join(user)
     socket.emit(EVENTS.JOINED_ROOM(), { event: EVENTS.JOINED_ROOM()})
 }

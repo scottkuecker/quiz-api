@@ -101,12 +101,14 @@ const acceptOponent = (socketIo, socket, data) =>{
 exports.setupListeners = () =>{
     const socketIo = socketCon.getIO();
     TOURNAMENT.setIOReady();
+    console.log('SETUP HAPPENS')
     TOURNAMENT.startListeningOneOnOne(socketIo);
     socketIo.on('connection', socket =>{
         console.log('connections')
         const oneOnOneRoom = TOURNAMENT.getoneOnOneRoom();
         socketIo.emit(EVENTS.ONLINE_USERS_COUNT(), { event: EVENTS.ONLINE_USERS_COUNT(), online: oneOnOneRoom.onlineUsers })
         socket.on('disconnect', (data) => {
+            console.log(EVENTS.ONLINE_USERS_COUNT())
             socketIo.emit(EVENTS.ONLINE_USERS_COUNT(), { event: EVENTS.ONLINE_USERS_COUNT(), online: oneOnOneRoom.onlineUsers})
             disconectSocket(socketIo, socket);
         })
@@ -120,10 +122,12 @@ exports.setupListeners = () =>{
         });
 
         socket.on(EVENTS.LEAVE_ONE_ON_ONE(), (data) => {
+            console.log(EVENTS.LEAVE_ONE_ON_ONE())
             leaveOneOnOne(socketIo, socket, data);
         });
 
         socket.on(EVENTS.OPONENT_ACCEPTED(), (data) => {
+            console.log(EVENTS.OPONENT_ACCEPTED())
             acceptOponent(socketIo, socket, data);
         });
 
@@ -140,14 +144,17 @@ exports.setupListeners = () =>{
         });
 
         socket.on(EVENTS.JOIN_ONE_ON_ONE(), data => {
+            console.log(EVENTS.JOIN_ONE_ON_ONE())
             joinOneOnOneRoom(socketIo, socket, data)
         })
 
         socket.on(EVENTS.JOIN_ROOM(), userAndRoom =>{
+            console.log(EVENTS.JOIN_ROOM())
             joinRoom(socketIo, socket, userAndRoom);
         })
 
         socket.on(EVENTS.LEAVE_ROOM(), userAndRoom =>{
+            console.log(EVENTS.LEAVE_ROOM())
             leaveRoom(socketIo, socket, userAndRoom)
         })
 

@@ -24,23 +24,52 @@ var oneOnOneRoom = {
         }
         this.oneOnOneUsers.push(user)
     },
+    block: function (myId, oponentId){
+        const me = this.oneOnOneUsers.find(user => user._id === myId);
+        if(me){
+            me.priority = this.oneOnOneUsers.length + 1;
+            this.leave(me._id);
+            this.join(me);
+            me.blocked.push(oponentId);
+            this.declineMatch(me._id)
+        }
+    },
     joinForNextMatch: function (user){
         this.nextMatch.push(user)
     },
     getMatch: function(){
         const match = JSON.parse(JSON.stringify(this.nextMatch));
         this.nextMatch = [];
-        this.leave(match[0]._id);
-        this.leave(match[1]._id);
+        this.oneOnOneUsers.forEach(user =>{
+            if (user._id === match[0]._id || user._id === match[1]._id){
+                user.playing = true;
+            } 
+        })
         return match;
     },
+    declineMatch: function (id){
+        this.nextMatch = this.nextMatch.filter(user => user._id !== id);
+    },
     matchPosible: function (){
-        console.log(this.oneOnOneUsers.length)
-        return this.oneOnOneUsers.length > 1;
+       if(this.nextMatch.length > 1 && this.nextMatch.every(user => user.playing === false)){
+           if (this.nextMatch[0].blocked.includes(this.nextMatch[1]._id)){
+               return false;
+           }else{
+               return true;
+           }
+       }else{   
+           return false;
+       }
+    },
+    potentialMatch: function (){
+        return this.oneOnOneUsers.length > 1
+    },
+    matchFull: function(){
+        return this.nextMatch.length > 1;
     }
 }
 var interval = null;
-
+var counter = 0;
 
 
 const getRandomNumber = (quantity) => {
@@ -58,20 +87,32 @@ exports.decreaseOnlineUsers = () => {
 }
 
 const searchPlayersToOneOnOne = async () =>{
-    if (oneOnOneRoom.matchPosible()){
+    if (oneOnOneRoom.potentialMatch() && !oneOnOneRoom.matchFull()){
+        console.log(oneOnOneRoom.potentialMatch(), !oneOnOneRoom.matchFull())
+        counter++
+        console.log("counter: " + counter)
         oneOnOneRoom.oneOnOneUsers.forEach((user, index) =>{
-            if(index === 0 || index === 1){
+            if(!oneOnOneRoom.matchFull()){
                 oneOnOneRoom.joinForNextMatch(user)
             }
         });
-        clearInterval(interval);
-        startOneOnOneMatch(oneOnOneRoom.getMatch());
+        if (oneOnOneRoom.matchFull()){
+            console.log('starting match')
+            oneOnOneRoom.nextMatch = [];
+            startOneOnOneMatch(oneOnOneRoom.getMatch());
+        }else{
+            oneOnOneRoom.nextMatch = [];
+            console.log('inner else happens')
+            this.startListeningOneOnOne();
+        }
+    }else{
+        console.log('else happens')
+        this.startListeningOneOnOne();
     }
     
 }
 
 const startOneOnOneMatch = async (arrOfTwo) => {
-    console.log(arrOfTwo)
     const roomName = ROOMS.randomValue(5);
     const user1 = JSON.parse(JSON.stringify(arrOfTwo[0]));
     const user2 = JSON.parse(JSON.stringify(arrOfTwo[1]));
@@ -85,13 +126,15 @@ const startOneOnOneMatch = async (arrOfTwo) => {
     await room.save();
     IO.in(user1._id.toString()).emit(EVENTS.MATCH_FOUND(), {event: EVENTS.MATCH_FOUND(), me: arrOfTwo[0], oponent: arrOfTwo[1], roomName })
     IO.in(user2._id.toString()).emit(EVENTS.MATCH_FOUND(), {event: EVENTS.MATCH_FOUND(), me: arrOfTwo[1], oponent: arrOfTwo[0], roomName })
-    this.startListeningOneOnOne();
+    searchPlayersToOneOnOne();
     return true;
     
 }
 
 exports.startListeningOneOnOne = () =>{
-    interval = setInterval(searchPlayersToOneOnOne, 3000);
+    setTimeout(() => {
+        searchPlayersToOneOnOne()
+    }, 3000)
 }
 
 exports.getoneOnOneRoom = () => {
@@ -203,6 +246,8 @@ exports.checkDBTournamentQuestion = async (io, socket, data) => {
 
 
 exports.declineOponent = (io, socket, data) => {
+    oneOnOneRoom.block(data.user_id, data.oponent_id);
+    
     socket.emit(EVENTS.OPONENT_DECLINED(), { event: EVENTS.OPONENT_DECLINED() })
 }
 
