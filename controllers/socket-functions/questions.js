@@ -1,6 +1,7 @@
 const Room = require('../../db_models/rooms');
 const EVENTS = require('../socket-events');
 const Questions = require('../../db_models/question');
+const Users = require('../../db_models/user');
 
 
 function getRandomNumber(quantity) {
@@ -178,8 +179,8 @@ exports.addQuestion = async (socket, data) => {
     const allAnswers = data.question.answers;
     const imageUrl = data.question.imageUrl;
     const type = data.question.type;
-    const id = data._id.toString();
-    const question = new Question({
+    const id = data.data._id.toString();
+    const question = new Questions({
         question: questionText,
         correct_letter: correct_letter,
         correct_text: correctText,
@@ -187,7 +188,8 @@ exports.addQuestion = async (socket, data) => {
         category: category,
         answers: allAnswers,
         imageUrl: imageUrl,
-        type: type
+        type: type,
+        status: 'ODOBRENO'
     });
     await question.save();
     const userDoc = await Users.findById(data.data._id.toString());
