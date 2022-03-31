@@ -33,6 +33,7 @@ var oneOnOneRoom = {
         }
     },
     joinForNextMatch: function (user){
+        user.playing = false;
         this.nextMatch.push(user)
     },
     getMatch: function(){
@@ -40,12 +41,12 @@ var oneOnOneRoom = {
         if(!match.length && match.length < 2){
             return;
         }
-        this.nextMatch = [];
         this.oneOnOneUsers.forEach(user =>{
             if (user._id === match[0]._id || user._id === match[1]._id){
                 user.playing = true;
             } 
-        })
+        });
+        this.nextMatch = [];
         return match;
     },
     declineMatch: function (id){
@@ -63,7 +64,8 @@ var oneOnOneRoom = {
        }
     },
     potentialMatch: function (){
-        return this.oneOnOneUsers.length > 1
+        const test = this.oneOnOneUsers.filter(user => user.playing !== true)
+        return test.length > 1
     },
     matchFull: function(){
         return this.nextMatch.length > 1;
@@ -93,6 +95,7 @@ const searchPlayersToOneOnOne = async () =>{
             }
         });
         if (oneOnOneRoom.matchFull()){
+            console.log(oneOnOneRoom.nextMatch)
             startOneOnOneMatch(oneOnOneRoom.getMatch());
         }else{
             oneOnOneRoom.nextMatch = [];
@@ -119,8 +122,9 @@ const startOneOnOneMatch = async (arrOfTwo) => {
         created_by: 'SERVER'
     });
     await room.save();
-    IO.in(user1._id.toString()).emit(EVENTS.MATCH_FOUND(), {event: EVENTS.MATCH_FOUND(), me: arrOfTwo[0], oponent: arrOfTwo[1], roomName })
-    IO.in(user2._id.toString()).emit(EVENTS.MATCH_FOUND(), {event: EVENTS.MATCH_FOUND(), me: arrOfTwo[1], oponent: arrOfTwo[0], roomName })
+    console.log(roomName)
+    IO.in(user1._id.toString()).emit(EVENTS.MATCH_FOUND(), { event: EVENTS.MATCH_FOUND(), me: user1, oponent: user2, roomName })
+    IO.in(user2._id.toString()).emit(EVENTS.MATCH_FOUND(), { event: EVENTS.MATCH_FOUND(), me: user2, oponent: user1, roomName })
     searchPlayersToOneOnOne();
     return true;
     
@@ -275,9 +279,10 @@ exports.createOneOnOneUsers = async (usersArr) =>{
 }
 
 exports.acceptDBOponent = async (io, socket, data) => {
+    console.log('joined: ' + data.roomName)
     socket.join(data.roomName);
-    io.in(data.oponent._id).emit(EVENTS.OPONENT_ACCEPTED(), { event: EVENTS.OPONENT_ACCEPTED(), success: true })
-    const room = await io.in(data.roomName).allSockets();
+    IO.in(data.oponent._id).emit(EVENTS.OPONENT_ACCEPTED(), { event: EVENTS.OPONENT_ACCEPTED(), success: true })
+    const room = await IO.in(data.roomName).allSockets();
     if(room.size === 2){
         const users = await this.createOneOnOneUsers([data.me, data.oponent])
         await QUESTIONS.generateRoomQuestions(data.roomName, 2, users);

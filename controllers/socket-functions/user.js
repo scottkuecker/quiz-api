@@ -106,7 +106,7 @@ exports.generateBots = async () => {
         password: 'none',
         name: 'Jakov Ilic',
         title: 'Pocetnik 1',
-        score: 3,
+        score: 12,
         lives: 3,
         tickets: 10,
         roles: ['USER', 'BOT'],
@@ -115,7 +115,7 @@ exports.generateBots = async () => {
         online: true,
         socket: 'bot_1_fake_socket',
         is_bot:true,
-        avatar_url: 'https://i.pinimg.com/474x/0a/42/7f/0a427f8c57082a1d1f0da6538acabf32--funny-animal-faces-hilarious-animals.jpg',
+        avatar_url: 'https://firebasestorage.googleapis.com/v0/b/kviz-live.appspot.com/o/1642193033985png-transparent-computer-icons-avatar-user-profile-avatar-heroes-rectangle-black.png?alt=media',
         questions: [],
         allready_answered: []
     });
@@ -124,7 +124,7 @@ exports.generateBots = async () => {
         password: 'none',
         name: 'Anica stanica',
         title: 'Pocetnik 2',
-        score: 5,
+        score: 12,
         lives: 3,
         tickets: 10,
         roles: ['USER', 'BOT'],
@@ -142,7 +142,7 @@ exports.generateBots = async () => {
         password: 'none',
         name: 'Frizider Vucic',
         title: 'Pocetnik 3',
-        score: 6,
+        score: 12,
         lives: 3,
         tickets: 10,
         roles: ['USER', 'BOT'],
@@ -151,7 +151,7 @@ exports.generateBots = async () => {
         online: true,
         socket: 'bot_3_fake_socket',
         is_bot: true,
-        avatar_url: 'https://www.nedeljnik.rs/wp-content/uploads/2020/01/Vucic-Tan2019-12-31_105040123_2.jpg',
+        avatar_url: 'https://firebasestorage.googleapis.com/v0/b/kviz-live.appspot.com/o/1642193033985png-transparent-computer-icons-avatar-user-profile-avatar-heroes-rectangle-black.png?alt=media',
         questions: [],
         allready_answered: []
     });
@@ -160,7 +160,7 @@ exports.generateBots = async () => {
         password: 'none',
         name: 'Lana',
         title: 'Pocetnik 4',
-        score: 9,
+        score: 12,
         lives: 3,
         tickets: 10,
         roles: ['USER', 'BOT'],
@@ -178,7 +178,7 @@ exports.generateBots = async () => {
         password: 'none',
         name: 'Danilo',
         title: 'Pocetnik 5',
-        score: 16,
+        score: 12,
         lives: 3,
         tickets: 10,
         roles: ['USER', 'BOT'],
@@ -187,7 +187,7 @@ exports.generateBots = async () => {
         online: true,
         socket: 'bot_5_fake_socket',
         is_bot: true,
-        avatar_url: 'https://ae01.alicdn.com/kf/HTB1619iNpXXXXXJaXXXq6xXFXXXG/small-cute-simulation-cat-polyethylene-fur-lovely-cat-model-in-a-basket-gift-about-12x10cm116.jpg_Q90.jpg_.webp',
+        avatar_url: 'https://firebasestorage.googleapis.com/v0/b/kviz-live.appspot.com/o/1642193033985png-transparent-computer-icons-avatar-user-profile-avatar-heroes-rectangle-black.png?alt=media',
         questions: [],
         allready_answered: []
     });
@@ -196,7 +196,7 @@ exports.generateBots = async () => {
         password: 'none',
         name: 'Konstantin',
         title: 'Pocetnik 6',
-        score: 17,
+        score: 12,
         lives: 3,
         tickets: 10,
         roles: ['USER', 'BOT'],
@@ -205,7 +205,7 @@ exports.generateBots = async () => {
         online: true,
         socket: 'bot_6_fake_socket',
         is_bot: true,
-        avatar_url: 'https://beoshoppingcenter.rs/wp-content/uploads/2020/02/konstantin.jpg',
+        avatar_url: 'https://firebasestorage.googleapis.com/v0/b/kviz-live.appspot.com/o/1642193033985png-transparent-computer-icons-avatar-user-profile-avatar-heroes-rectangle-black.png?alt=media',
         questions: [],
         allready_answered: []
     });
@@ -214,7 +214,7 @@ exports.generateBots = async () => {
         password: 'none',
         name: 'Matija',
         title: 'Pocetnik 7',
-        score: 19,
+        score: 12,
         lives: 3,
         tickets: 10,
         roles: ['USER', 'BOT'],
@@ -223,7 +223,7 @@ exports.generateBots = async () => {
         online: true,
         socket: 'bot_7_fake_socket',
         is_bot: true,
-        avatar_url: 'https://bigsee.eu/wp-content/uploads/2019/10/matijacop-portret.jpg',
+        avatar_url: 'https://firebasestorage.googleapis.com/v0/b/kviz-live.appspot.com/o/1642193033985png-transparent-computer-icons-avatar-user-profile-avatar-heroes-rectangle-black.png?alt=media',
         questions: [],
         allready_answered: []
     });
@@ -232,7 +232,7 @@ exports.generateBots = async () => {
         password: 'none',
         name: 'Iskra',
         title: 'Pocetnik 8',
-        score: 22,
+        score: 12,
         lives: 3,
         tickets: 10,
         roles: ['USER', 'BOT'],
@@ -241,7 +241,7 @@ exports.generateBots = async () => {
         online: true,
         socket: 'bot_8_fake_socket',
         is_bot: true,
-        avatar_url: 'https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/iskra-lawrence-scary-birth-labour-story-details-new-baby-picture-1587725217.jpg',
+        avatar_url: 'https://firebasestorage.googleapis.com/v0/b/kviz-live.appspot.com/o/1642193033985png-transparent-computer-icons-avatar-user-profile-avatar-heroes-rectangle-black.png?alt=media',
         questions: [],
         allready_answered: []
     });
@@ -250,7 +250,7 @@ exports.generateBots = async () => {
         password: 'none',
         name: 'El Preto',
         title: 'Pocetnik 9',
-        score: 37,
+        score: 12,
         lives: 3,
         tickets: 10,
         roles: ['USER', 'BOT'],
@@ -268,7 +268,7 @@ exports.generateBots = async () => {
         password: 'none',
         name: 'Haus aus Papier',
         title: 'Pocetnik 10',
-        score: 49,
+        score: 12,
         lives: 3,
         tickets: 10,
         roles: ['USER', 'BOT'],
