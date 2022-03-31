@@ -37,6 +37,9 @@ var oneOnOneRoom = {
     },
     getMatch: function(){
         const match = JSON.parse(JSON.stringify(this.nextMatch));
+        if(!match.length && match.length < 2){
+            return;
+        }
         this.nextMatch = [];
         this.oneOnOneUsers.forEach(user =>{
             if (user._id === match[0]._id || user._id === match[1]._id){
@@ -90,7 +93,6 @@ const searchPlayersToOneOnOne = async () =>{
             }
         });
         if (oneOnOneRoom.matchFull()){
-            oneOnOneRoom.nextMatch = [];
             startOneOnOneMatch(oneOnOneRoom.getMatch());
         }else{
             oneOnOneRoom.nextMatch = [];
@@ -104,6 +106,9 @@ const searchPlayersToOneOnOne = async () =>{
 
 const startOneOnOneMatch = async (arrOfTwo) => {
     const roomName = ROOMS.randomValue(5);
+    if (!arrOfTwo){
+        return;
+    }
     const user1 = JSON.parse(JSON.stringify(arrOfTwo[0]));
     const user2 = JSON.parse(JSON.stringify(arrOfTwo[1]));
     const room = new Room({
