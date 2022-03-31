@@ -55,15 +55,18 @@ exports.socketMiddleware = (socket, data, fn) =>{
             decodedToken = jwt.verify(token, process.env.SIGNING_SECRET)
         }
         catch (e) {
+            socket.emit(EVENTS.AUTOLOGINFAILED(), { event: EVENTS.AUTOLOGINFAILED() })
             return null;
         }
         if (!decodedToken) {
+            socket.emit(EVENTS.AUTOLOGINFAILED(), { event: EVENTS.AUTOLOGINFAILED() })
             return null;
         }
         data.data = decodedToken.user;
         return fn(socket, data)
 
     } else {
+        socket.emit(EVENTS.AUTOLOGINFAILED(), { event: EVENTS.AUTOLOGINFAILED()})
         return null;
     }
 }

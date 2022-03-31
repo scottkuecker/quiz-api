@@ -99,12 +99,18 @@ const acceptOponent = (socketIo, socket, data) =>{
 //SOCKETS EVENTS
 
 exports.setupListeners = () =>{
+
     const socketIo = socketCon.getIO();
     TOURNAMENT.setIOReady();
     TOURNAMENT.startListeningOneOnOne(socketIo);
+
     socketIo.on('connection', socket =>{
+
         const oneOnOneRoom = TOURNAMENT.getoneOnOneRoom();
         oneOnOneRoom.onlineUsers++;
+        console.log('new connection')
+
+        socket.emit(EVENTS.AUTOLOGIN_AVAILABLE(), {event: EVENTS.AUTOLOGIN_AVAILABLE()})
         socketIo.emit(EVENTS.ONLINE_USERS_COUNT(), { event: EVENTS.ONLINE_USERS_COUNT(), online: oneOnOneRoom.onlineUsers })
         socket.on('disconnect', (data) => {
             oneOnOneRoom.onlineUsers--;
