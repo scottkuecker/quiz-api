@@ -11,7 +11,7 @@ var IO;
 var oneOnOneRoom = {
     oneOnOneUsers: [],
     nextMatch: [],
-    onlineUsers: Math.floor(Math.random() * 10),
+    onlineUsers: 11 + Math.floor(Math.random() * 10),
     leave: function (id) {
         this.oneOnOneUsers = this.oneOnOneUsers.filter(user => user._id !== id)
     },
