@@ -11,13 +11,11 @@ var IO;
 var oneOnOneRoom = {
     oneOnOneUsers: [],
     nextMatch: [],
-    onlineUsers: 0,
+    onlineUsers: Math.floor(Math.random() * 10),
     leave: function (id) {
-        this.onlineUsers--;
         this.oneOnOneUsers = this.oneOnOneUsers.filter(user => user._id !== id)
     },
     join: function (user) {
-        this.onlineUsers++;
         const allreadyIn = this.nextMatch.find(u => u._id === user._id);
         if (allreadyIn){
             return;
@@ -68,8 +66,6 @@ var oneOnOneRoom = {
         return this.nextMatch.length > 1;
     }
 }
-var interval = null;
-var counter = 0;
 
 
 const getRandomNumber = (quantity) => {
@@ -88,25 +84,19 @@ exports.decreaseOnlineUsers = () => {
 
 const searchPlayersToOneOnOne = async () =>{
     if (oneOnOneRoom.potentialMatch() && !oneOnOneRoom.matchFull()){
-        console.log(oneOnOneRoom.potentialMatch(), !oneOnOneRoom.matchFull())
-        counter++
-        console.log("counter: " + counter)
         oneOnOneRoom.oneOnOneUsers.forEach((user, index) =>{
             if(!oneOnOneRoom.matchFull()){
                 oneOnOneRoom.joinForNextMatch(user)
             }
         });
         if (oneOnOneRoom.matchFull()){
-            console.log('starting match')
             oneOnOneRoom.nextMatch = [];
             startOneOnOneMatch(oneOnOneRoom.getMatch());
         }else{
             oneOnOneRoom.nextMatch = [];
-            console.log('inner else happens')
             this.startListeningOneOnOne();
         }
     }else{
-        console.log('else happens')
         this.startListeningOneOnOne();
     }
     

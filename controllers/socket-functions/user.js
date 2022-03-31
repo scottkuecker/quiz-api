@@ -98,3 +98,198 @@ exports.updateSettings = async (socket, data) =>{
         return socket.emit(EVENTS.REMOVE_NOTIFICATION(), {event: EVENTS.REMOVE_NOTIFICATION(), data: user, success: true})
     }
 }
+
+
+exports.generateBots = async () => {
+    const bot1 = new User({
+        email: 'bot1@kviz-live.com',
+        password: 'none',
+        name: 'Jakov Ilic',
+        title: 'Pocetnik 1',
+        score: 3,
+        lives: 3,
+        tickets: 10,
+        roles: ['USER', 'BOT'],
+        achievements: [],
+        room: '',
+        online: true,
+        socket: 'bot_1_fake_socket',
+        is_bot:true,
+        avatar_url: 'https://i.pinimg.com/474x/0a/42/7f/0a427f8c57082a1d1f0da6538acabf32--funny-animal-faces-hilarious-animals.jpg',
+        questions: [],
+        allready_answered: []
+    });
+    const bot2 = new User({
+        email: 'bot2@kviz-live.com',
+        password: 'none',
+        name: 'Anica stanica',
+        title: 'Pocetnik 2',
+        score: 5,
+        lives: 3,
+        tickets: 10,
+        roles: ['USER', 'BOT'],
+        achievements: [],
+        room: '',
+        online: true,
+        socket: 'bot_2_fake_socket',
+        is_bot: true,
+        avatar_url: 'https://firebasestorage.googleapis.com/v0/b/kviz-live.appspot.com/o/1642193033985png-transparent-computer-icons-avatar-user-profile-avatar-heroes-rectangle-black.png?alt=media',
+        questions: [],
+        allready_answered: []
+    });
+    const bot3 = new User({
+        email: 'bot3@kviz-live.com',
+        password: 'none',
+        name: 'Frizider Vucic',
+        title: 'Pocetnik 3',
+        score: 6,
+        lives: 3,
+        tickets: 10,
+        roles: ['USER', 'BOT'],
+        achievements: [],
+        room: '',
+        online: true,
+        socket: 'bot_3_fake_socket',
+        is_bot: true,
+        avatar_url: 'https://www.nedeljnik.rs/wp-content/uploads/2020/01/Vucic-Tan2019-12-31_105040123_2.jpg',
+        questions: [],
+        allready_answered: []
+    });
+    const bot4 = new User({
+        email: 'bot4@kviz-live.com',
+        password: 'none',
+        name: 'Lana',
+        title: 'Pocetnik 4',
+        score: 9,
+        lives: 3,
+        tickets: 10,
+        roles: ['USER', 'BOT'],
+        achievements: [],
+        room: '',
+        online: true,
+        socket: 'bot_4_fake_socket',
+        is_bot: true,
+        avatar_url: 'https://firebasestorage.googleapis.com/v0/b/kviz-live.appspot.com/o/1642193033985png-transparent-computer-icons-avatar-user-profile-avatar-heroes-rectangle-black.png?alt=media',
+        questions: [],
+        allready_answered: []
+    });
+    const bot5 = new User({
+        email: 'bot5@kviz-live.com',
+        password: 'none',
+        name: 'Danilo',
+        title: 'Pocetnik 5',
+        score: 16,
+        lives: 3,
+        tickets: 10,
+        roles: ['USER', 'BOT'],
+        achievements: [],
+        room: '',
+        online: true,
+        socket: 'bot_5_fake_socket',
+        is_bot: true,
+        avatar_url: 'https://ae01.alicdn.com/kf/HTB1619iNpXXXXXJaXXXq6xXFXXXG/small-cute-simulation-cat-polyethylene-fur-lovely-cat-model-in-a-basket-gift-about-12x10cm116.jpg_Q90.jpg_.webp',
+        questions: [],
+        allready_answered: []
+    });
+    const bot6 = new User({
+        email: 'bot6@kviz-live.com',
+        password: 'none',
+        name: 'Konstantin',
+        title: 'Pocetnik 6',
+        score: 17,
+        lives: 3,
+        tickets: 10,
+        roles: ['USER', 'BOT'],
+        achievements: [],
+        room: '',
+        online: true,
+        socket: 'bot_6_fake_socket',
+        is_bot: true,
+        avatar_url: 'https://beoshoppingcenter.rs/wp-content/uploads/2020/02/konstantin.jpg',
+        questions: [],
+        allready_answered: []
+    });
+    const bot7 = new User({
+        email: 'bot7@kviz-live.com',
+        password: 'none',
+        name: 'Matija',
+        title: 'Pocetnik 7',
+        score: 19,
+        lives: 3,
+        tickets: 10,
+        roles: ['USER', 'BOT'],
+        achievements: [],
+        room: '',
+        online: true,
+        socket: 'bot_7_fake_socket',
+        is_bot: true,
+        avatar_url: 'https://bigsee.eu/wp-content/uploads/2019/10/matijacop-portret.jpg',
+        questions: [],
+        allready_answered: []
+    });
+    const bot8 = new User({
+        email: 'bot8@kviz-live.com',
+        password: 'none',
+        name: 'Iskra',
+        title: 'Pocetnik 8',
+        score: 22,
+        lives: 3,
+        tickets: 10,
+        roles: ['USER', 'BOT'],
+        achievements: [],
+        room: '',
+        online: true,
+        socket: 'bot_8_fake_socket',
+        is_bot: true,
+        avatar_url: 'https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/iskra-lawrence-scary-birth-labour-story-details-new-baby-picture-1587725217.jpg',
+        questions: [],
+        allready_answered: []
+    });
+    const bot9 = new User({
+        email: 'bot9@kviz-live.com',
+        password: 'none',
+        name: 'El Preto',
+        title: 'Pocetnik 9',
+        score: 37,
+        lives: 3,
+        tickets: 10,
+        roles: ['USER', 'BOT'],
+        achievements: [],
+        room: '',
+        online: true,
+        socket: 'bot_9_fake_socket',
+        is_bot: true,
+        avatar_url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQVFdxsxEbFoZdRatbWw0NhUZ9qix5QtBvdAw&usqp=CAU',
+        questions: [],
+        allready_answered: []
+    });
+    const bot10 = new User({
+        email: 'bot10@kviz-live.com',
+        password: 'none',
+        name: 'Haus aus Papier',
+        title: 'Pocetnik 10',
+        score: 49,
+        lives: 3,
+        tickets: 10,
+        roles: ['USER', 'BOT'],
+        achievements: [],
+        room: '',
+        online: true,
+        socket: 'bot_10_fake_socket',
+        is_bot: true,
+        avatar_url: 'http://dzabaletan.com/wp-content/uploads/2019/09/La-Casa-de-Papel.jpg',
+        questions: [],
+        allready_answered: []
+    });
+    await bot1.save();
+    await bot2.save();
+    await bot3.save();
+    await bot4.save();
+    await bot5.save();
+    await bot6.save();
+    await bot7.save();
+    await bot8.save();
+    await bot9.save();
+    await bot10.save();
+    console.log('finished with bots')
+}

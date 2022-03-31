@@ -101,14 +101,13 @@ const acceptOponent = (socketIo, socket, data) =>{
 exports.setupListeners = () =>{
     const socketIo = socketCon.getIO();
     TOURNAMENT.setIOReady();
-    console.log('SETUP HAPPENS')
     TOURNAMENT.startListeningOneOnOne(socketIo);
     socketIo.on('connection', socket =>{
-        console.log('connections')
         const oneOnOneRoom = TOURNAMENT.getoneOnOneRoom();
+        oneOnOneRoom.onlineUsers++;
         socketIo.emit(EVENTS.ONLINE_USERS_COUNT(), { event: EVENTS.ONLINE_USERS_COUNT(), online: oneOnOneRoom.onlineUsers })
         socket.on('disconnect', (data) => {
-            console.log(EVENTS.ONLINE_USERS_COUNT())
+            oneOnOneRoom.onlineUsers--;
             socketIo.emit(EVENTS.ONLINE_USERS_COUNT(), { event: EVENTS.ONLINE_USERS_COUNT(), online: oneOnOneRoom.onlineUsers})
             disconectSocket(socketIo, socket);
         })
