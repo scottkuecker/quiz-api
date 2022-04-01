@@ -139,36 +139,36 @@ exports.joinOneOnOneDBRoom = async (socket, data) => {
     });
     socket.join(`${data.user_id}`)
 
-    if (room && room.allow_enter) {
-        const haveUser = room.users.some(user => user.id === null || user.id === data.user_id);
-        user.room = data.roomName;
-        user.socket = socket.id;
-        await user.save();
-        if (!haveUser) {
-            room.users.push({
-                name: data.name,
-                id: data.user_id,
-                score: 0,
-                answered: false,
-                avatar: data.avatar,
-            });
-        }
-        const result = await room.save();
-        if (result) {
-            result.success = true;
-            socket.join(`${data.roomName}`);
-            if (room.users.length > 1) {
-                this.startDBTournament(io, socket, data);
-            }
+    // if (room && room.allow_enter) {
+    //     const haveUser = room.users.some(user => user.id === null || user.id === data.user_id);
+    //     user.room = data.roomName;
+    //     user.socket = socket.id;
+    //     await user.save();
+    //     if (!haveUser) {
+    //         room.users.push({
+    //             name: data.name,
+    //             id: data.user_id,
+    //             score: 0,
+    //             answered: false,
+    //             avatar: data.avatar,
+    //         });
+    //     }
+    //     const result = await room.save();
+    //     if (result) {
+    //         result.success = true;
+    //         socket.join(`${data.roomName}`);
+    //         if (room.users.length > 1) {
+    //             this.startDBTournament(io, socket, data);
+    //         }
 
-        }
-    } else {
-        socket.emit(EVENTS.ROOM_DONT_EXIST(), {
-            event: EVENTS.ROOM_DONT_EXIST(),
-            fn: 'joinDBRoom'
-        });
-    }
-    return response;
+    //     }
+    // } else {
+    //     socket.emit(EVENTS.ROOM_DONT_EXIST(), {
+    //         event: EVENTS.ROOM_DONT_EXIST(),
+    //         fn: 'joinDBRoom'
+    //     });
+    // }
+    // return response;
 }
 exports.joinOneOnOne = async (socket, userAndRoom) => {
     const io = TOURNAMENT.getIO()

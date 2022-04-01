@@ -98,3 +98,198 @@ exports.updateSettings = async (socket, data) =>{
         return socket.emit(EVENTS.REMOVE_NOTIFICATION(), {event: EVENTS.REMOVE_NOTIFICATION(), data: user, success: true})
     }
 }
+
+
+exports.generateBots = async () => {
+    const bot1 = new User({
+        email: 'bot1@kviz-live.com',
+        password: 'none',
+        name: 'Jakov Ilic',
+        title: 'Pocetnik 1',
+        score: 12,
+        lives: 3,
+        tickets: 10,
+        roles: ['USER', 'BOT'],
+        achievements: [],
+        room: '',
+        online: true,
+        socket: 'bot_1_fake_socket',
+        is_bot:true,
+        avatar_url: 'https://firebasestorage.googleapis.com/v0/b/kviz-live.appspot.com/o/1642193033985png-transparent-computer-icons-avatar-user-profile-avatar-heroes-rectangle-black.png?alt=media',
+        questions: [],
+        allready_answered: []
+    });
+    const bot2 = new User({
+        email: 'bot2@kviz-live.com',
+        password: 'none',
+        name: 'Anica stanica',
+        title: 'Pocetnik 2',
+        score: 12,
+        lives: 3,
+        tickets: 10,
+        roles: ['USER', 'BOT'],
+        achievements: [],
+        room: '',
+        online: true,
+        socket: 'bot_2_fake_socket',
+        is_bot: true,
+        avatar_url: 'https://firebasestorage.googleapis.com/v0/b/kviz-live.appspot.com/o/1642193033985png-transparent-computer-icons-avatar-user-profile-avatar-heroes-rectangle-black.png?alt=media',
+        questions: [],
+        allready_answered: []
+    });
+    const bot3 = new User({
+        email: 'bot3@kviz-live.com',
+        password: 'none',
+        name: 'Frizider Vucic',
+        title: 'Pocetnik 3',
+        score: 12,
+        lives: 3,
+        tickets: 10,
+        roles: ['USER', 'BOT'],
+        achievements: [],
+        room: '',
+        online: true,
+        socket: 'bot_3_fake_socket',
+        is_bot: true,
+        avatar_url: 'https://firebasestorage.googleapis.com/v0/b/kviz-live.appspot.com/o/1642193033985png-transparent-computer-icons-avatar-user-profile-avatar-heroes-rectangle-black.png?alt=media',
+        questions: [],
+        allready_answered: []
+    });
+    const bot4 = new User({
+        email: 'bot4@kviz-live.com',
+        password: 'none',
+        name: 'Lana',
+        title: 'Pocetnik 4',
+        score: 12,
+        lives: 3,
+        tickets: 10,
+        roles: ['USER', 'BOT'],
+        achievements: [],
+        room: '',
+        online: true,
+        socket: 'bot_4_fake_socket',
+        is_bot: true,
+        avatar_url: 'https://firebasestorage.googleapis.com/v0/b/kviz-live.appspot.com/o/1642193033985png-transparent-computer-icons-avatar-user-profile-avatar-heroes-rectangle-black.png?alt=media',
+        questions: [],
+        allready_answered: []
+    });
+    const bot5 = new User({
+        email: 'bot5@kviz-live.com',
+        password: 'none',
+        name: 'Danilo',
+        title: 'Pocetnik 5',
+        score: 12,
+        lives: 3,
+        tickets: 10,
+        roles: ['USER', 'BOT'],
+        achievements: [],
+        room: '',
+        online: true,
+        socket: 'bot_5_fake_socket',
+        is_bot: true,
+        avatar_url: 'https://firebasestorage.googleapis.com/v0/b/kviz-live.appspot.com/o/1642193033985png-transparent-computer-icons-avatar-user-profile-avatar-heroes-rectangle-black.png?alt=media',
+        questions: [],
+        allready_answered: []
+    });
+    const bot6 = new User({
+        email: 'bot6@kviz-live.com',
+        password: 'none',
+        name: 'Konstantin',
+        title: 'Pocetnik 6',
+        score: 12,
+        lives: 3,
+        tickets: 10,
+        roles: ['USER', 'BOT'],
+        achievements: [],
+        room: '',
+        online: true,
+        socket: 'bot_6_fake_socket',
+        is_bot: true,
+        avatar_url: 'https://firebasestorage.googleapis.com/v0/b/kviz-live.appspot.com/o/1642193033985png-transparent-computer-icons-avatar-user-profile-avatar-heroes-rectangle-black.png?alt=media',
+        questions: [],
+        allready_answered: []
+    });
+    const bot7 = new User({
+        email: 'bot7@kviz-live.com',
+        password: 'none',
+        name: 'Matija',
+        title: 'Pocetnik 7',
+        score: 12,
+        lives: 3,
+        tickets: 10,
+        roles: ['USER', 'BOT'],
+        achievements: [],
+        room: '',
+        online: true,
+        socket: 'bot_7_fake_socket',
+        is_bot: true,
+        avatar_url: 'https://firebasestorage.googleapis.com/v0/b/kviz-live.appspot.com/o/1642193033985png-transparent-computer-icons-avatar-user-profile-avatar-heroes-rectangle-black.png?alt=media',
+        questions: [],
+        allready_answered: []
+    });
+    const bot8 = new User({
+        email: 'bot8@kviz-live.com',
+        password: 'none',
+        name: 'Iskra',
+        title: 'Pocetnik 8',
+        score: 12,
+        lives: 3,
+        tickets: 10,
+        roles: ['USER', 'BOT'],
+        achievements: [],
+        room: '',
+        online: true,
+        socket: 'bot_8_fake_socket',
+        is_bot: true,
+        avatar_url: 'https://firebasestorage.googleapis.com/v0/b/kviz-live.appspot.com/o/1642193033985png-transparent-computer-icons-avatar-user-profile-avatar-heroes-rectangle-black.png?alt=media',
+        questions: [],
+        allready_answered: []
+    });
+    const bot9 = new User({
+        email: 'bot9@kviz-live.com',
+        password: 'none',
+        name: 'El Preto',
+        title: 'Pocetnik 9',
+        score: 12,
+        lives: 3,
+        tickets: 10,
+        roles: ['USER', 'BOT'],
+        achievements: [],
+        room: '',
+        online: true,
+        socket: 'bot_9_fake_socket',
+        is_bot: true,
+        avatar_url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQVFdxsxEbFoZdRatbWw0NhUZ9qix5QtBvdAw&usqp=CAU',
+        questions: [],
+        allready_answered: []
+    });
+    const bot10 = new User({
+        email: 'bot10@kviz-live.com',
+        password: 'none',
+        name: 'Haus aus Papier',
+        title: 'Pocetnik 10',
+        score: 12,
+        lives: 3,
+        tickets: 10,
+        roles: ['USER', 'BOT'],
+        achievements: [],
+        room: '',
+        online: true,
+        socket: 'bot_10_fake_socket',
+        is_bot: true,
+        avatar_url: 'http://dzabaletan.com/wp-content/uploads/2019/09/La-Casa-de-Papel.jpg',
+        questions: [],
+        allready_answered: []
+    });
+    await bot1.save();
+    await bot2.save();
+    await bot3.save();
+    await bot4.save();
+    await bot5.save();
+    await bot6.save();
+    await bot7.save();
+    await bot8.save();
+    await bot9.save();
+    await bot10.save();
+    console.log('finished with bots')
+}

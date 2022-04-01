@@ -299,6 +299,14 @@ exports.AUTOLOGIN = () => 'AUTOLOGIN';
 
 
 /**
+* @description As soon as connection is established notify user to emit autologin
+* @common_data_to_send {event: 'AUTOLOGIN_AVAILABLE'}
+* @returns EVENT STRING
+*/
+exports.AUTOLOGIN_AVAILABLE = () => 'AUTOLOGIN_AVAILABLE';
+
+
+/**
 * @description Emits login requests
 * @common_data_to_send {event: 'LOGIN', data: User}
 * @returns EVENT STRING

@@ -11,34 +11,81 @@ var IO;
 var oneOnOneRoom = {
     oneOnOneUsers: [],
     nextMatch: [],
-    onlineUsers: 0,
+    onlineUsers: 11 + Math.floor(Math.random() * 10),
     leave: function (id) {
         this.oneOnOneUsers = this.oneOnOneUsers.filter(user => user._id !== id)
+        this.update()
     },
     join: function (user) {
         const allreadyIn = this.nextMatch.find(u => u._id === user._id);
         if (allreadyIn){
+            this.update()
             return;
         }
         this.oneOnOneUsers.push(user)
+        this.update()
+    },
+    block: function (myId, oponentId){
+        const me = this.oneOnOneUsers.find(user => user._id === myId);
+        if(me){
+            me.priority = this.oneOnOneUsers.length + 1;
+            this.leave(me._id);
+            this.join(me);
+            me.blocked.push(oponentId);
+            this.declineMatch(me._id)
+        }
+        this.update()
     },
     joinForNextMatch: function (user){
+        user.playing = false;
         this.nextMatch.push(user)
+        this.update()
     },
     getMatch: function(){
         const match = JSON.parse(JSON.stringify(this.nextMatch));
+        if(!match.length && match.length < 2){
+            this.update()
+            return;
+        }
+        this.oneOnOneUsers.forEach(user =>{
+            if (user._id === match[0]._id || user._id === match[1]._id){
+                user.playing = true;
+            } 
+        });
         this.nextMatch = [];
-        this.leave(match[0]._id);
-        this.leave(match[1]._id);
+        this.update()
         return match;
     },
+    declineMatch: function (id){
+        this.nextMatch = this.nextMatch.filter(user => user._id !== id);
+        this.update()
+    },
     matchPosible: function (){
-        console.log(this.oneOnOneUsers.length)
-        return this.oneOnOneUsers.length > 1;
+       if(this.nextMatch.length > 1 && this.nextMatch.every(user => user.playing === false)){
+           if (this.nextMatch[0].blocked.includes(this.nextMatch[1]._id)){
+            this.update()
+               return false;
+           }else{
+            this.update()
+               return true;
+           }
+       }else{   
+        this.update()
+           return false;
+       }
+    },
+    potentialMatch: function (){
+        const test = this.oneOnOneUsers.filter(user => user.playing !== true)
+        this.update()
+        return test.length > 1
+    },
+    matchFull: function(){
+        return this.nextMatch.length > 1;
+    },
+    update: function (){
+        IO.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: this})
     }
 }
-var interval = null;
-
 
 
 const getRandomNumber = (quantity) => {
@@ -60,21 +107,30 @@ exports.decreaseOnlineUsers = () => {
 }
 
 const searchPlayersToOneOnOne = async () =>{
-    if (oneOnOneRoom.matchPosible()){
+    if (oneOnOneRoom.potentialMatch() && !oneOnOneRoom.matchFull()){
         oneOnOneRoom.oneOnOneUsers.forEach((user, index) =>{
-            if(index === 0 || index === 1){
+            if(!oneOnOneRoom.matchFull()){
                 oneOnOneRoom.joinForNextMatch(user)
             }
         });
-        clearInterval(interval);
-        startOneOnOneMatch(oneOnOneRoom.getMatch());
+        if (oneOnOneRoom.matchFull()){
+            console.log(oneOnOneRoom.nextMatch)
+            startOneOnOneMatch(oneOnOneRoom.getMatch());
+        }else{
+            oneOnOneRoom.nextMatch = [];
+            this.startListeningOneOnOne();
+        }
+    }else{
+        this.startListeningOneOnOne();
     }
     
 }
 
 const startOneOnOneMatch = async (arrOfTwo) => {
-    console.log(arrOfTwo)
     const roomName = ROOMS.randomValue(5);
+    if (!arrOfTwo){
+        return;
+    }
     const user1 = JSON.parse(JSON.stringify(arrOfTwo[0]));
     const user2 = JSON.parse(JSON.stringify(arrOfTwo[1]));
     const room = new Room({
@@ -85,15 +141,18 @@ const startOneOnOneMatch = async (arrOfTwo) => {
         created_by: 'SERVER'
     });
     await room.save();
-    IO.in(user1._id.toString()).emit(EVENTS.MATCH_FOUND(), {event: EVENTS.MATCH_FOUND(), me: arrOfTwo[0], oponent: arrOfTwo[1], roomName })
-    IO.in(user2._id.toString()).emit(EVENTS.MATCH_FOUND(), {event: EVENTS.MATCH_FOUND(), me: arrOfTwo[1], oponent: arrOfTwo[0], roomName })
-    this.startListeningOneOnOne();
+    console.log(roomName)
+    IO.in(user1._id.toString()).emit(EVENTS.MATCH_FOUND(), { event: EVENTS.MATCH_FOUND(), me: user1, oponent: user2, roomName })
+    IO.in(user2._id.toString()).emit(EVENTS.MATCH_FOUND(), { event: EVENTS.MATCH_FOUND(), me: user2, oponent: user1, roomName })
+    searchPlayersToOneOnOne();
     return true;
     
 }
 
 exports.startListeningOneOnOne = () =>{
-    interval = setInterval(searchPlayersToOneOnOne, 6000);
+    setTimeout(() =>{
+        searchPlayersToOneOnOne()
+    }, 6000)
 }
 
 exports.getoneOnOneRoom = () => {
@@ -205,6 +264,8 @@ exports.checkDBTournamentQuestion = async (io, socket, data) => {
 
 
 exports.declineOponent = (io, socket, data) => {
+    oneOnOneRoom.block(data.user_id, data.oponent_id);
+    
     socket.emit(EVENTS.OPONENT_DECLINED(), { event: EVENTS.OPONENT_DECLINED() })
 }
 
@@ -237,9 +298,10 @@ exports.createOneOnOneUsers = async (usersArr) =>{
 }
 
 exports.acceptDBOponent = async (io, socket, data) => {
+    console.log('joined: ' + data.roomName)
     socket.join(data.roomName);
-    io.in(data.oponent._id).emit(EVENTS.OPONENT_ACCEPTED(), { event: EVENTS.OPONENT_ACCEPTED(), success: true })
-    const room = await io.in(data.roomName).allSockets();
+    IO.in(data.oponent._id).emit(EVENTS.OPONENT_ACCEPTED(), { event: EVENTS.OPONENT_ACCEPTED(), success: true })
+    const room = await IO.in(data.roomName).allSockets();
     if(room.size === 2){
         const users = await this.createOneOnOneUsers([data.me, data.oponent])
         await QUESTIONS.generateRoomQuestions(data.roomName, 2, users);

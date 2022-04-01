@@ -96,9 +96,11 @@ const acceptOponent = (socketIo, socket, data) =>{
 //SOCKETS EVENTS
 
 exports.setupListeners = () =>{
+
     const socketIo = socketCon.getIO();
     TOURNAMENT.setIOReady();
     TOURNAMENT.startListeningOneOnOne(socketIo);
+
     socketIo.on('connection', socket =>{
         const oneOnOneRoom = TOURNAMENT.getoneOnOneRoom();
         oneOnOneRoom.onlineUsers++;

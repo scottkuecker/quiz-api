@@ -37,6 +37,7 @@ const userSchema = new Schema({
     room: String,
     online: Boolean,
     socket: String,
+    is_bot: { type: Boolean, required: false, default: false},
     reset_password_token: {type: String, required: false, default: null},
     lives_reset_timer_set: {type: Boolean, required: false, default: false},
     reset_lives_at: { type: Number, required: false, default: null },
