@@ -13,11 +13,9 @@ var oneOnOneRoom = {
     nextMatch: [],
     onlineUsers: 0,
     leave: function (id) {
-        this.onlineUsers--;
         this.oneOnOneUsers = this.oneOnOneUsers.filter(user => user._id !== id)
     },
     join: function (user) {
-        this.onlineUsers++;
         const allreadyIn = this.nextMatch.find(u => u._id === user._id);
         if (allreadyIn){
             return;
@@ -50,6 +48,10 @@ const getRandomNumber = (quantity) => {
 
 exports.setIOReady = () => {
     IO = socketCon.getIO();
+}
+
+exports.getIO = () => {
+    return IO;
 }
 
 exports.increaseOnlineUsers = () => {
@@ -91,7 +93,7 @@ const startOneOnOneMatch = async (arrOfTwo) => {
 }
 
 exports.startListeningOneOnOne = () =>{
-    interval = setInterval(searchPlayersToOneOnOne, 3000);
+    interval = setInterval(searchPlayersToOneOnOne, 6000);
 }
 
 exports.getoneOnOneRoom = () => {
