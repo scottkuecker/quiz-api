@@ -112,42 +112,42 @@ exports.setupListeners = () =>{
         })
 
         socket.on(EVENTS.DISCONNECT_USER(), (data) => {
-            socketIo.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: TOURNAMENT.getoneOnOneRoom()})
+            
             disconectSocket(socketIo, socket);
         });
 
         socket.on(EVENTS.INVITE_FRIENDS(), (data) => {
-            socketIo.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: TOURNAMENT.getoneOnOneRoom()})
+            
             FRIEND_REQUESTS.inviteFriends(socketIo, socket, data);
         });
 
         socket.on(EVENTS.LEAVE_ONE_ON_ONE(), (data) => {
-            socketIo.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: TOURNAMENT.getoneOnOneRoom()})
+            
             leaveOneOnOne(socketIo, socket, data);
         });
 
         socket.on(EVENTS.TRACK_ONE_ON_ONE(), (data) => {
             console.log('GOT TRACK EVENT')
-            socketIo.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: TOURNAMENT.getoneOnOneRoom()})
+            
         });
 
         socket.on(EVENTS.OPONENT_ACCEPTED(), (data) => {
-            socketIo.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: TOURNAMENT.getoneOnOneRoom()})
+            
             acceptOponent(socketIo, socket, data);
         });
 
         socket.on(EVENTS.OPONENT_DECLINED(), (data) => {
-            socketIo.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: TOURNAMENT.getoneOnOneRoom()})
+            
             TOURNAMENT.declineOponent(socketIo, socket, data);
         });
 
         socket.on(EVENTS.CREATE_ROOM(), (userData) =>{
-            socketIo.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: TOURNAMENT.getoneOnOneRoom()})
+            
             ROOMS.createRoom(socket, userData);
         });
 
         socket.on(EVENTS.SAVE_SOCKET(), (userData) => {
-            socketIo.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: TOURNAMENT.getoneOnOneRoom()})
+            
             saveSocket(socketIo, socket, userData);
         });
 
@@ -156,135 +156,135 @@ exports.setupListeners = () =>{
         })
 
         socket.on(EVENTS.JOIN_ROOM(), userAndRoom =>{
-            socketIo.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: TOURNAMENT.getoneOnOneRoom()})
+            
             midleware.socketMiddleware(socket, userAndRoom, ROOMS.joinDBRoom);
         })
 
         socket.on(EVENTS.LEAVE_ROOM(), userAndRoom =>{
-            socketIo.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: TOURNAMENT.getoneOnOneRoom()})
+            
             leaveRoom(socketIo, socket, userAndRoom)
         })
 
         socket.on(EVENTS.START_TOURNAMENT(), data =>{
-            socketIo.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: TOURNAMENT.getoneOnOneRoom()})
+            
             startTournament(socketIo, socket, data)
         })
 
         socket.on(EVENTS.SELECTED_QUESTION_LETTER(), data =>{
-            socketIo.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: TOURNAMENT.getoneOnOneRoom()})
+            
             checkTournamentQuestion(socketIo, socket, data)
         })
 
         socket.on(EVENTS.GET_ROOM_QUESTION(), data =>{
-            socketIo.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: TOURNAMENT.getoneOnOneRoom()})
+            
             getQuestion(socket, data)
         })
 
         socket.on(EVENTS.GET_ROOM_RESULTS(), data => {
-            socketIo.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: TOURNAMENT.getoneOnOneRoom()})
+            
             getRoomResults(socket, data)
         })
 
         socket.on(EVENTS.CLEAN_THE_EMPTY_ROOMS(), data => {
-            socketIo.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: TOURNAMENT.getoneOnOneRoom()})
+            
             ROOMS.cleanRooms()
         })
 
         socket.on(EVENTS.ADD_FRIEND(), data => {
-            socketIo.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: TOURNAMENT.getoneOnOneRoom()})
+            
             addFriend(socket, data)
         })
 
         socket.on(EVENTS.ACCEPT_FRIEND(), data => {
-            socketIo.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: TOURNAMENT.getoneOnOneRoom()})
+            
             acceptFriend(socket, data)
         });
 
         socket.on(EVENTS.REFRESH_USER(), data => {
-            socketIo.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: TOURNAMENT.getoneOnOneRoom()})
+            
             midleware.socketMiddleware(socket, data, AUTH.refresh)
         })
         socket.on(EVENTS.AUTOLOGIN(), async data => {
-            socketIo.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: TOURNAMENT.getoneOnOneRoom()})
+            
             midleware.socketMiddleware(socket, data, AUTH.autoLogin);
         });
         socket.on(EVENTS.LOGIN(), async data => {
-            socketIo.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: TOURNAMENT.getoneOnOneRoom()})
+            
             AUTH.login(socket, data);
         });
         socket.on(EVENTS.REGISTER(), async data => {
-            socketIo.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: TOURNAMENT.getoneOnOneRoom()})
+            
             AUTH.signUp(socket, data)
         })
         socket.on(EVENTS.GET_ALL_USERS(), async data => {
-            socketIo.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: TOURNAMENT.getoneOnOneRoom()})
+            
             midleware.socketMiddleware(socket, data, FRIEND_REQUESTS.searchUsers);
         });
 
         socket.on(EVENTS.GET_FRIEND_LIST(), async data => {
-            socketIo.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: TOURNAMENT.getoneOnOneRoom()})
+            
             midleware.socketMiddleware(socket, data, FRIEND_REQUESTS.getFriendList)
         });
 
         socket.on(EVENTS.GET_FRIEND_REQUESTS(), async data => {
-            socketIo.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: TOURNAMENT.getoneOnOneRoom()})
+            
             midleware.socketMiddleware(socket, data, FRIEND_REQUESTS.getFriendRequests)
         })
 
         socket.on(EVENTS.REMOVE_FRIEND(), async data => {
-            socketIo.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: TOURNAMENT.getoneOnOneRoom()})
+            
             midleware.socketMiddleware(socket, data, FRIEND_REQUESTS.removeFriend)
         })
         socket.on(EVENTS.ADD_QUESTION(), async data => {
-            socketIo.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: TOURNAMENT.getoneOnOneRoom()})
+            
             midleware.socketMiddleware(socket, data, QUESTIONS.addQuestion)
         })
         socket.on(EVENTS.GET_QUESTIONS(), async data => {
-            socketIo.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: TOURNAMENT.getoneOnOneRoom()})
+            
             midleware.socketMiddleware(socket, data, QUESTIONS.getAllQuestions)
         })
         socket.on(EVENTS.GET_RANKING_LIST(), async data => {
-            socketIo.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: TOURNAMENT.getoneOnOneRoom()})
+            
             midleware.socketMiddleware(socket, data, USERS.getRankingList)
         })
         socket.on(EVENTS.GET_DAILY_REWARD(), async data => {
-            socketIo.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: TOURNAMENT.getoneOnOneRoom()})
+            
             midleware.socketMiddleware(socket, data, USERS.resetDailyPrice)
         })
         socket.on(EVENTS.RESET_PLAYING_STATE(), async data => {
-            socketIo.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: TOURNAMENT.getoneOnOneRoom()})
+            
             midleware.socketMiddleware(socket, data, USERS.resetPlayingState)
         })
         socket.on(EVENTS.RESET_LIVES(), async data => {
-            socketIo.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: TOURNAMENT.getoneOnOneRoom()})
+            
             midleware.socketMiddleware(socket, data, USERS.resetLives)
         })
         socket.on(EVENTS.UPDATE_SCORE(), async data => {
-            socketIo.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: TOURNAMENT.getoneOnOneRoom()})
+            
             midleware.socketMiddleware(socket, data, USERS.updateScore)
         })
         socket.on(EVENTS.UPDATE_SETTINGS(), async data => {
-            socketIo.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: TOURNAMENT.getoneOnOneRoom()})
+            
             midleware.socketMiddleware(socket, data, USERS.updateSettings)
         })
         socket.on(EVENTS.CHECK_QUESTION(), async data => {
-            socketIo.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: TOURNAMENT.getoneOnOneRoom()})
+            
             midleware.socketMiddleware(socket, data, QUESTIONS.checkQuestion)
         })
         socket.on(EVENTS.DELETE_QUESTION(), async data => {
-            socketIo.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: TOURNAMENT.getoneOnOneRoom()})
+            
             midleware.socketMiddleware(socket, data, QUESTIONS.deleteQuestion)
         })
         socket.on(EVENTS.REMOVE_NOTIFICATION(), async data => {
-            socketIo.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: TOURNAMENT.getoneOnOneRoom()})
+            
             midleware.socketMiddleware(socket, data, USERS.removeNotification)
         })
         socket.on(EVENTS.REDUCE_LIVES(), async data => {
-            socketIo.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: TOURNAMENT.getoneOnOneRoom()})
+            
             midleware.socketMiddleware(socket, data, QUESTIONS.reduceLives)
         })
         socket.on(EVENTS.GET_ACHIEVEMENTS(), async data => {
-            socketIo.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: TOURNAMENT.getoneOnOneRoom()})
+            
             midleware.socketMiddleware(socket, data, ACHIEVEMENTS.getAchievements)
         })
 

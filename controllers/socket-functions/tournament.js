@@ -14,16 +14,16 @@ var oneOnOneRoom = {
     onlineUsers: 11 + Math.floor(Math.random() * 10),
     leave: function (id) {
         this.oneOnOneUsers = this.oneOnOneUsers.filter(user => user._id !== id)
-        this.update()
+        
     },
     join: function (user) {
         const allreadyIn = this.nextMatch.find(u => u._id === user._id);
         if (allreadyIn){
-            this.update()
+            
             return;
         }
         this.oneOnOneUsers.push(user)
-        this.update()
+        
     },
     block: function (myId, oponentId){
         const me = this.oneOnOneUsers.find(user => user._id === myId);
@@ -34,17 +34,17 @@ var oneOnOneRoom = {
             me.blocked.push(oponentId);
             this.declineMatch(me._id)
         }
-        this.update()
+        
     },
     joinForNextMatch: function (user){
         user.playing = false;
         this.nextMatch.push(user)
-        this.update()
+        
     },
     getMatch: function(){
         const match = JSON.parse(JSON.stringify(this.nextMatch));
         if(!match.length && match.length < 2){
-            this.update()
+            
             return;
         }
         this.oneOnOneUsers.forEach(user =>{
@@ -53,30 +53,30 @@ var oneOnOneRoom = {
             } 
         });
         this.nextMatch = [];
-        this.update()
+        
         return match;
     },
     declineMatch: function (id){
         this.nextMatch = this.nextMatch.filter(user => user._id !== id);
-        this.update()
+        
     },
     matchPosible: function (){
        if(this.nextMatch.length > 1 && this.nextMatch.every(user => user.playing === false)){
            if (this.nextMatch[0].blocked.includes(this.nextMatch[1]._id)){
-            this.update()
+            
                return false;
            }else{
-            this.update()
+            
                return true;
            }
        }else{   
-        this.update()
+        
            return false;
        }
     },
     potentialMatch: function (){
         const test = this.oneOnOneUsers.filter(user => user.playing !== true)
-        this.update()
+        
         return test.length > 1
     },
     matchFull: function(){
