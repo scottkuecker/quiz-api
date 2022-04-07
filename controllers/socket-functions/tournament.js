@@ -95,7 +95,7 @@ const searchPlayersToOneOnOne = async () =>{
             }
         });
         if (oneOnOneRoom.matchFull()){
-            console.log(oneOnOneRoom.nextMatch)
+            // console.log(oneOnOneRoom.nextMatch)
             startOneOnOneMatch(oneOnOneRoom.getMatch());
         }else{
             oneOnOneRoom.nextMatch = [];
@@ -122,7 +122,6 @@ const startOneOnOneMatch = async (arrOfTwo) => {
         created_by: 'SERVER'
     });
     await room.save();
-    console.log(roomName)
     IO.in(user1._id.toString()).emit(EVENTS.MATCH_FOUND(), { event: EVENTS.MATCH_FOUND(), me: user1, oponent: user2, roomName })
     IO.in(user2._id.toString()).emit(EVENTS.MATCH_FOUND(), { event: EVENTS.MATCH_FOUND(), me: user2, oponent: user1, roomName })
     searchPlayersToOneOnOne();
@@ -279,13 +278,12 @@ exports.createOneOnOneUsers = async (usersArr) =>{
 }
 
 exports.acceptDBOponent = async (io, socket, data) => {
-    console.log('joined: ' + data.roomName)
     socket.join(data.roomName);
     IO.in(data.oponent._id).emit(EVENTS.OPONENT_ACCEPTED(), { event: EVENTS.OPONENT_ACCEPTED(), success: true })
     const room = await IO.in(data.roomName).allSockets();
     if(room.size === 2){
         const users = await this.createOneOnOneUsers([data.me, data.oponent])
-        await QUESTIONS.generateRoomQuestions(data.roomName, 2, users);
+        await QUESTIONS.generateRoomQuestions(data.roomName, 15, users);
         io.to(data.roomName).emit(EVENTS.BOTH_ACCEPTED(), { event: EVENTS.BOTH_ACCEPTED(), success: true })
     }
 }

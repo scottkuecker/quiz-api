@@ -17,6 +17,9 @@ exports.getDBQuestion = async (socket, data) => {
             fn: `getDBQuestion()|requestedRoom:${data.roomName}|respondedRoom: ${tournamentRoom.room_id}|allow: ${tournamentRoom.allow_enter}`
         });
     }
+    if (!tournamentRoom.questions[data.questionIndex]){
+        socket.emit(EVENTS.TOURNAMENT_FINISHED(), { event: EVENTS.TOURNAMENT_FINISHED(), data: null })
+    }
     socket.emit(EVENTS.GET_ROOM_QUESTION(), { event: EVENTS.GET_ROOM_QUESTION(), question: tournamentRoom.questions[data.questionIndex] })
     return true
 }
@@ -148,7 +151,6 @@ exports.getAllQuestions = async (socket, data) => {
     const id = data.data._id;
     const root = data.data.roles.some(role => role === 'ADMIN');
     const filter = data.filter;
-    console.log(id, root, filter)
     let questions;
     if (!filter) {
         if (root) {
