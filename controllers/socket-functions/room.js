@@ -50,10 +50,11 @@ exports.createDBRoom = async (socket, room, userData) => {
     return response;
 }
 
-exports.joinDBRoom = async (io, socket, userAndRoom) => {
+exports.joinDBRoom = async (socket, userAndRoom) => {
     if (userAndRoom.roomName === '1on1') {
-        return this.joinOneOnOne(io, socket, userAndRoom)
+        return this.joinOneOnOne(socket, userAndRoom)
     }
+    const io = TOURNAMENT.getIO()
     const response = { success: false }
     const rooms = await Room.find({ room_id: userAndRoom.roomName });
     const user = await Users.findOne({ _id: userAndRoom.user_id });
@@ -93,7 +94,8 @@ exports.joinDBRoom = async (io, socket, userAndRoom) => {
 }
 
 
-exports.leaveDBRoom = async (io, socket, userAndRoom) => {
+exports.leaveDBRoom = async (socket, userAndRoom) => {
+    const io = TOURNAMENT.getIO()
     const room = await Room.findOne({ room_id: userAndRoom.roomName });
     const socketRooms = socket.rooms;
     const adapter = socket.adapter.rooms;
@@ -127,15 +129,15 @@ exports.getDBRoomResults = async (socket, data) => {
     socket.emit(EVENTS.GET_ROOM_RESULTS(), { event: EVENTS.GET_ROOM_RESULTS(), users: room.users })
 }
 
-exports.joinOneOnOneDBRoom = async (io, socket, data) => {
-    // const response = { success: false }
-    // const room = await Room.findOne({ room_id: data.roomName });
-    // const user = await Users.findOne({ _id: data.user_id });
-    // const socketRooms = socket.rooms;
-    // socketRooms.forEach(rm => {
-    //     socket.leave(`${rm}`)
-    // });
-    // socket.join(`${data.user_id}`)
+exports.joinOneOnOneDBRoom = async (socket, data) => {
+    const response = { success: false }
+    const room = await Room.findOne({ room_id: data.roomName });
+    const user = await Users.findOne({ _id: data.user_id });
+    const socketRooms = socket.rooms;
+    socketRooms.forEach(rm => {
+        socket.leave(`${rm}`)
+    });
+    socket.join(`${data.user_id}`)
 
     // if (room && room.allow_enter) {
     //     const haveUser = room.users.some(user => user.id === null || user.id === data.user_id);
@@ -168,15 +170,20 @@ exports.joinOneOnOneDBRoom = async (io, socket, data) => {
     // }
     // return response;
 }
-exports.joinOneOnOne = async (io, socket, userAndRoom) => {
+exports.joinOneOnOne = async (socket, userAndRoom) => {
+    const io = TOURNAMENT.getIO()
     const users = TOURNAMENT.getoneOnOneRoom();
-    const length = users.length || 1;
-    const user = { _id: userAndRoom.user_id, socket: socket.id, blocked: [], priority: length,  playing: false, gameAccepted: false, avatar_url: userAndRoom.avatar_url }
-    const socketRooms = socket.rooms;
-    socketRooms.forEach(rm => {
-        socket.leave(`${rm}`)
-    });
-    socket.join(`${userAndRoom.user_id}`)
+    const user = { 
+        _id: userAndRoom.user_id,
+        name: userAndRoom.data.name,
+        socket: socket.id, 
+        blocked: [], 
+        gameAccepted: false,
+        playing: false,
+        avatar_url: userAndRoom.avatar_url
+     }
     users.join(user)
-    socket.emit(EVENTS.JOINED_ROOM(), { event: EVENTS.JOINED_ROOM()})
+    socket.emit(EVENTS.JOINED_ROOM(), { event: EVENTS.JOINED_ROOM()});
+    io.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: TOURNAMENT.getoneOnOneRoom()})
+
 }

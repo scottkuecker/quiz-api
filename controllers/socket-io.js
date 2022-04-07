@@ -47,9 +47,6 @@ const joinOneOnOneRoom = (io, socket, data) =>{
     ROOMS.joinOneOnOneDBRoom(io, socket, data)
 }
 
-const joinRoom = (io, socket, userAndRoom) => {    
-    handleError.handleIOError(ROOMS.joinDBRoom, io, socket, userAndRoom)
-}
 
 const leaveRoom = (io, socket, userAndRoom) => {
     handleError.handleIOError(ROOMS.leaveDBRoom, io, socket, userAndRoom) 
@@ -105,12 +102,8 @@ exports.setupListeners = () =>{
     TOURNAMENT.startListeningOneOnOne(socketIo);
 
     socketIo.on('connection', socket =>{
-
         const oneOnOneRoom = TOURNAMENT.getoneOnOneRoom();
         oneOnOneRoom.onlineUsers++;
-        console.log('new connection')
-
-        socket.emit(EVENTS.AUTOLOGIN_AVAILABLE(), {event: EVENTS.AUTOLOGIN_AVAILABLE()})
         socketIo.emit(EVENTS.ONLINE_USERS_COUNT(), { event: EVENTS.ONLINE_USERS_COUNT(), online: oneOnOneRoom.onlineUsers })
         socket.on('disconnect', (data) => {
             oneOnOneRoom.onlineUsers--;
@@ -119,142 +112,179 @@ exports.setupListeners = () =>{
         })
 
         socket.on(EVENTS.DISCONNECT_USER(), (data) => {
+            
             disconectSocket(socketIo, socket);
         });
 
         socket.on(EVENTS.INVITE_FRIENDS(), (data) => {
+            
             FRIEND_REQUESTS.inviteFriends(socketIo, socket, data);
         });
 
         socket.on(EVENTS.LEAVE_ONE_ON_ONE(), (data) => {
-            console.log(EVENTS.LEAVE_ONE_ON_ONE())
+            
             leaveOneOnOne(socketIo, socket, data);
         });
 
+        socket.on(EVENTS.TRACK_ONE_ON_ONE(), (data) => {
+            console.log('GOT TRACK EVENT')
+            
+        });
+
         socket.on(EVENTS.OPONENT_ACCEPTED(), (data) => {
-            console.log(EVENTS.OPONENT_ACCEPTED())
+            
             acceptOponent(socketIo, socket, data);
         });
 
         socket.on(EVENTS.OPONENT_DECLINED(), (data) => {
+            
             TOURNAMENT.declineOponent(socketIo, socket, data);
         });
 
         socket.on(EVENTS.CREATE_ROOM(), (userData) =>{
+            
             ROOMS.createRoom(socket, userData);
         });
 
         socket.on(EVENTS.SAVE_SOCKET(), (userData) => {
+            
             saveSocket(socketIo, socket, userData);
         });
 
         socket.on(EVENTS.JOIN_ONE_ON_ONE(), data => {
-            console.log(EVENTS.JOIN_ONE_ON_ONE())
-            joinOneOnOneRoom(socketIo, socket, data)
+            midleware.socketMiddleware(socketIo, socket, data, ROOMS.joinOneOnOne)
         })
 
         socket.on(EVENTS.JOIN_ROOM(), userAndRoom =>{
-            console.log(EVENTS.JOIN_ROOM())
-            joinRoom(socketIo, socket, userAndRoom);
+            
+            midleware.socketMiddleware(socket, userAndRoom, ROOMS.joinDBRoom);
         })
 
         socket.on(EVENTS.LEAVE_ROOM(), userAndRoom =>{
-            console.log(EVENTS.LEAVE_ROOM())
+            
             leaveRoom(socketIo, socket, userAndRoom)
         })
 
         socket.on(EVENTS.START_TOURNAMENT(), data =>{
+            
             startTournament(socketIo, socket, data)
         })
 
         socket.on(EVENTS.SELECTED_QUESTION_LETTER(), data =>{
+            
             checkTournamentQuestion(socketIo, socket, data)
         })
 
         socket.on(EVENTS.GET_ROOM_QUESTION(), data =>{
+            
             getQuestion(socket, data)
         })
 
         socket.on(EVENTS.GET_ROOM_RESULTS(), data => {
+            
             getRoomResults(socket, data)
         })
 
         socket.on(EVENTS.CLEAN_THE_EMPTY_ROOMS(), data => {
+            
             ROOMS.cleanRooms()
         })
 
         socket.on(EVENTS.ADD_FRIEND(), data => {
+            
             addFriend(socket, data)
         })
 
         socket.on(EVENTS.ACCEPT_FRIEND(), data => {
+            
             acceptFriend(socket, data)
         });
 
         socket.on(EVENTS.REFRESH_USER(), data => {
+            
             midleware.socketMiddleware(socket, data, AUTH.refresh)
         })
         socket.on(EVENTS.AUTOLOGIN(), async data => {
+            
             midleware.socketMiddleware(socket, data, AUTH.autoLogin);
         });
         socket.on(EVENTS.LOGIN(), async data => {
+            
             AUTH.login(socket, data);
         });
         socket.on(EVENTS.REGISTER(), async data => {
+            
             AUTH.signUp(socket, data)
         })
         socket.on(EVENTS.GET_ALL_USERS(), async data => {
+            
             midleware.socketMiddleware(socket, data, FRIEND_REQUESTS.searchUsers);
         });
 
         socket.on(EVENTS.GET_FRIEND_LIST(), async data => {
+            
             midleware.socketMiddleware(socket, data, FRIEND_REQUESTS.getFriendList)
         });
 
         socket.on(EVENTS.GET_FRIEND_REQUESTS(), async data => {
+            
             midleware.socketMiddleware(socket, data, FRIEND_REQUESTS.getFriendRequests)
         })
 
         socket.on(EVENTS.REMOVE_FRIEND(), async data => {
+            
             midleware.socketMiddleware(socket, data, FRIEND_REQUESTS.removeFriend)
         })
         socket.on(EVENTS.ADD_QUESTION(), async data => {
+            
             midleware.socketMiddleware(socket, data, QUESTIONS.addQuestion)
         })
         socket.on(EVENTS.GET_QUESTIONS(), async data => {
+            
             midleware.socketMiddleware(socket, data, QUESTIONS.getAllQuestions)
         })
         socket.on(EVENTS.GET_RANKING_LIST(), async data => {
+            
             midleware.socketMiddleware(socket, data, USERS.getRankingList)
         })
         socket.on(EVENTS.GET_DAILY_REWARD(), async data => {
+            
             midleware.socketMiddleware(socket, data, USERS.resetDailyPrice)
         })
         socket.on(EVENTS.RESET_PLAYING_STATE(), async data => {
+            
             midleware.socketMiddleware(socket, data, USERS.resetPlayingState)
         })
         socket.on(EVENTS.RESET_LIVES(), async data => {
+            
             midleware.socketMiddleware(socket, data, USERS.resetLives)
         })
         socket.on(EVENTS.UPDATE_SCORE(), async data => {
+            
             midleware.socketMiddleware(socket, data, USERS.updateScore)
         })
         socket.on(EVENTS.UPDATE_SETTINGS(), async data => {
+            
             midleware.socketMiddleware(socket, data, USERS.updateSettings)
         })
         socket.on(EVENTS.CHECK_QUESTION(), async data => {
+            
             midleware.socketMiddleware(socket, data, QUESTIONS.checkQuestion)
         })
         socket.on(EVENTS.DELETE_QUESTION(), async data => {
+            
             midleware.socketMiddleware(socket, data, QUESTIONS.deleteQuestion)
         })
         socket.on(EVENTS.REMOVE_NOTIFICATION(), async data => {
+            
             midleware.socketMiddleware(socket, data, USERS.removeNotification)
         })
         socket.on(EVENTS.REDUCE_LIVES(), async data => {
+            
             midleware.socketMiddleware(socket, data, QUESTIONS.reduceLives)
         })
         socket.on(EVENTS.GET_ACHIEVEMENTS(), async data => {
+            
             midleware.socketMiddleware(socket, data, ACHIEVEMENTS.getAchievements)
         })
 

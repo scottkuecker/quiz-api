@@ -14,13 +14,16 @@ var oneOnOneRoom = {
     onlineUsers: 11 + Math.floor(Math.random() * 10),
     leave: function (id) {
         this.oneOnOneUsers = this.oneOnOneUsers.filter(user => user._id !== id)
+        
     },
     join: function (user) {
         const allreadyIn = this.nextMatch.find(u => u._id === user._id);
         if (allreadyIn){
+            
             return;
         }
         this.oneOnOneUsers.push(user)
+        
     },
     block: function (myId, oponentId){
         const me = this.oneOnOneUsers.find(user => user._id === myId);
@@ -31,14 +34,17 @@ var oneOnOneRoom = {
             me.blocked.push(oponentId);
             this.declineMatch(me._id)
         }
+        
     },
     joinForNextMatch: function (user){
         user.playing = false;
         this.nextMatch.push(user)
+        
     },
     getMatch: function(){
         const match = JSON.parse(JSON.stringify(this.nextMatch));
         if(!match.length && match.length < 2){
+            
             return;
         }
         this.oneOnOneUsers.forEach(user =>{
@@ -47,28 +53,37 @@ var oneOnOneRoom = {
             } 
         });
         this.nextMatch = [];
+        
         return match;
     },
     declineMatch: function (id){
         this.nextMatch = this.nextMatch.filter(user => user._id !== id);
+        
     },
     matchPosible: function (){
        if(this.nextMatch.length > 1 && this.nextMatch.every(user => user.playing === false)){
            if (this.nextMatch[0].blocked.includes(this.nextMatch[1]._id)){
+            
                return false;
            }else{
+            
                return true;
            }
        }else{   
+        
            return false;
        }
     },
     potentialMatch: function (){
         const test = this.oneOnOneUsers.filter(user => user.playing !== true)
+        
         return test.length > 1
     },
     matchFull: function(){
         return this.nextMatch.length > 1;
+    },
+    update: function (){
+        IO.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: this})
     }
 }
 
@@ -80,6 +95,10 @@ const getRandomNumber = (quantity) => {
 
 exports.setIOReady = () => {
     IO = socketCon.getIO();
+}
+
+exports.getIO = () => {
+    return IO;
 }
 
 exports.increaseOnlineUsers = () => {
@@ -130,9 +149,9 @@ const startOneOnOneMatch = async (arrOfTwo) => {
 }
 
 exports.startListeningOneOnOne = () =>{
-    setTimeout(() => {
+    setTimeout(() =>{
         searchPlayersToOneOnOne()
-    }, 3000)
+    }, 6000)
 }
 
 exports.getoneOnOneRoom = () => {
