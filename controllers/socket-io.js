@@ -104,6 +104,7 @@ exports.setupListeners = () =>{
     socketIo.on('connection', socket =>{
         const oneOnOneRoom = TOURNAMENT.getoneOnOneRoom();
         oneOnOneRoom.onlineUsers++;
+        console.log('new connection')
         socketIo.emit(EVENTS.ONLINE_USERS_COUNT(), { event: EVENTS.ONLINE_USERS_COUNT(), online: oneOnOneRoom.onlineUsers })
         socket.on('disconnect', (data) => {
             oneOnOneRoom.onlineUsers--;

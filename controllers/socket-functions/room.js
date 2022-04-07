@@ -99,10 +99,12 @@ exports.leaveDBRoom = async (socket, userAndRoom) => {
     const room = await Room.findOne({ room_id: userAndRoom.roomName });
     const socketRooms = socket.rooms;
     const adapter = socket.adapter.rooms;
-    socketRooms.forEach(rm => {
-        socket.leave(`${rm}`)
-    });
-    socket.join(`${userAndRoom.user_id}`)
+    if(socketRooms){
+        socketRooms.forEach(rm => {
+            socket.leave(`${rm}`)
+        });
+        socket.join(`${userAndRoom.user_id}`)
+    }
     if (userAndRoom.roomName) {
         socket.leave(userAndRoom.roomName);
     }
