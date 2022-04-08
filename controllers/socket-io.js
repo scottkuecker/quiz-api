@@ -105,7 +105,7 @@ exports.setupListeners = () =>{
         const oneOnOneRoom = TOURNAMENT.getoneOnOneRoom();
         oneOnOneRoom.onlineUsers++;
         socketIo.emit(EVENTS.ONLINE_USERS_COUNT(), { event: EVENTS.ONLINE_USERS_COUNT(), online: oneOnOneRoom.onlineUsers })
-        socketIo.emit(EVENTS.AUTOLOGIN_AVAILABLE(), { event: EVENTS.AUTOLOGIN_AVAILABLE(), data: null })
+        socket.emit(EVENTS.AUTOLOGIN_AVAILABLE(), { event: EVENTS.AUTOLOGIN_AVAILABLE(), data: null })
         socket.on('disconnect', (data) => {
             oneOnOneRoom.onlineUsers--;
             socketIo.emit(EVENTS.ONLINE_USERS_COUNT(), { event: EVENTS.ONLINE_USERS_COUNT(), online: oneOnOneRoom.onlineUsers})

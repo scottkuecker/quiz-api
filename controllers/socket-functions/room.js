@@ -101,15 +101,11 @@ exports.leaveDBRoom = async (socket, userAndRoom) => {
     const io = TOURNAMENT.getIO()
     const room = await Room.findOne({ room_id: userAndRoom.roomName });
     const socketRooms = socket.rooms;
-    const adapter = socket.adapter.rooms;
     if(socketRooms){
         socketRooms.forEach(rm => {
             socket.leave(`${rm}`)
         });
         socket.join(`${userAndRoom.user_id}`)
-    }
-    if (userAndRoom.roomName) {
-        socket.leave(userAndRoom.roomName);
     }
     if (room) {
         const room_id = room._id;
@@ -143,7 +139,7 @@ exports.joinOneOnOneDBRoom = async (socket, data) => {
         socketRooms.forEach(rm => {
             socket.leave(`${rm}`)
         });
-        socket.join(`${userAndRoom.user_id}`)
+        socket.join(`${data.user_id}`)
     }
 
     // if (room && room.allow_enter) {
