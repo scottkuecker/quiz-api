@@ -59,10 +59,13 @@ exports.joinDBRoom = async (socket, userAndRoom) => {
     const rooms = await Room.find({ room_id: userAndRoom.roomName });
     const user = await Users.findOne({ _id: userAndRoom.user_id });
     const socketRooms = socket.rooms;
-    socketRooms.forEach(rm => {
-        socket.leave(`${rm}`)
-    });
-    socket.join(`${userAndRoom.user_id}`)
+    if (socketRooms){
+        socketRooms.forEach(rm => {
+            socket.leave(`${rm}`)
+        });
+        socket.join(`${userAndRoom.user_id}`)
+    }
+
     const room = rooms[0];
     if (room && room.allow_enter) {
         const haveUser = room.users.some(user => user.id === null || user.id === userAndRoom.user_id);
@@ -136,10 +139,12 @@ exports.joinOneOnOneDBRoom = async (socket, data) => {
     const room = await Room.findOne({ room_id: data.roomName });
     const user = await Users.findOne({ _id: data.user_id });
     const socketRooms = socket.rooms;
-    socketRooms.forEach(rm => {
-        socket.leave(`${rm}`)
-    });
-    socket.join(`${data.user_id}`)
+    if (socketRooms) {
+        socketRooms.forEach(rm => {
+            socket.leave(`${rm}`)
+        });
+        socket.join(`${userAndRoom.user_id}`)
+    }
 
     // if (room && room.allow_enter) {
     //     const haveUser = room.users.some(user => user.id === null || user.id === data.user_id);
