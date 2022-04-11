@@ -223,7 +223,6 @@ exports.setupListeners = () =>{
         });
 
         socket.on(EVENTS.GET_FRIEND_LIST(), async data => {
-            
             midleware.socketMiddleware(socket, data, FRIEND_REQUESTS.getFriendList)
         });
 
@@ -233,7 +232,6 @@ exports.setupListeners = () =>{
         })
 
         socket.on(EVENTS.REMOVE_FRIEND(), async data => {
-            
             midleware.socketMiddleware(socket, data, FRIEND_REQUESTS.removeFriend)
         })
         socket.on(EVENTS.ADD_QUESTION(), async data => {

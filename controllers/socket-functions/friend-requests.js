@@ -1,9 +1,11 @@
 const Users = require('../../db_models/user');
 const EVENTS = require('../socket-events');
+const TOURNAMENT = require('../socket-functions/tournament');
 
 exports.inviteFriends = (io, socket, data) => {
+    const IO = TOURNAMENT.getIO();
     data.friends.forEach(friend => {
-        io.in(`${friend._id}`).emit(EVENTS.TOURNAMENT_INVITATION(), { event: EVENTS.TOURNAMENT_INVITATION(), roomName: data.roomName, userName: data.userName })
+        IO.in(`${friend._id}`).emit(EVENTS.TOURNAMENT_INVITATION(), { event: EVENTS.TOURNAMENT_INVITATION(), roomName: data.roomName, userName: data.userName })
     })
 }
 
