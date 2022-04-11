@@ -11,7 +11,8 @@ const ACHIEVEMENTS = require('./socket-functions/achievements');
 const AUTH = require('./auth');
 const USERS = require('./socket-functions/user');
 
-const saveDBSocket = async (io, socket, data) =>{
+const saveDBSocket = async (socket, data) =>{
+    const IO = TOURNAMENT.getIO();
     const user = await Users.findById(data.user_id);
     if(user){
         user.socket = socket.id;
@@ -19,9 +20,9 @@ const saveDBSocket = async (io, socket, data) =>{
         socket.join(user._id.toString());
         const oneOnOneRoom = TOURNAMENT.getoneOnOneRoom();
         TOURNAMENT.increaseOnlineUsers();
-        io.emit(EVENTS.ONLINE_USERS_COUNT(), { event: EVENTS.ONLINE_USERS_COUNT(), online: oneOnOneRoom.onlineUsers})
+        IO.emit(EVENTS.ONLINE_USERS_COUNT(), { event: EVENTS.ONLINE_USERS_COUNT(), online: oneOnOneRoom.onlineUsers})
         await user.save();
-        return io.emit(EVENTS.USER_CONNECTED(), { event: EVENTS.USER_CONNECTED(), socket_id: socket.id, user_id: data.user_id })
+        return IO.emit(EVENTS.USER_CONNECTED(), { event: EVENTS.USER_CONNECTED(), socket_id: socket.id, user_id: data.user_id })
     }else{
         console.log('socket not saved')
     }
@@ -80,8 +81,8 @@ const acceptFriend = (socket, data) => {
     FRIEND_REQUESTS.acceptDBFriend(socket, data)
 }
 
-const saveSocket = (io, socket, data) => {
-    saveDBSocket(io, socket, data)
+const saveSocket = (socket, data) => {
+    saveDBSocket(socket, data)
 }
 
 const leaveOneOnOne = (io, socket, data) =>{
@@ -149,7 +150,7 @@ exports.setupListeners = () =>{
 
         socket.on(EVENTS.SAVE_SOCKET(), (userData) => {
             
-            saveSocket(socketIo, socket, userData);
+            saveSocket(socket, userData);
         });
 
         socket.on(EVENTS.JOIN_ONE_ON_ONE(), data => {
