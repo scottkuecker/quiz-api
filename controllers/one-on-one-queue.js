@@ -63,7 +63,7 @@ class PrivateQueueManager{
         this.queue.push(user);
         this.generateMatches();
         this.checkForMatch();
-        this.io.emit(EVENTS.TRACK_QUEUE_MANAGER(), { event: EVENTS.TRACK_QUEUE_MANAGER(), queue: this.queue, playing: this.playing });
+        this.io.emit(EVENTS.TRACK_QUEUE_MANAGER(), { event: EVENTS.TRACK_QUEUE_MANAGER(), data: { queue: this.queue, playing: this.playing }  });
         return this;
     }
 
