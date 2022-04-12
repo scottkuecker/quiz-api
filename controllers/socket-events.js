@@ -534,3 +534,11 @@ exports.REDUCE_LIVES = () => 'REDUCE_LIVES';
 * @returns EVENT STRING
 */
 exports.TRACK_ONE_ON_ONE = () => 'TRACK_ONE_ON_ONE';
+
+
+/**
+* @description For debugging purposes only
+* @common_data_to_send {event: 'TRACK_ONE_ON_ONE', data: oneOneOneRoom.oneonOneusers}
+* @returns EVENT STRING
+*/
+exports.TRACK_QUEUE_MANAGER = () => 'TRACK_QUEUE_MANAGER';
