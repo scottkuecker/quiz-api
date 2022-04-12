@@ -92,7 +92,7 @@ class PrivateQueueManager{
 
     matchFinished(roomName){
         this.playing = this.playing.filter(match => match[0].roomName !== roomName);
-        this.io.emit(EVENTS.TRACK_ONE_ON_ONE(), { queue: this.queue, playing: this.playing });
+        this.io.emit(EVENTS.TRACK_ONE_ON_ONE(), { event: EVENTS.TRACK_ONE_ON_ONE(), data: { queue: this.queue, playing: this.playing } });
     }
 }
 
