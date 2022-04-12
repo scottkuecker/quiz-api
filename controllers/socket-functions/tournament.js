@@ -19,10 +19,10 @@ const getRandomNumber = (quantity) => {
 exports.setIOReady = () => {
     IO = socketCon.getIO();
     QUEUE = QUE.QueueManager.getInstance();
-    console.log(QUEUE)
 }
 
 exports.getQueue = () => {
+    console.clear()
     return QUEUE;
 }
 

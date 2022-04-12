@@ -1,6 +1,7 @@
 
 const TOURNAMENT = require('./socket-functions/tournament');
 const EVENTS = require('./socket-events');
+const crypto = require('crypto');
 
 exports.QueueManager = class {
     static instance = null;
@@ -28,7 +29,7 @@ class GenerateMatch{
     constructor(user1, user2) {
         this.user1 = user1;
         this.user2 = user2;
-        this.generate();
+        return this.generate();
     }
 
     randomValue = () => {
@@ -63,12 +64,15 @@ class PrivateQueueManager{
         this.queue.push(user);
         this.generateMatches();
         this.checkForMatch();
+        console.log(this.queue)
         this.io.emit(EVENTS.TRACK_QUEUE_MANAGER(), { event: EVENTS.TRACK_QUEUE_MANAGER(), data: { queue: this.queue, playing: this.playing }  });
         return this;
     }
 
     generateMatches(){
-        while(this.queue.length >= 2){
+        let counter = 0;
+        while (counter < this.queue.length - 1){
+            counter++;
             const match = new GenerateMatch(this.queue[0], this.queue[1])
             this.playing.push(match);
             this.queue = this.queue.filter((item, index) => index !== 0 || index !== 1);
@@ -79,6 +83,7 @@ class PrivateQueueManager{
     checkForMatch(){
         let i = 0;
         while(i <= this.playing.length - 1){
+          
             //this.playing[i][0] -> {roomName: string, busy: boolean};
             //this.playing[i][1] -> user1
             //this.playing[i][2] -> user2
@@ -86,6 +91,7 @@ class PrivateQueueManager{
                 this.playing[i][0].busy = true;
                 this.io.emit(this.playing[i][0].roomName, {event: EVENTS.MATCH_FOUND(), data: [this.playing[i][1], this.playing[i][2]]});
             }
+            i++;
 
         }
     }

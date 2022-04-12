@@ -30,7 +30,6 @@ const disconectDBSocket = async (io, socket) =>{
     if (user) {
         user.online = false;
         socket.leave(user._id.toString());
-        TOURNAMENT.decreaseOnlineUsers();
         await user.save();
         return io.emit(EVENTS.USER_DISCONECTED(), { event: EVENTS.USER_DISCONECTED(), user_id: user._id })
     }
@@ -104,8 +103,7 @@ exports.setupListeners = () =>{
             disconectSocket(socketIo, socket);
         })
 
-        socket.on(EVENTS.DISCONNECT_USER(), (data) => {
-            
+        socket.on(EVENTS.DISCONNECT_USER(), (data) => {  
             disconectSocket(socketIo, socket);
         });
 
@@ -115,7 +113,6 @@ exports.setupListeners = () =>{
         });
 
         socket.on(EVENTS.LEAVE_ONE_ON_ONE(), (data) => {
-            
             leaveOneOnOne(socketIo, socket, data);
         });
 
