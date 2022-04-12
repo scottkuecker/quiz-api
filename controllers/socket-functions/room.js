@@ -4,6 +4,8 @@ const TOURNAMENT = require('./tournament');
 const crypto = require('crypto');
 const EVENTS = require('../socket-events');
 
+
+
 exports.randomValue = (len) => {
     return crypto.randomBytes(Math.ceil(len / 2))
         .toString('hex')
@@ -142,40 +144,11 @@ exports.joinOneOnOneDBRoom = async (socket, data) => {
         socket.join(`${data.user_id}`)
     }
 
-    // if (room && room.allow_enter) {
-    //     const haveUser = room.users.some(user => user.id === null || user.id === data.user_id);
-    //     user.room = data.roomName;
-    //     user.socket = socket.id;
-    //     await user.save();
-    //     if (!haveUser) {
-    //         room.users.push({
-    //             name: data.name,
-    //             id: data.user_id,
-    //             score: 0,
-    //             answered: false,
-    //             avatar: data.avatar,
-    //         });
-    //     }
-    //     const result = await room.save();
-    //     if (result) {
-    //         result.success = true;
-    //         socket.join(`${data.roomName}`);
-    //         if (room.users.length > 1) {
-    //             this.startDBTournament(io, socket, data);
-    //         }
-
-    //     }
-    // } else {
-    //     socket.emit(EVENTS.ROOM_DONT_EXIST(), {
-    //         event: EVENTS.ROOM_DONT_EXIST(),
-    //         fn: 'joinDBRoom'
-    //     });
-    // }
-    // return response;
 }
+
+
 exports.joinOneOnOne = async (socket, userAndRoom) => {
-    const io = TOURNAMENT.getIO()
-    const users = TOURNAMENT.getoneOnOneRoom();
+    const QUEUE = TOURNAMENT.getQueue();
     const user = { 
         _id: userAndRoom.user_id,
         name: userAndRoom.data.name,
@@ -184,9 +157,8 @@ exports.joinOneOnOne = async (socket, userAndRoom) => {
         gameAccepted: false,
         playing: false,
         avatar_url: userAndRoom.avatar_url
-     }
-    users.join(user)
-    socket.emit(EVENTS.JOINED_ROOM(), { event: EVENTS.JOINED_ROOM()});
-    io.emit(EVENTS.TRACK_ONE_ON_ONE(), {event: EVENTS.TRACK_ONE_ON_ONE(), data: TOURNAMENT.getoneOnOneRoom()})
+     };
+
+    QUEUE.addToQueue(user);
 
 }

@@ -128,7 +128,7 @@ exports.refresh = async (socket, data) => {
 }
 
 exports.takeDailyPrice = async (socket, data) =>{
-    console.log(data)
+
     const user = User.findById(data.data._id);
         if (!user){
             return 

@@ -28,6 +28,7 @@ mongoose.connect(process.env.MONGO).then(() =>{
     console.log('connected')
 }).catch((error)=>{
     console.error('error connecting')
+    console.log(error)
 })
 
 

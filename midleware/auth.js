@@ -28,7 +28,6 @@ exports.authMidleware = async (req, res,next) =>{
         if(req.user){
             next();
         }else{
-            console.log('no next')
             return res.json({
                 sucess: false,
                 data: undefined,
