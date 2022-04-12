@@ -18,9 +18,6 @@ const saveDBSocket = async (socket, data) =>{
         user.socket = socket.id;
         user.online = true;
         socket.join(user._id.toString());
-        const oneOnOneRoom = TOURNAMENT.getoneOnOneRoom();
-        TOURNAMENT.increaseOnlineUsers();
-        IO.emit(EVENTS.ONLINE_USERS_COUNT(), { event: EVENTS.ONLINE_USERS_COUNT(), online: oneOnOneRoom.onlineUsers})
         await user.save();
         return IO.emit(EVENTS.USER_CONNECTED(), { event: EVENTS.USER_CONNECTED(), socket_id: socket.id, user_id: data.user_id })
     }else{
@@ -30,8 +27,6 @@ const saveDBSocket = async (socket, data) =>{
 
 const disconectDBSocket = async (io, socket) =>{
     const user = await Users.findOne({socket: socket.id});
-    const oneOnOneRoom = TOURNAMENT.getoneOnOneRoom();
-    oneOnOneRoom.oneOnOneUsers = oneOnOneRoom.oneOnOneUsers.filter(user => user.socket_id !== socket.id)
     if (user) {
         user.online = false;
         socket.leave(user._id.toString());
@@ -102,13 +97,10 @@ exports.setupListeners = () =>{
     TOURNAMENT.setIOReady();
 
     socketIo.on('connection', socket =>{
-        const oneOnOneRoom = TOURNAMENT.getoneOnOneRoom();
-        oneOnOneRoom.onlineUsers++;
-        socketIo.emit(EVENTS.ONLINE_USERS_COUNT(), { event: EVENTS.ONLINE_USERS_COUNT(), online: oneOnOneRoom.onlineUsers })
+        socketIo.emit(EVENTS.ONLINE_USERS_COUNT(), { event: EVENTS.ONLINE_USERS_COUNT(), data: null})
         socket.emit(EVENTS.AUTOLOGIN_AVAILABLE(), { event: EVENTS.AUTOLOGIN_AVAILABLE(), data: null })
         socket.on('disconnect', (data) => {
-            oneOnOneRoom.onlineUsers--;
-            socketIo.emit(EVENTS.ONLINE_USERS_COUNT(), { event: EVENTS.ONLINE_USERS_COUNT(), online: oneOnOneRoom.onlineUsers})
+            socketIo.emit(EVENTS.ONLINE_USERS_COUNT(), { event: EVENTS.ONLINE_USERS_COUNT(), online: null})
             disconectSocket(socketIo, socket);
         })
 
@@ -157,7 +149,7 @@ exports.setupListeners = () =>{
         })
 
         socket.on(EVENTS.JOIN_ROOM(), userAndRoom =>{
-            
+            console.log('joining')
             midleware.socketMiddleware(socket, userAndRoom, ROOMS.joinDBRoom);
         })
 

@@ -54,6 +54,7 @@ exports.createDBRoom = async (socket, room, userData) => {
 
 exports.joinDBRoom = async (socket, userAndRoom) => {
     if (userAndRoom.roomName === '1on1') {
+        console.log('redirecting')
         return this.joinOneOnOne(socket, userAndRoom)
     }
     const io = TOURNAMENT.getIO()
@@ -149,6 +150,7 @@ exports.joinOneOnOneDBRoom = async (socket, data) => {
 
 exports.joinOneOnOne = async (socket, userAndRoom) => {
     const QUEUE = TOURNAMENT.getQueue();
+    console.log('fetching QUEUE')
     const user = { 
         _id: userAndRoom.user_id,
         name: userAndRoom.data.name,
@@ -160,5 +162,6 @@ exports.joinOneOnOne = async (socket, userAndRoom) => {
      };
 
     QUEUE.addToQueue(user);
+
 
 }
