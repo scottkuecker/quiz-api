@@ -60,20 +60,21 @@ class PrivateQueueManager{
     }
     
 
-    addToQueue(user){
+    addToQueue(user, socket){
+        this.queue = this.queue.filter((item) => item._id !== user._id);
         this.queue.push(user);
-        this.generateMatches();
+        this.generateMatches(socket);
         this.checkForMatch();
-        console.log(this.queue)
         this.io.emit(EVENTS.TRACK_QUEUE_MANAGER(), { event: EVENTS.TRACK_QUEUE_MANAGER(), data: { queue: this.queue, playing: this.playing }  });
         return this;
     }
 
-    generateMatches(){
+    generateMatches(socket){
         let counter = 0;
         while (counter < this.queue.length - 1){
             counter++;
             const match = new GenerateMatch(this.queue[0], this.queue[1])
+            socket.join(match.roomName)
             this.playing.push(match);
             this.queue = this.queue.filter((item, index) => index !== 0 || index !== 1);
         }

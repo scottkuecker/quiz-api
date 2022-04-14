@@ -150,7 +150,6 @@ exports.joinOneOnOneDBRoom = async (socket, data) => {
 
 exports.joinOneOnOne = async (socket, userAndRoom) => {
     const QUEUE = TOURNAMENT.getQueue();
-    console.log('fetching QUEUE')
     const user = { 
         _id: userAndRoom.user_id,
         name: userAndRoom.data.name,
@@ -161,7 +160,7 @@ exports.joinOneOnOne = async (socket, userAndRoom) => {
         avatar_url: userAndRoom.avatar_url
      };
 
-    QUEUE.addToQueue(user);
+    QUEUE.addToQueue(user, socket);
 
 
 }
