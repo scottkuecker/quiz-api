@@ -146,7 +146,6 @@ exports.setupListeners = () =>{
         })
 
         socket.on(EVENTS.JOIN_ROOM(), userAndRoom =>{
-            console.log('joining')
             midleware.socketMiddleware(socket, userAndRoom, ROOMS.joinDBRoom);
         })
 
@@ -276,7 +275,6 @@ exports.setupListeners = () =>{
             midleware.socketMiddleware(socket, data, ACHIEVEMENTS.getAchievements)
         })
         socket.on(EVENTS.CHECK_PRACTICE_QUESTION(), async data => {
-            console.log('received')
             midleware.socketMiddleware(socket, data, QUESTIONS.checkQuestion)
         })
 

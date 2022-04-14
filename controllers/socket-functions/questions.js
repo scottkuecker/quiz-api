@@ -109,7 +109,6 @@ exports.getQuestion = async (socket, data) => {
         let timesPicked = picked.question_picked + 1;
         let difficulty = parseInt((picked.answered_correctly / timesPicked) * 100);
         await Questions.findByIdAndUpdate({ _id: picked._id.toString() }, { question_picked: timesPicked, question_difficulty: difficulty });
-        console.log('emited')
         socket.emit(EVENTS.GET_QUESTION(), { event: EVENTS.GET_QUESTION(), data: picked })
     } else {
         return //empty question list
@@ -292,7 +291,7 @@ exports.checkQuestion = async (socket, data) =>{
     let category = '';
     Questions.findById(questionID).then(question =>{
         if (question){
-            if(userPick === question.correct_text){
+            if (userPick === question.correct_letter){
                 correct = true;
                 question.answered_correctly++;
                 category = question.category;
