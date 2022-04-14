@@ -227,8 +227,10 @@ exports.setupListeners = () =>{
             
             midleware.socketMiddleware(socket, data, QUESTIONS.addQuestion)
         })
+        socket.on(EVENTS.GET_QUESTION(), async data => {
+            midleware.socketMiddleware(socket, data, QUESTIONS.getQuestion)
+        })
         socket.on(EVENTS.GET_QUESTIONS(), async data => {
-            
             midleware.socketMiddleware(socket, data, QUESTIONS.getAllQuestions)
         })
         socket.on(EVENTS.GET_RANKING_LIST(), async data => {
