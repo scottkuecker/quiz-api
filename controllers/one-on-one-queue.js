@@ -60,23 +60,21 @@ class PrivateQueueManager{
     }
     
 
-    addToQueue(user, socket){
-        this.queue = this.queue.filter((item) => item._id !== user._id);
+    addToQueue(user){
         this.queue.push(user);
-        this.generateMatches(socket);
+        this.generateMatches();
         this.checkForMatch();
         this.io.emit(EVENTS.TRACK_QUEUE_MANAGER(), { event: EVENTS.TRACK_QUEUE_MANAGER(), data: { queue: this.queue, playing: this.playing }  });
         return this;
     }
 
-    generateMatches(socket){
+    generateMatches(){
         let counter = 0;
         while (counter < this.queue.length - 1){
             counter++;
             const match = new GenerateMatch(this.queue[0], this.queue[1])
-            socket.join(match.roomName)
             this.playing.push(match);
-            this.queue = this.queue.filter((item, index) => index !== 0 || index !== 1);
+            this.queue = this.queue.filter((item, index) => index !== 0 && index !== 1);
         }
         return this;
     }
@@ -84,13 +82,14 @@ class PrivateQueueManager{
     checkForMatch(){
         let i = 0;
         while(i <= this.playing.length - 1){
-          
+            
             //this.playing[i][0] -> {roomName: string, busy: boolean};
             //this.playing[i][1] -> user1
             //this.playing[i][2] -> user2
             if(!this.playing[i][0].busy){
                 this.playing[i][0].busy = true;
-                this.io.emit(this.playing[i][0].roomName, {event: EVENTS.MATCH_FOUND(), data: [this.playing[i][1], this.playing[i][2]]});
+                this.io.in(this.playing[i][1]._id.toString()).emit(EVENTS.MATCH_FOUND(), {event: EVENTS.MATCH_FOUND(), data: {me: this.playing[i][1], oponent: this.playing[i][2]}});
+                this.io.in(this.playing[i][2]._id.toString()).emit(EVENTS.MATCH_FOUND(), {event: EVENTS.MATCH_FOUND(), data: {me: this.playing[i][2], oponent: this.playing[i][1]}});
             }
             i++;
 
