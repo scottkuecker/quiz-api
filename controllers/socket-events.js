@@ -436,6 +436,13 @@ exports.DELETE_QUESTION = () => 'DELETE_QUESTION';
 */
 exports.CHECK_QUESTION = () => 'CHECK_QUESTION';
 
+/**
+* @description emit deleted question
+* @common_data_to_send {event: 'CHECK_QUESTION', data: boolean}
+* @returns EVENT STRING
+*/
+exports.CHECK_PRACTICE_QUESTION = () => 'CHECK_PRACTICE_QUESTION';
+
 
 /**
 * @description Emit that question is published

@@ -70,7 +70,7 @@ exports.getQuestion = async (socket, data) => {
     const id = data.data._id;
     const user = await Users.findById(id);
     user.allready_answered = user.allready_answered || [];
-    const category = req.params.category;
+    const category = data.category;
     user.playing = true;
     await user.save();
     if (!id) {
@@ -78,9 +78,9 @@ exports.getQuestion = async (socket, data) => {
     }
     let questions;
     if (category && category !== 'RAZNO') {
-        questions = await Question.find({ status: 'ODOBRENO', category: category });
+        questions = await Questions.find({ status: 'ODOBRENO', category: category });
     } else {
-        questions = await Question.find({ status: 'ODOBRENO' });
+        questions = await Questions.find({ status: 'ODOBRENO' });
     }
 
     let questionsByOthers = [];
@@ -108,7 +108,8 @@ exports.getQuestion = async (socket, data) => {
         picked.correct_letter = 'Saznaces nakon sto izaberes';
         let timesPicked = picked.question_picked + 1;
         let difficulty = parseInt((picked.answered_correctly / timesPicked) * 100);
-        await Question.findByIdAndUpdate({ _id: picked._id.toString() }, { question_picked: timesPicked, question_difficulty: difficulty });
+        await Questions.findByIdAndUpdate({ _id: picked._id.toString() }, { question_picked: timesPicked, question_difficulty: difficulty });
+        console.log('emited')
         socket.emit(EVENTS.GET_QUESTION(), { event: EVENTS.GET_QUESTION(), data: picked })
     } else {
         return //empty question list
@@ -119,7 +120,7 @@ exports.getQuestion = async (socket, data) => {
 exports.publishQuestion = async (socket, data) => {
     const id = data.data.id;
     const root = req.user.roles.some(role => role === 'ADMIN')
-    const result = await Question.findByIdAndUpdate(id, { status: 'ODOBRENO' });
+    const result = await Questions.findByIdAndUpdate(id, { status: 'ODOBRENO' });
     if (result) {
         return socket.emit(EVENTS.PUBLISH_QUESTION(), { event: EVENTS.PUBLISH_QUESTION(), data: true })
     }
@@ -129,7 +130,7 @@ exports.publishQuestion = async (socket, data) => {
 exports.unpublishQuestion = async (socket, data) => {
     const id = data.data.id;
     const root = req.user.roles.some(role => role === 'ADMIN')
-    const result = await Question.findByIdAndUpdate(id, { status: 'NA CEKANJU' });
+    const result = await Questions.findByIdAndUpdate(id, { status: 'NA CEKANJU' });
     if (result) {
         return socket.emit(EVENTS.UNPUBLISH_QUESTION(), { event: EVENTS.UNPUBLISH_QUESTION(), data: true })
     }
@@ -139,7 +140,7 @@ exports.unpublishQuestion = async (socket, data) => {
 exports.updateQuestionText = async (socket, data) => {
     const id = data.data.id;
     const text = data.data.text;
-    const result = await Question.findByIdAndUpdate(id, { question: text, status: 'NA CEKANJU' });
+    const result = await Questions.findByIdAndUpdate(id, { question: text, status: 'NA CEKANJU' });
     if (result) {
         return socket.emit(EVENTS.UPDATE_QUESTION_TEXT(), { event: EVENTS.UPDATE_QUESTION_TEXT(), data: true })
     }
@@ -261,10 +262,10 @@ exports.deleteQuestion = async (socket, data) =>{
     if(!id){
         return;
     }
-    await Question.findByIdAndDelete(id);
+    await Questions.findByIdAndDelete(id);
     const userId = data.data._id;
     const root = data.data.roles.some(role => role === 'ADMIN')
-    const questions = await Question.find();
+    const questions = await Questions.find();
     const questionsByOthers = [];
     questions.forEach(q => {
         if (!root) {
@@ -285,11 +286,11 @@ exports.deleteQuestion = async (socket, data) =>{
 
 exports.checkQuestion = async (socket, data) =>{
     const userPick = data.correct;
-    const questionID = data.questionId;
+    const questionID = data.question_id;
     let correct = false;
     const user = await Users.findById(data.data._id);
     let category = '';
-    Question.findById(questionID).then(question =>{
+    Questions.findById(questionID).then(question =>{
         if (question){
             if(userPick === question.correct_text){
                 correct = true;
@@ -324,7 +325,7 @@ exports.checkQuestion = async (socket, data) =>{
         }
     })
     .then(saved =>{
-        return socket.emit(EVENTS.CHECK_QUESTION(), {event: EVENTS.CHECK_QUESTION(), data: correct})
+        return socket.emit(EVENTS.CHECK_PRACTICE_QUESTION(), { event: EVENTS.CHECK_PRACTICE_QUESTION(), data: correct})
     })
 }
 

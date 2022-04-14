@@ -216,7 +216,6 @@ exports.setupListeners = () =>{
         });
 
         socket.on(EVENTS.GET_FRIEND_REQUESTS(), async data => {
-            
             midleware.socketMiddleware(socket, data, FRIEND_REQUESTS.getFriendRequests)
         })
 
@@ -274,8 +273,11 @@ exports.setupListeners = () =>{
             midleware.socketMiddleware(socket, data, QUESTIONS.reduceLives)
         })
         socket.on(EVENTS.GET_ACHIEVEMENTS(), async data => {
-            
             midleware.socketMiddleware(socket, data, ACHIEVEMENTS.getAchievements)
+        })
+        socket.on(EVENTS.CHECK_PRACTICE_QUESTION(), async data => {
+            console.log('received')
+            midleware.socketMiddleware(socket, data, QUESTIONS.checkQuestion)
         })
 
     });
