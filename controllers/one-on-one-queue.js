@@ -82,18 +82,22 @@ class PrivateQueueManager{
     checkForMatch(){
         let i = 0;
         while(i <= this.playing.length - 1){
-            
-            //this.playing[i][0] -> {roomName: string, busy: boolean};
-            //this.playing[i][1] -> user1
-            //this.playing[i][2] -> user2
             if(!this.playing[i][0].busy){
                 this.playing[i][0].busy = true;
                 this.io.in(this.playing[i][1]._id.toString()).emit(EVENTS.MATCH_FOUND(), {event: EVENTS.MATCH_FOUND(), data: {me: this.playing[i][1], oponent: this.playing[i][2]}});
                 this.io.in(this.playing[i][2]._id.toString()).emit(EVENTS.MATCH_FOUND(), {event: EVENTS.MATCH_FOUND(), data: {me: this.playing[i][2], oponent: this.playing[i][1]}});
             }
             i++;
-
         }
+    }
+
+    acceptOpponent(oponentID, myID, roomName){
+        this.io.in(oponentID.toString()).emit(EVENTS.OPONENT_ACCEPTED(), { event: EVENTS.OPONENT_ACCEPTED(), data: true });
+    }
+
+    declineOpponent(oponentID, myID, roomName) {
+        this.io.in(oponentID.toString()).emit(EVENTS.OPONENT_DECLINED(), { event: EVENTS.OPONENT_DECLINED(), data: true });
+        this.playing = this.playing.filter(item => item[0].roomName !== roomName);
     }
 
     matchFinished(roomName){

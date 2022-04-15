@@ -84,10 +84,6 @@ const leaveOneOnOne = (io, socket, data) =>{
     TOURNAMENT.leaveDBOneOnOne(io, socket, data)
 }
 
-const acceptOponent = (socketIo, socket, data) =>{
-    TOURNAMENT.acceptDBOponent(socketIo, socket, data)
-}
-
 
 //SOCKETS EVENTS
 
@@ -123,13 +119,11 @@ exports.setupListeners = () =>{
         });
 
         socket.on(EVENTS.OPONENT_ACCEPTED(), (data) => {
-            
-            acceptOponent(socketIo, socket, data);
+            midleware.socketMiddleware(data, TOURNAMENT.acceptDBOponent)
         });
 
         socket.on(EVENTS.OPONENT_DECLINED(), (data) => {
-            
-            TOURNAMENT.declineOponent(socketIo, socket, data);
+            midleware.socketMiddleware(data, TOURNAMENT.declineOponent)
         });
 
         socket.on(EVENTS.CREATE_ROOM(), (userData) =>{

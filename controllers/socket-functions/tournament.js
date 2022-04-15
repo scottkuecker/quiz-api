@@ -8,7 +8,11 @@ const socketCon = require('../../socket');
 const QUE = require('../one-on-one-queue');
 
 var IO;
-var QUEUE;
+var QUEUE = {
+    acceptOpponent: (oponentID, myID, roomName) => {},
+    declineOpponent: (oponentID, myID, roomName) => {},
+    addToQueue: (user) => { } 
+};
 
 
 const getRandomNumber = (quantity) => {
@@ -22,7 +26,6 @@ exports.setIOReady = () => {
 }
 
 exports.getQueue = () => {
-    console.clear()
     return QUEUE;
 }
 
@@ -140,19 +143,13 @@ exports.checkDBTournamentQuestion = async (io, socket, data) => {
 }
 
 
-exports.declineOponent = (io, socket, data) => {
-    socket.emit(EVENTS.OPONENT_DECLINED(), { event: EVENTS.OPONENT_DECLINED() })
+exports.declineOponent = (data) => {
+
+    QUEUE.declineOpponent(data.oponentID, data.data._id, data.roomName)
 }
 
-exports.acceptDBOponent = async (io, socket, data) => {
-    socket.join(data.roomName);
-    // IO.in(data.oponent._id).emit(EVENTS.OPONENT_ACCEPTED(), { event: EVENTS.OPONENT_ACCEPTED(), success: true })
-    // const room = await IO.in(data.roomName).allSockets();
-    // if(room.size === 2){
-    //     const users = await this.createOneOnOneUsers([data.me, data.oponent])
-    //     await QUESTIONS.generateRoomQuestions(data.roomName, 15, users);
-    //     io.to(data.roomName).emit(EVENTS.BOTH_ACCEPTED(), { event: EVENTS.BOTH_ACCEPTED(), success: true })
-    // }
+exports.acceptDBOponent = (data) => {
+    QUEUE.acceptOpponent(data.oponentID, data.data._id, data.roomName)
 }
 
 exports.leaveDBOneOnOne = (io, socket, data) => {
