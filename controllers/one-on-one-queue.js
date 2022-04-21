@@ -91,8 +91,23 @@ class PrivateQueueManager{
         }
     }
 
+    startMatch(roomName){
+        this.io.in(roomName).emit(EVENTS.BOTH_ACCEPTED(), { event: EVENTS.BOTH_ACCEPTED(), data: true });
+    }
+
     acceptOpponent(oponentID, myID, roomName){
-        this.io.in(oponentID.toString()).emit(EVENTS.OPONENT_ACCEPTED(), { event: EVENTS.OPONENT_ACCEPTED(), data: true });
+        const myRoom = this.playing.find(match => match[0].roomName === roomName);
+        const me = myRoom.find(item =>{
+            if(item._id && item._id.toString() === myID){
+                me.gameAccepted = true;
+            }
+        });
+        if(myRoom[1].gameAccepted && myRoom[2].gameAccepted){
+            this.startMatch(roomName);
+        }else{
+            this.io.in(oponentID.toString()).emit(EVENTS.OPONENT_ACCEPTED(), { event: EVENTS.OPONENT_ACCEPTED(), data: true });
+        }
+       
     }
 
     declineOpponent(oponentID, myID, roomName) {
