@@ -25,7 +25,6 @@ mongoose.connect(process.env.MONGO).then(() =>{
     const app = server.listen(port);
     const io = require('./socket').init(app);
     ioEvents.setupListeners();
-    console.log('connected')
 }).catch((error)=>{
     console.error('error connecting')
     console.log(error)

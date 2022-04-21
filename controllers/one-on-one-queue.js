@@ -56,11 +56,8 @@ class PrivateQueueManager{
     playing = [];
     io;
 
-    constructor(){
-        this.io = TOURNAMENT.getIO();
-    }
+    constructor(){this.io = TOURNAMENT.getIO(); }
     
-
     addToQueue(user){
         this.queue.push(user);
         this.generateMatches();
@@ -94,21 +91,18 @@ class PrivateQueueManager{
 
     async startMatch(roomName, user1, user2){
         const { success } = await ROOM.createMatchRoom(roomName, [user1, user2]);
-        if(!success){
-            return;
-        }
+        if(!success){return;}
+
         const { questions } = await TOURNAMENT.generateMatchQuestions(roomName, {amountOfQuestions: 15});
-        if(!questions){
-            return;
-        }
+        if(!questions){return;}
+
         this.io.in(roomName).emit(EVENTS.BOTH_ACCEPTED(), { event: EVENTS.BOTH_ACCEPTED(), data: true });
     }
 
     acceptOpponent(oponentID, myID, roomName){
         const myRoom = this.playing.find(match => match[0].roomName === roomName);
-        if(!myRoom){
-            return;
-        }
+        if(!myRoom){return;}
+        
         myRoom.forEach(item => {
             if(item._id && item._id === myID){
                 item.gameAccepted = true;
