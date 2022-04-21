@@ -1,6 +1,7 @@
 
 const TOURNAMENT = require('./socket-functions/tournament');
 const EVENTS = require('./socket-events');
+const ROOM = require('./socket-functions/room')
 const crypto = require('crypto');
 
 exports.QueueManager = class {
@@ -91,15 +92,21 @@ class PrivateQueueManager{
         }
     }
 
-    startMatch(roomName){
-        console.log('starting')
+    async startMatch(roomName, user1, user2){
+        const { success } = await ROOM.createMatchRoom(roomName, [user1, user2]);
+        if(!success){
+            return;
+        }
+        const { questions } = await TOURNAMENT.generateMatchQuestions(roomName, {amountOfQuestions: 15});
+        if(!questions){
+            return;
+        }
         this.io.in(roomName).emit(EVENTS.BOTH_ACCEPTED(), { event: EVENTS.BOTH_ACCEPTED(), data: true });
     }
 
     acceptOpponent(oponentID, myID, roomName){
         const myRoom = this.playing.find(match => match[0].roomName === roomName);
         if(!myRoom){
-            console.log('no room')
             return;
         }
         myRoom.forEach(item => {
@@ -107,8 +114,12 @@ class PrivateQueueManager{
                 item.gameAccepted = true;
             }
         });
-        if(myRoom[1].gameAccepted && myRoom[2].gameAccepted){
-            this.startMatch(roomName);
+        const user1 = myRoom[1];
+        const user2 = myRoom[2];
+        user1.answered = false;
+        user2.answered = false;
+        if (user1.gameAccepted && user2.gameAccepted){
+            this.startMatch(roomName,user1,user2);
         }else{
             this.io.in(oponentID.toString()).emit(EVENTS.OPONENT_ACCEPTED(), { event: EVENTS.OPONENT_ACCEPTED(), data: true });
         }

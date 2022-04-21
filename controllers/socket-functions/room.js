@@ -29,6 +29,21 @@ exports.cleanRooms = async () => {
     return result;
 }
 
+exports.createMatchRoom = async (room, users) => {
+    const response = { success: false }
+    const newRoom = new Room({
+        room_id: room,
+        users: users,
+        allow_enter: true,
+        total_questions: 0
+    })
+    const result = await newRoom.save();
+    if (result) {
+        response.success = true;
+    }
+    return response;
+}
+
 exports.createDBRoom = async (socket, room, userData) => {
     const response = { success: false }
     const user = await Users.findOne({ _id: userData.user_id });
@@ -54,7 +69,6 @@ exports.createDBRoom = async (socket, room, userData) => {
 
 exports.joinDBRoom = async (socket, userAndRoom) => {
     if (userAndRoom.roomName === '1on1') {
-        console.log('redirecting')
         return this.joinOneOnOne(socket, userAndRoom)
     }
     const io = TOURNAMENT.getIO()
@@ -134,9 +148,6 @@ exports.getDBRoomResults = async (socket, data) => {
 }
 
 exports.joinOneOnOneDBRoom = async (socket, data) => {
-    const response = { success: false }
-    const room = await Room.findOne({ room_id: data.roomName });
-    const user = await Users.findOne({ _id: data.user_id });
     const socketRooms = socket.rooms;
     if (socketRooms) {
         socketRooms.forEach(rm => {

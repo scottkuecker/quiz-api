@@ -133,7 +133,6 @@ exports.setupListeners = () =>{
         });
 
         socket.on(EVENTS.SAVE_SOCKET(), (userData) => {
-            
             saveSocket(socket, userData);
         });
 
@@ -156,7 +155,7 @@ exports.setupListeners = () =>{
         })
 
         socket.on(EVENTS.SELECTED_QUESTION_LETTER(), data =>{
-            
+            console.log(data)
             checkTournamentQuestion(socketIo, socket, data)
         })
 
