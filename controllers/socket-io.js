@@ -119,11 +119,12 @@ exports.setupListeners = () =>{
         });
 
         socket.on(EVENTS.OPONENT_ACCEPTED(), (data) => {
-            midleware.socketMiddleware(data, TOURNAMENT.acceptDBOponent)
+            socket.join(data.roomName)
+            midleware.socketMiddleware(socket, data, TOURNAMENT.acceptDBOponent)
         });
 
         socket.on(EVENTS.OPONENT_DECLINED(), (data) => {
-            midleware.socketMiddleware(data, TOURNAMENT.declineOponent)
+            midleware.socketMiddleware(socket, data, TOURNAMENT.declineOponent)
         });
 
         socket.on(EVENTS.CREATE_ROOM(), (userData) =>{

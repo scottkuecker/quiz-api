@@ -143,12 +143,15 @@ exports.checkDBTournamentQuestion = async (io, socket, data) => {
 }
 
 
-exports.declineOponent = (data) => {
+exports.declineOponent = (socket, data) => {
 
     QUEUE.declineOpponent(data.oponentID, data.data._id, data.roomName)
 }
 
-exports.acceptDBOponent = (data) => {
+exports.acceptDBOponent = (socket, data) => {
+    console.log('********* accept oponent ')
+    console.log(data)
+    console.log('*****************')
     QUEUE.acceptOpponent(data.oponentID, data.data._id, data.roomName)
 }
 

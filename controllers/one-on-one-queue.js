@@ -84,22 +84,27 @@ class PrivateQueueManager{
         while(i <= this.playing.length - 1){
             if(!this.playing[i][0].busy){
                 this.playing[i][0].busy = true;
-                this.io.in(this.playing[i][1]._id.toString()).emit(EVENTS.MATCH_FOUND(), {event: EVENTS.MATCH_FOUND(), data: {me: this.playing[i][1], oponent: this.playing[i][2]}});
-                this.io.in(this.playing[i][2]._id.toString()).emit(EVENTS.MATCH_FOUND(), {event: EVENTS.MATCH_FOUND(), data: {me: this.playing[i][2], oponent: this.playing[i][1]}});
+                this.io.in(this.playing[i][1]._id.toString()).emit(EVENTS.MATCH_FOUND(), {event: EVENTS.MATCH_FOUND(), data: {me: this.playing[i][1],roomName: this.playing[i][0].roomName,oponent: this.playing[i][2]}});
+                this.io.in(this.playing[i][2]._id.toString()).emit(EVENTS.MATCH_FOUND(), {event: EVENTS.MATCH_FOUND(), data: {me: this.playing[i][2],roomName: this.playing[i][0].roomName,oponent: this.playing[i][1]}});
             }
             i++;
         }
     }
 
     startMatch(roomName){
+        console.log('starting')
         this.io.in(roomName).emit(EVENTS.BOTH_ACCEPTED(), { event: EVENTS.BOTH_ACCEPTED(), data: true });
     }
 
     acceptOpponent(oponentID, myID, roomName){
         const myRoom = this.playing.find(match => match[0].roomName === roomName);
-        const me = myRoom.find(item =>{
-            if(item._id && item._id.toString() === myID){
-                me.gameAccepted = true;
+        if(!myRoom){
+            console.log('no room')
+            return;
+        }
+        myRoom.forEach(item => {
+            if(item._id && item._id === myID){
+                item.gameAccepted = true;
             }
         });
         if(myRoom[1].gameAccepted && myRoom[2].gameAccepted){
