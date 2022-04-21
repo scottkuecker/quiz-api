@@ -193,6 +193,8 @@ exports.addQuestion = async (socket, data) => {
         type: type,
         status: 'ODOBRENO'
     });
+
+
     await question.save();
     const userDoc = await Users.findById(data.data._id.toString());
     if (userDoc) {
@@ -209,6 +211,50 @@ exports.addQuestion = async (socket, data) => {
         await userDoc.save();
     }
     socket.emit(EVENTS.ADD_QUESTION(), {event: EVENTS.ADD_QUESTION(), data: true})
+}
+
+
+
+
+exports.addWordQuestion = async (socket, data) => {
+    const questionText = data.question.question || 'Pitanje sa slikom';
+    const category = data.question.category.toUpperCase();
+    const id = data.data._id.toString();
+    const question = new Questions({
+        question: questionText,
+        posted_by: id,
+        category: category,
+        answers: wordBreak(),
+        type: 'WORD',
+        status: 'NA CEKANJU'
+    });
+
+    function wordBreak() {
+        let name = questionText;
+        let words = name.split(' ');
+        words = words.map(n => {
+            n = n.split('')
+            n.sort();
+            return n;
+        })
+        return words;
+    }
+    await question.save();
+    const userDoc = await Users.findById(data.data._id.toString());
+    if (userDoc) {
+        const userCat = userDoc.categories.some(cat => cat.category === category);
+        if (!userCat) {
+            userDoc.categories.push({ category: category, questions_added: 1 })
+        } else {
+            userDoc.categories.forEach(cat => {
+                if (cat.category === category) {
+                    cat.questions_added += 1;
+                }
+            })
+        }
+        await userDoc.save();
+    }
+    socket.emit(EVENTS.ADD_QUESTION(), { event: EVENTS.ADD_QUESTION(), data: true })
 }
 
 
