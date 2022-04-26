@@ -1,9 +1,9 @@
-const User = require('../db_models/user');
-const Achievements = require('../db_models/achievement');
+const User = require('../../db_models/user');
+const Achievements = require('../../db_models/achievement');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const oneOnOneRoom = require('../db_models/one-on-one');
-const EVENTS = require('../controllers/socket-events');
+const oneOnOneRoom = require('../../db_models/one-on-one');
+const EVENTS = require('../socket-events');
 
 exports.signUp = async (socket, data) =>{
     const email = data.email;

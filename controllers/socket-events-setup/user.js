@@ -1,7 +1,7 @@
 const socketCon = require('../../socket');
 const EVENTS = require('../socket-events');
 const QUESTIONS = require('../socket-functions/questions');
-const AUTH = require('../auth');
+const AUTH = require('../socket-functions/auth');
 const USERS = require('../socket-functions/user');
 const midleware = require('../../midleware/auth');
 
