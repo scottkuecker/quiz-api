@@ -142,6 +142,14 @@ exports.startDBTournamentQuestion = async (io, data) => {
         room.allow_enter = false;
         await room.save();
         io.in(`${data.roomName}`).emit(EVENTS.TOURNAMENT_FINISHED(), { event: EVENTS.TOURNAMENT_FINISHED(), users: room.users });
+        if (data && data.match) {
+            const user1 = await Users.findById(room.users[0]._id);
+            const user2 = await Users.findById(room.users[1]._id);
+            user1.score = user1.score + room.users[0].score;
+            user2.score = user2.score + room.users[1].score;
+            await user1.save();
+            await user2.save();
+        }
         return;
     }
     io.in(`${data.roomName}`).emit(EVENTS.EVERYONE_ANSWERED(), { event: EVENTS.EVERYONE_ANSWERED(), users: room.users })
@@ -179,6 +187,7 @@ exports.checkMatchQuestion = async (io, socket, data) => {
         await room.save();
         io.in(`${data.roomName}`).emit(EVENTS.UPDATE_WAITING_STATUS(), { event: EVENTS.UPDATE_WAITING_STATUS(), users: room.users })
         socket.emit(EVENTS.SELECTED_QUESTION_LETTER(), { correct: data.letter === question.correct_letter, event: EVENTS.SELECTED_QUESTION_LETTER(), users: room.users })
+        data.match = true;
         this.startDBTournamentQuestion(io, data);
 
     } else {

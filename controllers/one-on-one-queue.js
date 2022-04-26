@@ -95,14 +95,12 @@ class PrivateQueueManager{
 
         const { questions } = await TOURNAMENT.generateMatchQuestions(roomName, {amountOfQuestions: 15});
         if(!questions){return;}
-
         this.io.in(roomName).emit(EVENTS.BOTH_ACCEPTED(), { event: EVENTS.BOTH_ACCEPTED(), data: true });
     }
 
     acceptOpponent(oponentID, myID, roomName){
         const myRoom = this.playing.find(match => match[0].roomName === roomName);
         if(!myRoom){return;}
-        
         myRoom.forEach(item => {
             if(item._id && item._id === myID){
                 item.gameAccepted = true;

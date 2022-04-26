@@ -5,9 +5,9 @@ const midleware = require('../../midleware/auth');
 
 exports.setup = () => {
     const socketIo = socketCon.getIO();
-    console.log('tournament listeners ready')
     socketIo.on('connection', socket => {
         socket.on(EVENTS.OPONENT_ACCEPTED(), (data) => {
+            socket.join(data.roomName)
             midleware.socketMiddleware(socket, data, TOURNAMENT.acceptDBOponent)
         });
 

@@ -52,6 +52,12 @@ exports.JOINED_ROOM = () => 'JOINED_ROOM';
  */
 exports.LEAVE_ROOM = () => 'LEAVE_ROOM';
 
+/**
+ * @description Emited from client to leave the room
+ * @returns EVENT STRING
+ */
+exports.LEAVE_MATCH = () => 'LEAVE_MATCH';
+
 
 /**
  * @description Emit to all room clients that user has leaved room

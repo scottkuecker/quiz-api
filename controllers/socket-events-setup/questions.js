@@ -5,7 +5,6 @@ const midleware = require('../../midleware/auth');
 
 exports.setup = () => {
     const socketIo = socketCon.getIO();
-    console.log('question listeners ready')
     socketIo.on('connection', socket => {
 
 

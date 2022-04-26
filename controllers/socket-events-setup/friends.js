@@ -6,7 +6,6 @@ const midleware = require('../../midleware/auth');
 
 exports.setup = () => {
     const socketIo = socketCon.getIO();
-    console.log('friend listeners ready')
     socketIo.on('connection', socket => {
 
         socket.on(EVENTS.GET_ALL_USERS(), async data => {

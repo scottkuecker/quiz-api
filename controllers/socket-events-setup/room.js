@@ -7,7 +7,6 @@ const midleware = require('../../midleware/auth');
 
 exports.setup = () => {
     const socketIo = socketCon.getIO();
-    console.log('room listeners ready')
     socketIo.on('connection', socket => {
 
         socket.on(EVENTS.LEAVE_ONE_ON_ONE(), (data) => {
@@ -28,6 +27,10 @@ exports.setup = () => {
 
         socket.on(EVENTS.LEAVE_ROOM(), userAndRoom => {
             ROOMS.leaveDBRoom(socketIo, socket, userAndRoom)
+        });
+
+        socket.on(EVENTS.LEAVE_MATCH(), data => {
+           socket.leave(data.roomName)
         });
 
         socket.on(EVENTS.GET_ROOM_RESULTS(), data => {
