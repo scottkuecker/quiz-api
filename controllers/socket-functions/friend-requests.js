@@ -4,6 +4,9 @@ const TOURNAMENT = require('../socket-functions/tournament');
 
 exports.inviteFriends = (io, socket, data) => {
     const IO = TOURNAMENT.getIO();
+    if(!data && !data.friends){
+        return socket.emit(EVENTS.DATABASE_CONNECTION_ERROR(), { event: EVENTS.DATABASE_CONNECTION_ERROR(), data: null })
+    }
     data.friends.forEach(friend => {
         IO.in(`${friend._id}`).emit(EVENTS.TOURNAMENT_INVITATION(), { event: EVENTS.TOURNAMENT_INVITATION(), roomName: data.roomName, userName: data.userName })
     })
@@ -79,19 +82,22 @@ exports.searchUsers = async (socket, data) =>{
     const filter = data.query.toUpperCase();
     let allUsers;
     allUsers = await Users.find();
+    if(!allUsers){
+        return socket.emit(EVENTS.DATABASE_CONNECTION_ERROR(), { event: EVENTS.DATABASE_CONNECTION_ERROR(), data: null})
+    }
     const users = allUsers.filter(user =>{
             if(user.name.toUpperCase().includes(filter)){
                 return true;
             }
     })
-        let top100;
-        if(users.length > 100){
-           top100 = users.splice(0, 100);
-        }else{
-            top100 = users;
-        }
+    let top100;
+    if(users.length > 100){
+        top100 = users.splice(0, 100);
+    }else{
+        top100 = users;
+    }
 
-       const mapped = top100.map(user =>{
+    const mapped = top100.map(user =>{
             return {
                 name: user.name,
                 avatar_url: user.avatar_url,
@@ -99,8 +105,8 @@ exports.searchUsers = async (socket, data) =>{
                 socket: user.socket,
                 online: user.online || false
             }
-        })
-        return socket.emit(EVENTS.GET_ALL_USERS(), {event: EVENTS.GET_ALL_USERS(), data: mapped})
+    })
+    return socket.emit(EVENTS.GET_ALL_USERS(), {event: EVENTS.GET_ALL_USERS(), data: mapped})
 
 }
 

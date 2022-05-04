@@ -555,3 +555,11 @@ exports.TRACK_ONE_ON_ONE = () => 'TRACK_ONE_ON_ONE';
 * @returns EVENT STRING
 */
 exports.TRACK_QUEUE_MANAGER = () => 'TRACK_QUEUE_MANAGER';
+
+
+/**
+* @description If data pulling error occurs, emit to socket
+* @common_data_to_send {event: 'DATABASE_CONNECTION_ERROR', data: null}
+* @returns EVENT STRING
+*/
+exports.DATABASE_CONNECTION_ERROR = () => 'DATABASE_CONNECTION_ERROR';

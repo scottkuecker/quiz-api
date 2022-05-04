@@ -59,7 +59,7 @@ exports.login = async (socket, data) => {
                 return socket.emit(EVENTS.LOGIN(), {event: EVENTS.LOGIN(), data: data})
 
             } else {
-                return ;
+                return socket.emit(EVENTS.AUTOLOGINFAILED(), { event: EVENTS.AUTOLOGINFAILED(), data: null })
             }
         });
 }

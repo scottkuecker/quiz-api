@@ -4,7 +4,6 @@ const EVENTS = require('../socket-events');
 
 exports.getAchievements =  async (socket, data) =>{
     const achievements = await Achievement.find();
-    console.log(data.data)
     const user = await User.findById(data.data._id);
     const userAchievements = user.achievements;
     const modifiedAchievements = [];

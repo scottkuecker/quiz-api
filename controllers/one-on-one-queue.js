@@ -59,6 +59,7 @@ class PrivateQueueManager{
     constructor(){this.io = TOURNAMENT.getIO(); }
     
     addToQueue(user){
+        this.queue = this.queue.filter(useItem => useItem._id !== user._id);
         this.queue.push(user);
         this.generateMatches();
         this.checkForMatch();

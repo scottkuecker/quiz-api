@@ -312,6 +312,9 @@ exports.deleteQuestion = async (socket, data) =>{
     const root = data.data.roles.some(role => role === 'ADMIN')
     const questions = await Questions.find();
     const questionsByOthers = [];
+    if(!questions){
+        return socket.emit(EVENTS.DATABASE_CONNECTION_ERROR(), { event: EVENTS.DATABASE_CONNECTION_ERROR(), data: null })
+    }
     questions.forEach(q => {
         if (!root) {
             if (q._id.toString() === userId) {
