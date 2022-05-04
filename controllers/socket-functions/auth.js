@@ -1,19 +1,28 @@
 const User = require('../../db_models/user');
 const Achievements = require('../../db_models/achievement');
+const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const oneOnOneRoom = require('../../db_models/one-on-one');
 const EVENTS = require('../socket-events');
+var nodemailer = require('nodemailer');
+
+exports.randomValue = (len) => {
+    return crypto.randomBytes(Math.ceil(len / 2))
+        .toString('hex')
+        .slice(0, len).toUpperCase();
+}
 
 exports.signUp = async (socket, data) =>{
     const email = data.email;
     const password = data.password;
+    console.log(email, password)
     if(!password){
         return;
     }
     const user = await User.findOne({email: email});
     if(user){
-          return //allready exist
+          return socket.emit(EVENTS.EMAIL_ALLREADY_EXIST(), {event: EVENTS.EMAIL_ALLREADY_EXIST(), data: null})
     }
     const hashedPassword = await bcrypt.hash(password, 12);
     if(hashedPassword){
@@ -23,11 +32,11 @@ exports.signUp = async (socket, data) =>{
             reset_daily_price: Date.now() + 60 * 60 * 1000,
             roles: ['USER'],
             contributions: [],
+            activation_token: this.randomValue(20),
             questions: []
 
         });
-       user.save();
-       return socket.emit(EVENTS.REGISTER(), {event: EVENTS.REGISTER(), data: true})
+        sendEmail(socket, user)
     }
 }
 
@@ -36,7 +45,10 @@ exports.login = async (socket, data) => {
     const password = data.password;
     const userDoc = await User.findOne({ email: email });
     if (!userDoc) {
-        return;
+        return socket.emit(EVENTS.INCORRECT_LOGIN_DETAILS(), {event: EVENTS.INCORRECT_LOGIN_DETAILS(), data: null});
+    }
+    if (userDoc && !userDoc.account_activated){
+        return socket.emit(EVENTS.ACCOUNT_NOT_ACTIVATED(), { event: EVENTS.ACCOUNT_NOT_ACTIVATED(), data: null });
     }
         bcrypt.compare(password, userDoc.password).then(async doMatch =>{
             if (doMatch) {
@@ -59,7 +71,7 @@ exports.login = async (socket, data) => {
                 return socket.emit(EVENTS.LOGIN(), {event: EVENTS.LOGIN(), data: data})
 
             } else {
-                return socket.emit(EVENTS.AUTOLOGINFAILED(), { event: EVENTS.AUTOLOGINFAILED(), data: null })
+                return socket.emit(EVENTS.INCORRECT_LOGIN_DETAILS(), { event: EVENTS.INCORRECT_LOGIN_DETAILS(), data: null });
             }
         });
 }
@@ -67,7 +79,7 @@ exports.login = async (socket, data) => {
 exports.autoLogin = async (socket, data) => {
     const email = data.data.email;
     const user = await User.findOne({ email: email });
-    if (!user) {
+    if (!user || !user.account_activated) {
         socket.emit(EVENTS.AUTOLOGINFAILED(), { event: EVENTS.AUTOLOGINFAILED(), data: null })
         return;
     }
@@ -149,4 +161,45 @@ exports.takeDailyPrice = async (socket, data) =>{
     if(success){
         return socket.emit(EVENTS.DAILY_PRICE(), {event: EVENTS.DAILY_PRICE(), data: true})
     }
+}
+
+exports.activateUser = async (req, res, next) =>{
+   const token = req.token;
+   const user = User.findOne({ activation_token: token });
+   if(!user){
+       return res.render('activation_failed')
+   }
+   user.account_activated = true;
+   await user.save();
+   return res.render('activated');
+}
+
+
+function sendEmail(socket, user){
+    var transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: 'kviz.live@gmail.com',
+            pass: process.env.EMAIL_PASSWORD
+        }
+    });
+
+    var mailOptions = {
+        from: 'kviz-live@gmail.com',
+        to: user.email,
+        subject: 'PASSWORD CONFIRMATION',
+        html: `
+            <h1>Registration successfull</h1>
+            <p>Click <a href="127.0.0.1/activate/${user.activation_token}">HERE</a> to activate your account</p>
+        `
+    };
+
+    transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+            return socket.emit(EVENTS.ERROR_CREATING_ACCOUNT(), { event: EVENTS.ERROR_CREATING_ACCOUNT(), data: false })
+        } else {
+            user.save();
+            return socket.emit(EVENTS.REGISTER(), { event: EVENTS.REGISTER(), data: true })
+        }
+    });
 }

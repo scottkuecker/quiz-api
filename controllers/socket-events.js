@@ -320,11 +320,39 @@ exports.AUTOLOGIN_AVAILABLE = () => 'AUTOLOGIN_AVAILABLE';
 exports.LOGIN = () => 'LOGIN';
 
 /**
+* @description Emits incorect login details
+* @common_data_to_send {event: 'INCORRECT_LOGIN_DETAILS', data: null}
+* @returns EVENT STRING
+*/
+exports.INCORRECT_LOGIN_DETAILS = () => 'INCORRECT_LOGIN_DETAILS';
+
+/**
+* @description Emits incorect login details
+* @common_data_to_send {event: 'EMAIL_ALLREADY_EXIST', data: null}
+* @returns EVENT STRING
+*/
+exports.EMAIL_ALLREADY_EXIST = () => 'EMAIL_ALLREADY_EXIST';
+
+/**
+* @description Emits account not yet activated
+* @common_data_to_send {event: 'ACCOUNT_NOT_ACTIVATED', data: null}
+* @returns EVENT STRING
+*/
+exports.ACCOUNT_NOT_ACTIVATED = () => 'ACCOUNT_NOT_ACTIVATED';
+
+/**
 * @description Emits register requests
 * @common_data_to_send {event: 'REGISTER', data: boolean}
 * @returns EVENT STRING
 */
 exports.REGISTER = () => 'REGISTER';
+
+/**
+* @description Emits error on account creation
+* @common_data_to_send {event: 'ERROR_CREATING_ACCOUNT', data: null}
+* @returns EVENT STRING
+*/
+exports.ERROR_CREATING_ACCOUNT = () => 'ERROR_CREATING_ACCOUNT';
 
 /**
 * @description Emits failed autologin
